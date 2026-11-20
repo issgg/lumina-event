@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lumina Event | Catálogo</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body data-pagina="catalogo">
+  <header class="encabezado">
+    <div class="contenedor navegacion">
+      <a class="logo" href="index.html">Lumina Event</a>
+      <nav data-menu aria-label="Navegación principal"></nav>
+    </div>
+  </header>
+
+  <main class="seccion">
+    <div class="contenedor">
+      <h1>Catálogo de servicios</h1>
+      <p id="contador-evento" aria-live="polite"></p>
+
+      <div class="filtros">
+        <div class="campo">
+          <label for="filtro-categoria">Categoría</label>
+          <select id="filtro-categoria" name="categoria"></select>
+        </div>
+        <div class="campo">
+          <label for="buscar-servicio">Buscar servicio</label>
+          <input type="search" id="buscar-servicio" name="busqueda" maxlength="60" placeholder="Ej. DJ, pastel, salón">
+        </div>
+        <div class="acciones">
+          <button type="button" class="boton boton-secundario" id="btn-limpiar">Limpiar filtros</button>
+          <button type="button" class="boton boton-secundario" id="btn-reintentar">Reintentar carga</button>
+        </div>
+      </div>
+
+      <p id="estado-catalogo" class="aviso" role="status" aria-live="polite"></p>
+      <p id="aviso-catalogo" class="aviso" role="status" aria-live="polite"></p>
+
+      <div class="rejilla" id="rejilla-catalogo"></div>
+      <p><a class="boton" href="armador.html">Ir al armador</a></p>
+    </div>
+  </main>
+
+  <footer class="pie">
+    <p>Lumina Event · Proyecto de Aplicaciones Web · 2026</p>
+  </footer>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
