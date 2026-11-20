@@ -11,6 +11,7 @@ Guía para responder "¿dónde vive esto?" sin explicar línea por línea.
 | La definición de las 8 tablas | `db/schema.sql` | `CREATE TABLE` |
 | SQLite en el navegador | `js/base-datos.js`, `vendor/sql-wasm.js` | `inicializarBase()` |
 | La base guardada entre recargas | `localStorage` | clave `lumina.db.v1` |
+| Ver tablas en la consola | `js/base-datos.js` | `window.luminaDB.consultar(sql)` |
 | Las categorías del catálogo y sus nombres | `data/config.js` | `CATEGORIAS` |
 | La carga del catálogo y el estado "Cargando" | `js/catalogo.js` | `cargarCatalogo` (llama a SQL) |
 | La búsqueda y el filtro por categoría | `js/catalogo.js` | `filtrarServicios` |

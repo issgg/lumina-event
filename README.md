@@ -24,7 +24,7 @@ No incluye: pagos reales, contratos, facturación ni confirmaciones externas.
 
 HTML5 semántico, CSS (Flexbox, Grid, media queries, `:focus-visible`), JavaScript ES6 (`fetch`, `async/await`, módulos), **SQLite real ejecutado en el navegador con sql.js (WASM)**, GitHub Pages. `db/schema.sql` se ejecuta tal cual; la base se exporta y se guarda en `localStorage` con la clave `lumina.db.v1` para que sobreviva recargas. `data/catalogo.json` solo se usa para sembrar las tablas la primera vez.
 
-Para ver los datos: **F12 → Application → Local Storage → clave `lumina.db.v1`** (base exportada en base64), o abre `db/schema.sql` y `data/catalogo.json` en el editor. Las pruebas ejecutan el mismo SQL con `node --test tests/*.test.js`.
+Para ver los datos: **F12 → Application → Local Storage → clave `lumina.db.v1`** (base exportada en base64). Para consultar tablas en la consola: `luminaDB.consultar("SELECT * FROM eventos")` o `luminaDB.servicios()`. Las pruebas ejecutan el mismo SQL con `node --test tests/*.test.js`.
 
 ## Cómo ejecutarlo
 

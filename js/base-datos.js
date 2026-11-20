@@ -108,6 +108,7 @@ export async function inicializarBase() {
 
   if (guardado) {
     base = new SQL.Database(deBase64(guardado));
+    exponerDepuracion();
     return base;
   }
 
@@ -115,7 +116,17 @@ export async function inicializarBase() {
   base.run(await obtenerTexto("db/schema.sql"));
   await sembrarBase();
   persistirBase();
+  exponerDepuracion();
   return base;
+}
+
+function exponerDepuracion() {
+  if (typeof window === "undefined") return;
+  window.luminaDB = {
+    consultar: (sql, parametros = []) => filas(base.exec(sql, parametros)),
+    servicios: consultarServicios,
+    cronograma: consultarCronograma
+  };
 }
 
 export function consultarServicios() {
