@@ -1,0 +1,134 @@
+{
+  "servicios": [
+    {
+      "id": "salon-eleganza",
+      "categoria": "salones",
+      "nombre": "Salón Eleganza",
+      "proveedor": "Grupo Eleganza",
+      "precio": 20000,
+      "descripcion": "Salón principal para 200 personas con pista de baile y jardín.",
+      "direccion": "Ensenada, Baja California",
+      "capacidad": 200,
+      "imagen": "assets/img/salon.svg"
+    },
+    {
+      "id": "salon-jardin",
+      "categoria": "salones",
+      "nombre": "Jardín Las Palmas",
+      "proveedor": "Eventos Costa",
+      "precio": 14500,
+      "descripcion": "Espacio abierto para 120 invitados, ideal para bodas al atardecer.",
+      "direccion": "Ensenada, Baja California",
+      "capacidad": 120,
+      "imagen": "assets/img/salon.svg"
+    },
+    {
+      "id": "comida-banquete",
+      "categoria": "comida",
+      "nombre": "Banquete completo",
+      "proveedor": "Cocina del Puerto",
+      "precio": 18000,
+      "descripcion": "Menú de tres tiempos para 120 personas con servicio de mesa.",
+      "imagen": "assets/img/comida.svg"
+    },
+    {
+      "id": "comida-catering",
+      "categoria": "comida",
+      "nombre": "Catering ligero",
+      "proveedor": "Sabores del Valle",
+      "precio": 9500,
+      "descripcion": "Bocadillos y bebidas para 100 invitados.",
+      "imagen": "assets/img/comida.svg"
+    },
+    {
+      "id": "mobiliario-basico",
+      "categoria": "mobiliario",
+      "nombre": "Mesas y sillas",
+      "proveedor": "Rentas Norte",
+      "precio": 7000,
+      "descripcion": "15 mesas redondas, 150 sillas y manteles a juego.",
+      "imagen": "assets/img/mobiliario.svg"
+    },
+    {
+      "id": "mobiliario-carpas",
+      "categoria": "mobiliario",
+      "nombre": "Carpa y vajilla",
+      "proveedor": "Rentas Norte",
+      "precio": 5200,
+      "descripcion": "Carpa para 80 personas, vajilla y cristalería.",
+      "imagen": "assets/img/mobiliario.svg"
+    },
+    {
+      "id": "musica-dj",
+      "categoria": "musica",
+      "nombre": "DJ y sonido",
+      "proveedor": "Sonido Ultra",
+      "precio": 8000,
+      "descripcion": "DJ, bocinas, iluminación y prueba de audio antes del evento.",
+      "imagen": "assets/img/musica.svg"
+    },
+    {
+      "id": "musica-grupo",
+      "categoria": "musica",
+      "nombre": "Grupo en vivo",
+      "proveedor": "Sonido Ultra",
+      "precio": 11500,
+      "descripcion": "Cuarteto musical con equipo de sonido incluido.",
+      "imagen": "assets/img/musica.svg"
+    },
+    {
+      "id": "decoracion-tematic",
+      "categoria": "decoracion",
+      "nombre": "Decoración temática",
+      "proveedor": "Estudio Flores",
+      "precio": 12000,
+      "descripcion": "Centros de mesa, globos, flores y mesa principal.",
+      "imagen": "assets/img/decoracion.svg"
+    },
+    {
+      "id": "decoracion-luces",
+      "categoria": "decoracion",
+      "nombre": "Iluminación decorativa",
+      "proveedor": "Estudio Flores",
+      "precio": 4300,
+      "descripcion": "Luces cálidas, cortinas y fondo para fotografías.",
+      "imagen": "assets/img/decoracion.svg"
+    },
+    {
+      "id": "foto-paquete",
+      "categoria": "fotografia",
+      "nombre": "Fotografía y video",
+      "proveedor": "Lente Estudio",
+      "precio": 6000,
+      "descripcion": "Fotógrafo, video, sesión previa y 200 fotografías editadas.",
+      "imagen": "assets/img/fotografia.svg"
+    },
+    {
+      "id": "foto-cabina",
+      "categoria": "fotografia",
+      "nombre": "Cabina de fotos",
+      "proveedor": "Lente Estudio",
+      "precio": 3500,
+      "descripcion": "Cabina automática con impresiones para los invitados.",
+      "imagen": "assets/img/fotografia.svg"
+    },
+    {
+      "id": "detalle-pastel",
+      "categoria": "detalles",
+      "nombre": "Pastel e invitaciones",
+      "proveedor": "Dulce Momento",
+      "precio": 2800,
+      "descripcion": "Pastel para 120 personas e invitaciones impresas.",
+      "imagen": "assets/img/detalles.svg"
+    },
+    {
+      "id": "seguridad-basica",
+      "categoria": "seguridad",
+      "nombre": "Seguridad del evento",
+      "proveedor": "Proteger",
+      "precio": 3900,
+      "descripcion": "Cuatro personas de seguridad y control de acceso.",
+      "imagen": "assets/img/seguridad.svg"
+    }
+  ]
+}

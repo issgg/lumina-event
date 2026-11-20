@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" role="img" aria-label="Decoración floral">
+  <rect width="400" height="240" fill="#f7e9ef"/>
+  <rect x="180" y="130" width="40" height="80" rx="8" fill="#b98a9e"/>
+  <circle cx="200" cy="105" r="28" fill="#e8a0b8"/>
+  <circle cx="165" cy="115" r="22" fill="#f0b8cb"/>
+  <circle cx="235" cy="115" r="22" fill="#f0b8cb"/>
+  <circle cx="200" cy="75" r="20" fill="#e8a0b8"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" role="img" aria-label="Mesas y sillas">
+  <rect width="400" height="240" fill="#f1ebe2"/>
+  <circle cx="130" cy="120" r="55" fill="#c99b6b"/>
+  <rect x="105" y="115" width="50" height="12" fill="#fffaf3"/>
+  <circle cx="270" cy="120" r="55" fill="#c99b6b"/>
+  <rect x="245" y="115" width="50" height="12" fill="#fffaf3"/>
+  <rect x="120" y="185" width="14" height="40" fill="#8c6239"/>
+  <rect x="266" y="185" width="14" height="40" fill="#8c6239"/>
+</svg>
