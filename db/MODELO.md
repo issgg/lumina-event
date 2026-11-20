@@ -35,4 +35,9 @@ Ocho tablas. Este archivo explica el modelo; `schema.sql` contiene la definició
 
 ## Cómo se refleja en la app
 
-GitHub Pages no ejecuta base de datos. El `schema.sql` documenta el modelo real y la app usa la misma forma en `localStorage`: `lumina.evento.v1` guarda el evento con su arreglo de detalles y su cronograma calculado. Por eso el armador tipo carrito corresponde a `detalle_evento`.
+GitHub Pages no ejecuta un servidor de base de datos, pero la app usa **SQLite real dentro del navegador** con sql.js (WASM). `inicializarBase()` en `js/base-datos.js` ejecuta este mismo `schema.sql`, siembra `categorias`, `proveedores`, `salones` y `servicios` desde `data/catalogo.json`, y guarda la base exportada en `localStorage` con la clave `lumina.db.v1`.
+
+- Guardar el evento = `INSERT`/`UPDATE` en `eventos` + `detalle_evento` + `cronograma`.
+- Recargar = reabrir la base exportada desde `localStorage`.
+- El armador tipo carrito corresponde a `detalle_evento`; el `UNIQUE (evento_id, servicio_id)` evita duplicados por doble clic.
+- `node --test tests/*.test.js` ejecuta el esquema y las consultas con SQLite real.

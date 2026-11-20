@@ -1,4 +1,5 @@
 import { MENSAJES, mostrarMensaje } from "./errores.js";
+import { consultarServicios } from "./base-datos.js";
 
 export function normalizar(texto) {
   return String(texto ?? "")
@@ -10,12 +11,10 @@ export function normalizar(texto) {
 export async function cargarCatalogo() {
   mostrarMensaje("estado-catalogo", MENSAJES.cargando);
   try {
-    const respuesta = await fetch("data/catalogo.json");
-    if (!respuesta.ok) throw new Error(`HTTP ${respuesta.status}`);
-    const datos = await respuesta.json();
-    if (!Array.isArray(datos.servicios)) throw new Error("formato inválido");
+    const servicios = consultarServicios();
+    if (!Array.isArray(servicios)) throw new Error("formato inválido");
     mostrarMensaje("estado-catalogo", "Catálogo listo.", "ok");
-    return datos.servicios;
+    return servicios;
   } catch {
     mostrarMensaje("estado-catalogo", MENSAJES.errorCarga, "error");
     return null;

@@ -8,7 +8,7 @@ Abrir la versión desplegada y seguir el camino feliz:
 2. `catalogo.html` → filtrar por categoría, buscar, agregar salón y 4 servicios.
 3. `armador.html` → llenar datos, ver cantidades y total, guardar.
 4. `resumen.html` → ver el desglose y la tabla del cronograma.
-5. Recargar y mostrar que el evento se recuperó.
+5. Recargar y mostrar que el evento se recuperó desde SQLite (F12 → Local Storage → `lumina.db.v1`).
 
 Después el maestro pide un caso límite: ir a `PRUEBAS.md`, aplicarlo y mostrar el mensaje claro.
 

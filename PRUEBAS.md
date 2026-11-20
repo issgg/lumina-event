@@ -11,8 +11,9 @@ Antes de entregar, ejecutar cada caso y marcarlo. Si algo falla, debe fallar con
 | 5 | Buscar algo que no existe | `catalogo.html` → buscar `zzzz` | "No encontramos 'zzzz'. Prueba otra categoría" y botón limpiar | [ ] |
 | 6 | Doble clic en guardar | `armador.html` → dos clics rápidos | Botón deshabilitado; el servicio no se duplica; mensaje "Ya está en tu evento" | [ ] |
 | 7 | Recargar a mitad del proceso | Llenar, agregar servicios y recargar | Se restaura el borrador y avisa "Retomamos tu evento guardado" | [ ] |
-| 8 | API lenta o que no responde | `catalogo.html` sin servidor o con `catalogo.json` renombrado | "Cargando catálogo…" y luego error con botón Reintentar; sin consola rota | [ ] |
+| 8 | SQLite/WASM tarda o no carga | `catalogo.html` sin el archivo `vendor/sql-wasm.wasm` | "Cargando catálogo…" y luego error con botón Reintentar; sin pantalla en blanco ni consola rota | [ ] |
 | 9 | Lista vacía | `armador.html` → quitar todos los servicios | "Aún no agregaste servicios. Elige uno del catálogo" | [ ] |
+| 10 | Doble guardado con el mismo servicio | Agregar el mismo servicio dos veces y guardar | `UNIQUE (evento_id, servicio_id)` impide el duplicado en `detalle_evento` | [ ] |
 
 ## Cómo ejecutarlas rápido
 
@@ -20,14 +21,14 @@ Antes de entregar, ejecutar cada caso y marcarlo. Si algo falla, debe fallar con
 python3 -m http.server 8000
 ```
 
-Abrir `http://localhost:8000`. Para el caso 8, detener el servidor o renombrar temporalmente `data/catalogo.json`.
+Abrir `http://localhost:8000`. Para el caso 8, renombrar temporalmente `vendor/sql-wasm.wasm`. Para ver la base real: F12 → Application → Local Storage → `lumina.db.v1`.
 
 ## Pruebas automáticas de lógica
 
 ```bash
-npm test
+node --test tests/*.test.js
 ```
 
-No instala nada: usa `node:test`, incluido en Node. Cubre total, duplicados, cantidades, validación, filtro y cronograma. Resultado al 19/11/2026: **7 pruebas, 7 aprobadas**.
+No instala nada: usa `node:test`, incluido en Node. Cubre total, duplicados, cantidades, validación, filtro, cronograma y las 8 tablas SQLite reales. Resultado al 19/11/2026: **10 pruebas, 10 aprobadas**.
 
 También se verificó que todos los `id` usados por JavaScript existen en el HTML y que el servidor local devuelve 200 para páginas, JSON, CSS, JS e imágenes.

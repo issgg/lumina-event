@@ -1,6 +1,7 @@
 export const MENSAJES = {
   cargando: "Cargando catálogo…",
   errorCarga: "No se pudo cargar el catálogo. Revisa la conexión e intenta de nuevo.",
+  errorBase: "No se pudo iniciar la base de datos SQLite. Recarga la página o intenta de nuevo.",
   sinResultados: "No encontramos servicios con ese nombre. Prueba otra categoría.",
   listaVacia: "Aún no agregaste servicios. Elige uno del catálogo.",
   yaAgregado: "Ya está en tu evento.",

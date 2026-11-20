@@ -22,7 +22,9 @@ No incluye: pagos reales, contratos, facturación ni confirmaciones externas.
 
 ## Tecnologías
 
-HTML5 semántico, CSS (Flexbox, Grid, media queries, `:focus-visible`), JavaScript ES6 (`fetch`, `async/await`, módulos), JSON local, `localStorage` y GitHub Pages. El diseño relacional SQL está documentado en `db/`.
+HTML5 semántico, CSS (Flexbox, Grid, media queries, `:focus-visible`), JavaScript ES6 (`fetch`, `async/await`, módulos), **SQLite real ejecutado en el navegador con sql.js (WASM)**, GitHub Pages. `db/schema.sql` se ejecuta tal cual; la base se exporta y se guarda en `localStorage` con la clave `lumina.db.v1` para que sobreviva recargas. `data/catalogo.json` solo se usa para sembrar las tablas la primera vez.
+
+Para ver los datos: **F12 → Application → Local Storage → clave `lumina.db.v1`** (base exportada en base64), o abre `db/schema.sql` y `data/catalogo.json` en el editor. Las pruebas ejecutan el mismo SQL con `node --test tests/*.test.js`.
 
 ## Cómo ejecutarlo
 
@@ -38,9 +40,10 @@ Después abre `http://localhost:8000`. Se necesita servidor porque el catálogo 
 |---|---|
 | `index.html`, `eventos.html`, `catalogo.html`, `armador.html`, `resumen.html`, `admin.html` | Páginas del sitio |
 | `css/` | Estilos base y componentes |
-| `js/` | Lógica: navegación, catálogo, carrito, cronograma, validación, almacenamiento, errores |
-| `data/` | Catálogo JSON y configuración de menú, categorías y reglas |
-| `db/` | Modelo ER y `schema.sql` |
+| `js/` | Lógica: base de datos SQL, navegación, catálogo, carrito, cronograma, validación, almacenamiento, errores |
+| `data/` | Catálogo JSON de siembra y configuración de menú, categorías y reglas |
+| `db/` | Modelo ER y `schema.sql` ejecutado por la app |
+| `vendor/` | `sql-wasm.js` y `sql-wasm.wasm` (SQLite en el navegador) |
 | `MAPA.md`, `GUIÓN.md`, `BITÁCORA.md`, `PRUEBAS.md`, `KIT-VIVO.md` | Material de la presentación |
 
 Deploy: pendiente de configurar en Settings → Pages → `main / root`.

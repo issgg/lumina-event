@@ -14,12 +14,14 @@ CREATE TABLE proveedores (
 
 CREATE TABLE categorias (
     id INTEGER PRIMARY KEY,
+    clave VARCHAR(20) NOT NULL UNIQUE,
     nombre VARCHAR(40) NOT NULL UNIQUE,
     descripcion VARCHAR(160)
 );
 
 CREATE TABLE salones (
     id INTEGER PRIMARY KEY,
+    clave VARCHAR(40) NOT NULL UNIQUE,
     proveedor_id INTEGER NOT NULL,
     nombre VARCHAR(80) NOT NULL,
     direccion VARCHAR(160) NOT NULL,
@@ -32,6 +34,7 @@ CREATE TABLE salones (
 
 CREATE TABLE servicios (
     id INTEGER PRIMARY KEY,
+    clave VARCHAR(40) NOT NULL UNIQUE,
     categoria_id INTEGER NOT NULL,
     proveedor_id INTEGER NOT NULL,
     nombre VARCHAR(80) NOT NULL,

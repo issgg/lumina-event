@@ -1,4 +1,5 @@
 import { CATEGORIAS, TIPOS_EVENTO, HORA_INICIO_PREDETERMINADA } from "../data/config.js";
+import { inicializarBase } from "./base-datos.js";
 import { renderizarMenu } from "./navegacion.js";
 import { cargarCatalogo, filtrarServicios, renderizarTarjetas, formatearMoneda } from "./catalogo.js";
 import { agregarServicio, quitarServicio, cambiarCantidad, calcularTotal, agruparPorCategoria } from "./carrito.js";
@@ -30,7 +31,7 @@ function todosLosServicios() {
 
 async function cargarServicios() {
   serviciosBase = (await cargarCatalogo()) ?? [];
-  serviciosExtras = leerServiciosExtra();
+  serviciosExtras = [];
   return todosLosServicios();
 }
 
@@ -354,6 +355,12 @@ async function configurarAdmin() {
 document.addEventListener("DOMContentLoaded", async () => {
   renderizarMenu();
   const pagina = document.body.dataset.pagina;
+  try {
+    await inicializarBase();
+  } catch {
+    mostrarMensaje(AVISOS[pagina], MENSAJES.errorBase, "error");
+    return;
+  }
   if (pagina === "catalogo") await configurarCatalogo();
   if (pagina === "armador") await configurarArmador();
   if (pagina === "resumen") configurarResumen();
