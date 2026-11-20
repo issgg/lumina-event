@@ -28,4 +28,6 @@ Abrir `http://localhost:8000`. Para el caso 8, detener el servidor o renombrar t
 npm test
 ```
 
-No instala nada: usa `node:test`, incluido en Node. Cubre total, duplicados, cantidades, validación, filtro y cronograma.
+No instala nada: usa `node:test`, incluido en Node. Cubre total, duplicados, cantidades, validación, filtro y cronograma. Resultado al 19/11/2026: **7 pruebas, 7 aprobadas**.
+
+También se verificó que todos los `id` usados por JavaScript existen en el HTML y que el servidor local devuelve 200 para páginas, JSON, CSS, JS e imágenes.
