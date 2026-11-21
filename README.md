@@ -48,6 +48,7 @@ La organización es la misma idea del proyecto Pokédex: `src/api` para traer da
 ```text
 LuminaEvent/
 ├─ .env.example
+├─ .env.production
 ├─ .github/workflows/pages.yml
 ├─ index.html
 ├─ vite.config.js
@@ -104,13 +105,12 @@ luminaDB.tablas()
 
 El workflow `.github/workflows/pages.yml` compila y publica `dist/` en GitHub Pages en cada push a `main`. También se puede lanzar desde **Actions → Desplegar pagina → Run workflow**.
 
+El build usa `.env.production` con la URL y la `publishable key` de Supabase. Esa key es pública y viaja en el bundle del navegador; nunca se pone `service_role`.
+
 Para activarlo:
 
 1. En GitHub, entrar a **Settings → Pages**.
 2. Elegir **Source: GitHub Actions**.
-3. En **Settings → Secrets and variables → Actions → New repository secret**, agregar:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
-4. Hacer push a `main` o ejecutar el workflow manualmente.
+3. Hacer push a `main` o ejecutar el workflow manualmente.
 
-La URL será `https://issgg.github.io/lumina-event/`. El `base: "./"` de `vite.config.js` permite que funcione en una URL de proyecto. Las variables `VITE_SUPABASE_*` deben existir **antes de compilar**, por eso se configuran como Secrets del workflow.
+La URL será `https://issgg.github.io/lumina-event/`. El `base: "./"` de `vite.config.js` permite que funcione en una URL de proyecto. Las variables `VITE_SUPABASE_*` deben existir **antes de compilar**, por eso están en `.env.production`.
