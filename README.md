@@ -102,7 +102,7 @@ luminaDB.tablas()
 
 ## Deploy
 
-El workflow `.github/workflows/pages.yml` compila y publica `dist/` en GitHub Pages en cada push a `main`.
+El workflow `.github/workflows/pages.yml` compila y publica `dist/` en GitHub Pages en cada push a `main`. También se puede lanzar desde **Actions → Desplegar pagina → Run workflow**.
 
 Para activarlo:
 
