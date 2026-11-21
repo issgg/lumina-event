@@ -14,7 +14,7 @@ export default function TarjetaServicio({ servicio, agregado, onAgregar }) {
         <p>{servicio.descripcion}</p>
         <p className="proveedor">{servicio.proveedor}</p>
         <p className="precio">{formatearMoneda(servicio.precio)}</p>
-        <button type="button" className="boton" onClick={() => onAgregar(servicio)} disabled={agregado}>
+        <button type="button" className="boton boton-tarjeta" onClick={() => onAgregar(servicio)} disabled={agregado}>
           {agregado ? "En tu evento" : "Agregar"}
         </button>
       </div>

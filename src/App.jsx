@@ -119,7 +119,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout aviso={aviso} sesion={sesion} onCerrarSesion={salir} />}>
-        <Route index element={<Inicio />} />
+        <Route index element={<Inicio evento={evento} />} />
         <Route
           path="catalogo"
           element={<Catalogo evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}

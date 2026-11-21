@@ -30,17 +30,35 @@ export default function Resumen({ evento, onActualizar, setAviso }) {
         <div>
           <p className="etiqueta">Paso 3</p>
           <h1>Resumen del evento</h1>
-          <p>{evento.nombre || "Sin nombre"} · {evento.tipoEvento || "Tipo sin definir"} · {evento.fecha || "Fecha sin definir"}</p>
+          <p>
+            {evento.nombre || "Sin nombre"} · {evento.tipoEvento || "Tipo sin definir"} ·{" "}
+            {evento.fecha || "Fecha sin definir"}
+          </p>
         </div>
         <div className="acciones-hero">
           <button type="button" className="boton" onClick={() => onActualizar(evento, MENSAJES.guardado)}>
-            Guardar en la base
+            Guardar evento
           </button>
           <button type="button" className="boton boton-peligro" onClick={reiniciar}>
             Reiniciar
           </button>
         </div>
       </header>
+
+      <div className="resumen-metricas">
+        <div className="metrica">
+          <span>Servicios</span>
+          <strong>{evento.detalles.length}</strong>
+        </div>
+        <div className="metrica">
+          <span>Categorías</span>
+          <strong>{agruparPorCategoria(evento.detalles).length}</strong>
+        </div>
+        <div className="metrica metrica-total">
+          <span>Total final</span>
+          <strong>{formatearMoneda(calcularTotal(evento.detalles))}</strong>
+        </div>
+      </div>
 
       <div className="panel">
         <h2>Servicios seleccionados</h2>

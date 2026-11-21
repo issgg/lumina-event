@@ -25,6 +25,9 @@ export default function Layout({ aviso, sesion, onCerrarSesion }) {
             ))}
           </nav>
           <div className="usuario">
+            <span className="usuario-avatar" aria-hidden="true">
+              {correo.charAt(0).toUpperCase()}
+            </span>
             <span title={correo}>{correo}</span>
             <button type="button" className="boton-texto" onClick={onCerrarSesion}>
               Salir
