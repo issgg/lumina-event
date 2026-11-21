@@ -6,9 +6,7 @@ import { CATEGORIAS } from "../api/configuracion.js";
 import { agruparPorCategoria, calcularTotal } from "../logica/carrito.js";
 import { generarCronograma } from "../logica/cronograma.js";
 import { formatearMoneda } from "../logica/formato.js";
-import { estadoPresupuesto, evaluarCobertura } from "../logica/paquete.js";
 import { formatearNumeroTarjeta, validarPago } from "../logica/pago.js";
-import Guia from "./guia.jsx";
 
 const FORMULARIO_VACIO = { titular: "", numero: "", vencimiento: "", cvv: "" };
 
@@ -27,9 +25,7 @@ export default function Pago({ evento, onActualizar }) {
   const [confirmado, setConfirmado] = useState(null);
 
   const total = calcularTotal(evento.detalles);
-  const presupuesto = estadoPresupuesto(evento.presupuesto, total);
   const grupos = agruparPorCategoria(evento.detalles);
-  const cobertura = evaluarCobertura(evento.detalles);
   const cronograma = generarCronograma(evento.detalles, evento.horaInicio);
   const salon = cargarServicios().find((servicio) => servicio.id === evento.salonId);
   const eventoConfirmado = confirmado?.evento ?? evento;
@@ -58,9 +54,8 @@ export default function Pago({ evento, onActualizar }) {
   if (evento.detalles.length === 0) {
     return (
       <section className="pagina">
-        <Guia paso={5} evento={evento} />
         <div className="vacio vacio-destacado">
-          <p className="etiqueta">Paso 05 · Pago simulado</p>
+          <p className="etiqueta">Compra simulada</p>
           <h1>Tu paquete todavía está vacío.</h1>
           <p>Agrega un salón y algunos servicios antes de ver cómo quedaría el pago.</p>
           <Link className="boton" to="/salon">
@@ -73,32 +68,13 @@ export default function Pago({ evento, onActualizar }) {
 
   return (
     <section className="pagina pago-pagina">
-      <Guia paso={5} evento={evento} confirmado={Boolean(confirmado)} />
-
-      <header className="titulo-pagina titulo-pagina-destacado">
+      <header className="titulo-pagina">
         <div>
-          <p className="etiqueta">Paso 05 · Cierre</p>
-          <h1>Así se vería tu compra.</h1>
-          <p>
-            Revisa el desglose, simula el pago y obtén un comprobante de ejemplo. No se cobra ni se guarda ningún dato
-            bancario.
-          </p>
-        </div>
-        <div className="sello-paso" aria-hidden="true">
-          <span>05</span>
-          <small>Pago</small>
+          <p className="etiqueta">Compra simulada</p>
+          <h1>Así quedaría tu compra.</h1>
+          <p>Genera un comprobante de ejemplo. No se cobra nada ni se guardan datos bancarios.</p>
         </div>
       </header>
-
-      <div className="pago-aviso" role="note">
-        <span className="pago-aviso-icono" aria-hidden="true">
-          !
-        </span>
-        <div>
-          <strong>Simulación de compra</strong>
-          <p>Usa la tarjeta de prueba 4242 4242 4242 4242. El pago no es real y no se procesa con ningún banco.</p>
-        </div>
-      </div>
 
       {confirmado ? (
         <section className="ticket" role="status" aria-live="polite">
@@ -164,7 +140,7 @@ export default function Pago({ evento, onActualizar }) {
 
           <footer className="ticket-pie">
             <p>Comprobante generado el {confirmado.fecha}. Solo corresponde a una simulación.</p>
-            <div className="acciones-hero">
+            <div className="acciones-principales">
               <Link className="boton" to="/">
                 Volver al inicio
               </Link>
@@ -177,19 +153,12 @@ export default function Pago({ evento, onActualizar }) {
       ) : (
         <div className="paneles pago-paneles">
           <form className="panel pago-formulario" onSubmit={confirmar} noValidate>
-            <div className="pago-tarjeta" aria-hidden="true">
-              <div className="pago-tarjeta-top">
-                <span>Lumina Event</span>
-                <span className="pago-chip"></span>
-              </div>
-              <strong>{formulario.numero || "0000 0000 0000 0000"}</strong>
-              <div className="pago-tarjeta-bottom">
-                <span>{formulario.titular || "NOMBRE DEL TITULAR"}</span>
-                <span>{formulario.vencimiento || "MM/AA"}</span>
-              </div>
+            <div className="pago-total">
+              <span>Total de tu paquete</span>
+              <strong>{formatearMoneda(total)}</strong>
             </div>
 
-            <h2>Datos de pago simulado</h2>
+            <h2>Datos de pago</h2>
             <div className="formulario pago-campos">
               <label className="completo">
                 Nombre del titular
@@ -253,13 +222,15 @@ export default function Pago({ evento, onActualizar }) {
               </label>
             </div>
             <button type="submit" className="boton boton-completo">
-              Confirmar pago simulado · {formatearMoneda(total)}
+              Generar comprobante
             </button>
-            <p className="pago-nota">No guardamos estos datos. La tarjeta de prueba es la única recomendada.</p>
+            <p className="pago-nota">
+              Usa la tarjeta de prueba <strong>4242 4242 4242 4242</strong>. No guardamos estos datos.
+            </p>
           </form>
 
           <aside className="panel pago-resumen">
-            <p className="etiqueta">Tu paquete</p>
+            <p className="etiqueta">Resumen</p>
             <h2>{evento.nombre || "Evento sin nombre"}</h2>
             <p className="subtitulo">
               {evento.tipoEvento || "Tipo sin definir"} · {evento.fecha || "Fecha sin definir"} ·{" "}
@@ -277,40 +248,14 @@ export default function Pago({ evento, onActualizar }) {
               ))}
             </dl>
 
-            <div className={`presupuesto-estado ${presupuesto.estado}`}>
-              <span>{presupuesto.estado === "excedido" ? "Supera tu presupuesto" : "Dentro de tu presupuesto"}</span>
-              <strong>{formatearMoneda(presupuesto.diferencia)}</strong>
-              <small>
-                {presupuesto.estado === "excedido"
-                  ? "Puedes volver al catálogo y ajustar servicios."
-                  : presupuesto.estado === "sin-definir"
-                    ? "Define un presupuesto para comparar."
-                    : "Te quedaría este margen para detalles."}
-              </small>
-            </div>
-
-            <ul className="cobertura-lista">
-              {cobertura.map((item) => (
-                <li key={item.categoria} className={item.completo ? "completo" : "faltante"}>
-                  <span aria-hidden="true">{item.completo ? "✓" : "+"}</span>
-                  {nombreCategoria(item.categoria)}
-                </li>
-              ))}
-            </ul>
-
             <div className="total">
               <span>Total a pagar</span>
               <strong>{formatearMoneda(total)}</strong>
             </div>
 
-            <div className="acciones-hero">
-              <Link className="boton-texto" to="/catalogo">
-                Agregar servicios
-              </Link>
-              <Link className="boton-texto" to="/resumen">
-                Ver desglose completo
-              </Link>
-            </div>
+            <Link className="boton-texto" to="/resumen">
+              Ver desglose completo
+            </Link>
           </aside>
         </div>
       )}

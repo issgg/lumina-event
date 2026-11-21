@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NavLink, Outlet } from "react-router";
+import { Link, NavLink, Outlet } from "react-router";
 import { NAVEGACION } from "../api/configuracion.js";
 
 export default function Layout({ aviso, sesion, onCerrarSesion }) {
@@ -66,6 +66,9 @@ export default function Layout({ aviso, sesion, onCerrarSesion }) {
 
       <footer className="pie">
         <p>Lumina Event</p>
+        <Link className="pie-enlace" to="/administrar">
+          Administrar
+        </Link>
       </footer>
     </div>
   );

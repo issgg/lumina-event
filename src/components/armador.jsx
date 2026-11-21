@@ -2,18 +2,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 
 import { TIPOS_EVENTO } from "../api/configuracion.js";
-import {
-  calcularTotal,
-  cambiarCantidad,
-  quitarServicio,
-} from "../logica/carrito.js";
 import { formatearMoneda } from "../logica/formato.js";
 import { MENSAJES } from "../logica/mensajes.js";
 import { validarDatosEvento } from "../logica/validacion.js";
-import Guia from "./guia.jsx";
 
 const CAMPOS = [
-  { clave: "nombre", etiqueta: "Nombre", tipo: "text", maxLength: 60 },
+  { clave: "nombre", etiqueta: "Nombre del evento", tipo: "text", maxLength: 60 },
   { clave: "tipoEvento", etiqueta: "Tipo de evento", tipo: "select" },
   { clave: "fecha", etiqueta: "Fecha", tipo: "date" },
   { clave: "invitados", etiqueta: "Invitados", tipo: "number", min: 1, max: 10000 },
@@ -30,7 +24,6 @@ export default function Armador({ evento, onActualizar, setAviso }) {
     invitados: String(evento.invitados ?? ""),
     presupuesto: String(evento.presupuesto ?? ""),
     horaInicio: evento.horaInicio,
-    salonId: evento.salonId,
   }));
   const [errores, setErrores] = useState({});
   const [guardando, setGuardando] = useState(false);
@@ -64,14 +57,6 @@ export default function Armador({ evento, onActualizar, setAviso }) {
     }
   }
 
-  function cambiarCantidadServicio(id, delta) {
-    onActualizar({ ...evento, detalles: cambiarCantidad(evento.detalles, id, delta) });
-  }
-
-  function quitar(id) {
-    onActualizar({ ...evento, detalles: quitarServicio(evento.detalles, id) }, MENSAJES.eliminado);
-  }
-
   function campo(campoConfig) {
     const { clave, etiqueta, tipo } = campoConfig;
     const comun = {
@@ -84,20 +69,27 @@ export default function Armador({ evento, onActualizar, setAviso }) {
 
     let control;
     if (tipo === "select") {
-      const opciones = TIPOS_EVENTO;
-      const valores = TIPOS_EVENTO;
       control = (
         <select {...comun}>
           <option value="">Selecciona una opción</option>
-          {opciones.map((opcion, indice) => (
-            <option key={valores[indice]} value={valores[indice]}>
+          {TIPOS_EVENTO.map((opcion) => (
+            <option key={opcion} value={opcion}>
               {opcion}
             </option>
           ))}
         </select>
       );
     } else {
-      control = <input {...comun} type={tipo} maxLength={campoConfig.maxLength} min={campoConfig.min} max={campoConfig.max} step={campoConfig.step} />;
+      control = (
+        <input
+          {...comun}
+          type={tipo}
+          maxLength={campoConfig.maxLength}
+          min={campoConfig.min}
+          max={campoConfig.max}
+          step={campoConfig.step}
+        />
+      );
     }
 
     return (
@@ -113,64 +105,46 @@ export default function Armador({ evento, onActualizar, setAviso }) {
 
   return (
     <section className="pagina">
-      <Guia paso={1} evento={evento} />
-
-      <header className="titulo-pagina titulo-pagina-destacado">
+      <header className="titulo-pagina">
         <div>
-          <p className="etiqueta">Paso 01 · Los detalles</p>
-          <h1>Primero, pongámosle nombre a tu evento.</h1>
-          <p>
-            Define el tipo, la fecha y cuántas personas esperas. Después elegiremos el salón y armaremos el paquete.
-          </p>
-        </div>
-        <div className="sello-paso" aria-hidden="true">
-          <span>01</span>
-          <small>Datos</small>
+          <p className="etiqueta">Datos del evento</p>
+          <h1>Empecemos por lo básico.</h1>
+          <p>Con estos datos podremos buscar un salón que sí se ajuste a tu celebración.</p>
         </div>
       </header>
 
-      <div className="paneles">
+      <div className="paneles paneles-formulario">
         <form className="panel" onSubmit={guardar} noValidate>
-          <h2>Datos del evento</h2>
+          <h2>Tu evento</h2>
           <div className="formulario">{CAMPOS.map(campo)}</div>
-          <button className="boton boton-completo" type="submit" disabled={guardando}>
-            {guardando ? "Guardando…" : "Guardar y elegir salón →"}
-          </button>
+          <div className="acciones-formulario">
+            <button className="boton" type="submit" disabled={guardando}>
+              {guardando ? "Guardando…" : "Guardar y continuar"}
+            </button>
+            <span className="acciones-nota">Después elegirás el salón.</span>
+          </div>
         </form>
 
-        <aside className="panel">
-          <h2>Tu paquete</h2>
-          {evento.detalles.length === 0 ? (
-            <p className="vacio-texto">{MENSAJES.listaVacia}</p>
-          ) : (
-            <ul className="lista-evento">
-              {evento.detalles.map((item) => (
-                <li key={item.id}>
-                  <div>
-                    <strong>{item.nombre}</strong>
-                    <small>{item.categoria} · {item.proveedor}</small>
-                  </div>
-                  <div className="controles-cantidad">
-                    <button type="button" aria-label={`Quitar una unidad de ${item.nombre}`} onClick={() => cambiarCantidadServicio(item.id, -1)}>
-                      −
-                    </button>
-                    <span>{item.cantidad}</span>
-                    <button type="button" aria-label={`Agregar una unidad de ${item.nombre}`} onClick={() => cambiarCantidadServicio(item.id, 1)}>
-                      +
-                    </button>
-                    <button type="button" className="boton-texto" onClick={() => quitar(item.id)}>
-                      Quitar
-                    </button>
-                  </div>
-                  <span className="subtotal">{formatearMoneda(item.precioUnitario * item.cantidad)}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-          <div className="total">
-            <span>Total estimado</span>
-            <strong>{formatearMoneda(calcularTotal(evento.detalles))}</strong>
-          </div>
+        <aside className="panel panel-nota">
+          <p className="etiqueta">Lo que llevas</p>
+          <h2>{formulario.nombre || "Evento sin nombre"}</h2>
+          <dl className="nota-datos">
+            <div>
+              <dt>Tipo</dt>
+              <dd>{formulario.tipoEvento || "Por definir"}</dd>
+            </div>
+            <div>
+              <dt>Invitados</dt>
+              <dd>{formulario.invitados || "—"}</dd>
+            </div>
+            <div>
+              <dt>Presupuesto</dt>
+              <dd>
+                {formulario.presupuesto ? formatearMoneda(Number(formulario.presupuesto)) : "Sin definir"}
+              </dd>
+            </div>
+          </dl>
+          <p className="vacio-texto">Nada se pierde: puedes volver a editar estos datos cuando quieras.</p>
         </aside>
       </div>
     </section>

@@ -4,7 +4,6 @@ import { Link, useNavigate } from "react-router";
 import { cargarServicios } from "../api/catalogo.js";
 import { formatearMoneda } from "../logica/formato.js";
 import { seleccionarSalon } from "../logica/paquete.js";
-import Guia from "./guia.jsx";
 
 export default function Salon({ evento, onActualizar, setAviso }) {
   const navigate = useNavigate();
@@ -44,26 +43,22 @@ export default function Salon({ evento, onActualizar, setAviso }) {
 
   return (
     <section className="pagina">
-      <Guia paso={2} evento={evento} />
-
-      <header className="titulo-pagina titulo-pagina-destacado">
+      <header className="titulo-pagina">
         <div>
-          <p className="etiqueta">Paso 02 · El lugar</p>
-          <h1>Elige dónde va a suceder todo.</h1>
-          <p>
-            El salón define la ubicación principal del evento y aparecerá en tu resumen final. Revisa capacidad y
-            precio antes de continuar.
-          </p>
+          <p className="etiqueta">El lugar</p>
+          <h1>Elige el salón de tu evento.</h1>
+          <p>Revisa la capacidad y el precio. El salón aparecerá en tu resumen final.</p>
         </div>
-        <div className="sello-paso" aria-hidden="true">
-          <span>02</span>
-          <small>Salón</small>
+        <div className="titulo-acciones">
+          <Link className="boton-texto" to="/armador">
+            Cambiar datos del evento
+          </Link>
         </div>
       </header>
 
       <div className="barra-filtros salon-filtros">
         <label>
-          Ordenar salones
+          Ordenar
           <select value={orden} onChange={(eventoCambio) => setOrden(eventoCambio.target.value)}>
             <option value="recomendado">Por nombre</option>
             <option value="precio">Menor precio primero</option>
@@ -71,7 +66,7 @@ export default function Salon({ evento, onActualizar, setAviso }) {
           </select>
         </label>
         <p className="contador">
-          {invitados > 0 ? `Buscando espacio para ${invitados} invitados` : "Define tus invitados para comparar capacidad"}
+          {invitados > 0 ? `Espacio para ${invitados} invitados` : "Define tus invitados para comparar capacidad"}
         </p>
       </div>
 
@@ -83,15 +78,18 @@ export default function Salon({ evento, onActualizar, setAviso }) {
             const suffices = Number(salon.capacidad) >= invitados;
             const activo = seleccionado?.id === salon.id;
             return (
-              <article key={salon.id} className={`salon-tarjeta ${activo ? "seleccionado" : ""}`}>
-                <figure className="salon-imagen">
+              <article key={salon.id} className={`tarjeta salon-tarjeta ${activo ? "seleccionado" : ""}`}>
+                <figure className="tarjeta-imagen salon-imagen">
                   <img src={salon.imagen} alt={`Salón ${salon.nombre}`} loading="lazy" />
                   <span className={`salon-badge ${suffices ? "" : "alerta"}`}>
                     {suffices ? `Hasta ${salon.capacidad} personas` : `Capacidad ${salon.capacidad}`}
                   </span>
                 </figure>
-                <div className="salon-cuerpo">
-                  <h2>{salon.nombre}</h2>
+                <div className="tarjeta-cuerpo salon-cuerpo">
+                  <div className="tarjeta-cabecera">
+                    <h2>{salon.nombre}</h2>
+                    <span className="categoria">Salón</span>
+                  </div>
                   <p>{salon.direccion}</p>
                   <dl className="salon-datos">
                     <div>
@@ -105,7 +103,7 @@ export default function Salon({ evento, onActualizar, setAviso }) {
                   </dl>
                   <button
                     type="button"
-                    className={`boton ${activo ? "" : "boton-secundario"}`}
+                    className={`boton boton-tarjeta ${activo ? "" : "boton-secundario"}`}
                     onClick={() => elegir(salon)}
                     disabled={!suffices || guardando === salon.id}
                   >
@@ -115,7 +113,7 @@ export default function Salon({ evento, onActualizar, setAviso }) {
                         ? "Salón elegido"
                         : suffices
                           ? "Elegir este salón"
-                          : "No alcanza para tus invitados"}
+                          : "Capacidad insuficiente"}
                   </button>
                 </div>
               </article>
@@ -129,9 +127,9 @@ export default function Salon({ evento, onActualizar, setAviso }) {
           <p className="subtitulo">
             {seleccionado
               ? seleccionado.direccion
-              : "Selecciona una opción para fijar la dirección y continuar con los servicios."}
+              : "Elige una opción para fijar la dirección y continuar con los servicios."}
           </p>
-          <dl className="salon-resumen-datos">
+          <dl className="nota-datos">
             <div>
               <dt>Invitados</dt>
               <dd>{invitados || "—"}</dd>
@@ -151,11 +149,8 @@ export default function Salon({ evento, onActualizar, setAviso }) {
             onClick={() => navigate("/catalogo")}
             disabled={!seleccionado}
           >
-            Continuar a servicios →
+            Continuar a servicios
           </button>
-          <Link className="boton-texto" to="/armador">
-            Volver a los datos
-          </Link>
         </aside>
       </div>
     </section>

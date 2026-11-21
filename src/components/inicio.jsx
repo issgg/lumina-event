@@ -2,93 +2,68 @@ import { Link } from "react-router";
 
 import { calcularTotal } from "../logica/carrito.js";
 import { formatearMoneda } from "../logica/formato.js";
-import Guia from "./guia.jsx";
-
-const PASOS_DESTACADOS = [
-  { numero: "01", titulo: "Datos y salón", texto: "Defines el evento y fijas la ubicación principal." },
-  { numero: "02", titulo: "Paquete", texto: "Agregas servicios y ajustas cantidades desde el catálogo." },
-  { numero: "03", titulo: "Cierre", texto: "Revisas desglose, cronograma y pago simulado." },
-];
 
 export default function Inicio({ evento = { detalles: [] } }) {
   const servicios = evento.detalles.length;
   const total = calcularTotal(evento.detalles);
-  const progreso = Math.min(100, Math.max(8, servicios * 14));
 
   return (
     <section className="pagina inicio-pagina">
-      <Guia paso={1} evento={evento} />
-
-      <div className="hero">
-        <div className="hero-texto">
-          <p className="etiqueta">Estudio de eventos</p>
+      <div className="portada">
+        <div className="portada-texto">
+          <p className="etiqueta">Planea tu evento</p>
           <h1>
-            Tu evento, <em>pieza por pieza.</em>
+            Tu celebración, <em>en un solo lugar.</em>
           </h1>
           <p className="subtitulo">
-            No solo guardamos tu paquete: te guiamos desde los primeros datos hasta el pago simulado, con desglose,
-            presupuesto y cronograma.
+            Elige el salón, agrega los servicios y mira cómo queda tu paquete antes de pagar.
           </p>
-          <div className="acciones-hero">
+          <div className="acciones-principales">
             <Link className="boton" to="/armador">
-              Empezar la ruta <span aria-hidden="true">→</span>
+              Empezar mi evento <span aria-hidden="true">→</span>
             </Link>
             <Link className="boton boton-secundario" to="/catalogo">
-              Ver catálogo
+              Explorar catálogo
             </Link>
           </div>
+          <p className="portada-ayuda">Guarda lo que lleves y continua cuando quieras.</p>
         </div>
 
-        <div className="hero-tarjeta" aria-label="Resumen del evento">
-          <div className="hero-tarjeta-top">
-            <span className="hero-punto"></span>
-            <span>Ficha 01</span>
-            <span className="hero-estado">Borrador</span>
-          </div>
-          <h2>{evento.nombre || "Tu celebración"}</h2>
-          <div className="hero-progreso" aria-hidden="true">
-            <span style={{ width: `${progreso}%` }}></span>
-          </div>
-          <div className="hero-mini-grid">
-            <div className="hero-mini">
-              <small>Servicios</small>
-              <strong>{servicios}</strong>
+        <aside className="portada-tarjeta" aria-label="Resumen del evento">
+          <p className="etiqueta">Tu evento</p>
+          <h2>{evento.nombre || "Aún sin nombre"}</h2>
+          <p className="portada-detalle">
+            {evento.tipoEvento || "Tipo por definir"} · {evento.fecha || "Fecha por definir"}
+          </p>
+          <dl className="portada-datos">
+            <div>
+              <dt>Invitados</dt>
+              <dd>{evento.invitados || "—"}</dd>
             </div>
-            <div className="hero-mini">
-              <small>Categorías</small>
-              <strong>{new Set(evento.detalles.map((item) => item.categoria)).size}</strong>
+            <div>
+              <dt>Servicios</dt>
+              <dd>{servicios}</dd>
             </div>
-            <div className="hero-mini">
-              <small>Total estimado</small>
-              <strong>{formatearMoneda(total)}</strong>
+            <div>
+              <dt>Total estimado</dt>
+              <dd>{formatearMoneda(total)}</dd>
             </div>
-            <div className="hero-mini">
-              <small>Invitados</small>
-              <strong>{evento.invitados || "—"}</strong>
-            </div>
-          </div>
-          <ul>
-            <li>Elegir servicios por categoría</li>
-            <li>Ajustar cantidades y total</li>
-            <li>Revisar el cronograma</li>
-            <li>Ver el pago simulado</li>
-          </ul>
-        </div>
+          </dl>
+          <Link className="boton-texto" to={servicios ? "/resumen" : "/armador"}>
+            {servicios ? "Ver mi paquete" : "Comenzar con los datos"}
+          </Link>
+        </aside>
       </div>
 
-      <div className="pasos-destacados">
-        <div className="pasos-destacados-cabecera">
-          <p className="etiqueta">Cómo funciona</p>
-          <h2>Una ruta clara, sin perderte.</h2>
+      <div className="inicio-resumen">
+        <div>
+          <p className="etiqueta">Así funciona</p>
+          <h2>Lo esencial, sin rodeos.</h2>
         </div>
-        <div className="pasos-grid">
-          {PASOS_DESTACADOS.map((paso) => (
-            <article key={paso.numero} className="paso-destacado">
-              <span aria-hidden="true">{paso.numero}</span>
-              <h3>{paso.titulo}</h3>
-              <p>{paso.texto}</p>
-            </article>
-          ))}
+        <div className="inicio-pasos">
+          <p>Cuenta tu evento</p>
+          <p>Elige el salón</p>
+          <p>Arma y revisa tu paquete</p>
         </div>
       </div>
     </section>

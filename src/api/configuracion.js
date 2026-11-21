@@ -1,10 +1,10 @@
 export const NAVEGACION = [
   { to: "/", texto: "Inicio" },
-  { to: "/catalogo", texto: "Catálogo" },
-  { to: "/armador", texto: "Armador" },
-  { to: "/resumen", texto: "Resumen" },
+  { to: "/armador", texto: "Datos" },
+  { to: "/salon", texto: "Salón" },
+  { to: "/catalogo", texto: "Servicios" },
+  { to: "/resumen", texto: "Mi paquete" },
   { to: "/pago", texto: "Pago" },
-  { to: "/administrar", texto: "Administrar" },
 ];
 
 export const CATEGORIAS = [

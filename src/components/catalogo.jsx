@@ -8,7 +8,8 @@ import { filtrarServicios } from "../logica/filtros.js";
 import { MENSAJES } from "../logica/mensajes.js";
 import { validarBusqueda } from "../logica/validacion.js";
 import TarjetaServicio from "./tarjetaServicio.jsx";
-import Guia from "./guia.jsx";
+
+const CATEGORIAS_DISPONIBLES = CATEGORIAS.filter((item) => item.id !== "salones");
 
 export default function Catalogo({ evento, onActualizar, setAviso }) {
   const [servicios, setServicios] = useState([]);
@@ -16,7 +17,7 @@ export default function Catalogo({ evento, onActualizar, setAviso }) {
   const [busqueda, setBusqueda] = useState("");
 
   useEffect(() => {
-    setServicios(cargarServicios());
+    setServicios(cargarServicios().filter((servicio) => servicio.categoria !== "salones"));
   }, []);
 
   const errorBusqueda = validarBusqueda(busqueda);
@@ -38,21 +39,16 @@ export default function Catalogo({ evento, onActualizar, setAviso }) {
 
   return (
     <section className="pagina">
-      <Guia paso={3} evento={evento} />
-
-      <header className="titulo-pagina titulo-pagina-destacado">
+      <header className="titulo-pagina">
         <div>
-          <p className="etiqueta">Paso 03 · Los servicios</p>
-          <h1>Completa tu paquete.</h1>
-          <p>
-            Explora por categoría, compara proveedores y agrega solo lo que necesitas. Tu paquete se actualiza al
-            instante.
-          </p>
+          <p className="etiqueta">Servicios</p>
+          <h1>Arma tu paquete.</h1>
+          <p>Explora por categoría y agrega solo lo que necesitas. El total se actualiza al instante.</p>
         </div>
         <div className="titulo-acciones">
           <p className="contador">{evento.detalles.length} servicio(s) en tu evento</p>
           <Link className="boton boton-secundario" to="/resumen">
-            Ir a mi paquete →
+            Ver mi paquete
           </Link>
         </div>
       </header>
@@ -62,7 +58,7 @@ export default function Catalogo({ evento, onActualizar, setAviso }) {
           Categoría
           <select value={categoria} onChange={(eventoCambio) => setCategoria(eventoCambio.target.value)}>
             <option value="todos">Todas las categorías</option>
-            {CATEGORIAS.map((item) => (
+            {CATEGORIAS_DISPONIBLES.map((item) => (
               <option key={item.id} value={item.id}>
                 {item.nombre}
               </option>
@@ -75,23 +71,13 @@ export default function Catalogo({ evento, onActualizar, setAviso }) {
             type="search"
             value={busqueda}
             maxLength={60}
-            placeholder="Ej. salón, DJ, flores…"
+            placeholder="Ej. DJ, flores, pastel…"
             onChange={(eventoCambio) => setBusqueda(eventoCambio.target.value)}
           />
         </label>
         <button type="button" className="boton boton-secundario" onClick={limpiar}>
           Limpiar
         </button>
-      </div>
-
-      <div className="paso-ayuda">
-        <span className="paso-ayuda-numero" aria-hidden="true">
-          03
-        </span>
-        <p>
-          <strong>Consejo de la ruta:</strong> cubre primero comida, mobiliario, música, decoración y fotografía.
-          Los detalles y la seguridad puedes ajustarlos al final.
-        </p>
       </div>
 
       {errorBusqueda && <p className="aviso aviso-error">{errorBusqueda}</p>}
@@ -113,6 +99,15 @@ export default function Catalogo({ evento, onActualizar, setAviso }) {
               onAgregar={agregar}
             />
           ))}
+        </div>
+      )}
+
+      {evento.detalles.length > 0 && (
+        <div className="catalogo-pie">
+          <p>Ya armaste {evento.detalles.length} servicio(s).</p>
+          <Link className="boton" to="/resumen">
+            Ver mi paquete <span aria-hidden="true">→</span>
+          </Link>
         </div>
       )}
     </section>
