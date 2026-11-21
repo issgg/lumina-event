@@ -3,6 +3,7 @@ export const NAVEGACION = [
   { to: "/catalogo", texto: "Catálogo" },
   { to: "/armador", texto: "Armador" },
   { to: "/resumen", texto: "Resumen" },
+  { to: "/pago", texto: "Pago" },
   { to: "/administrar", texto: "Administrar" },
 ];
 

@@ -5,6 +5,8 @@ import { agregarServicio, quitarServicio, cambiarCantidad, calcularTotal, agrupa
 import { validarDatosEvento, validarBusqueda } from "../src/logica/validacion.js";
 import { filtrarServicios, normalizar } from "../src/logica/filtros.js";
 import { generarCronograma, aMinutos, formatearHora } from "../src/logica/cronograma.js";
+import { seleccionarSalon, evaluarCobertura, estadoPresupuesto } from "../src/logica/paquete.js";
+import { validarPago, formatearNumeroTarjeta } from "../src/logica/pago.js";
 import { MENSAJES } from "../src/logica/mensajes.js";
 
 const servicio = { id: "dj", nombre: "DJ", categoria: "musica", precio: 8000 };
@@ -74,4 +76,63 @@ test("el cronograma usa solo categorías seleccionadas y cruza medianoche", () =
   assert.equal(generarCronograma([], "19:00").length, 2);
   assert.equal(aMinutos("19:00"), 1140);
   assert.equal(formatearHora(-10), "23:50");
+});
+
+test("elegir salón reemplaza cualquier salón previo y lo pone al inicio", () => {
+  const previos = [
+    { id: "salon-viejo", categoria: "salones", precioUnitario: 100, cantidad: 1 },
+    { id: "dj", categoria: "musica", precioUnitario: 8000, cantidad: 1 },
+  ];
+  const resultado = seleccionarSalon(previos, {
+    id: "salon-nuevo",
+    nombre: "Salón Nuevo",
+    categoria: "salones",
+    precio: 20000,
+    proveedor: "Proveedor",
+  });
+  assert.equal(resultado.length, 2);
+  assert.equal(resultado[0].id, "salon-nuevo");
+  assert.equal(resultado[0].precioUnitario, 20000);
+  assert.equal(resultado[1].id, "dj");
+});
+
+test("la cobertura marca lo que falta del paquete guiado", () => {
+  const cobertura = evaluarCobertura([
+    { categoria: "salones" },
+    { categoria: "musica" },
+    { categoria: "musica" },
+  ]);
+  assert.deepEqual(cobertura[0], { categoria: "salones", completo: true });
+  assert.deepEqual(cobertura[1], { categoria: "comida", completo: false });
+  assert.deepEqual(cobertura[3], { categoria: "musica", completo: true });
+});
+
+test("el presupuesto indica si sobra o se excede", () => {
+  assert.deepEqual(estadoPresupuesto(80000, 71000), { estado: "dentro", diferencia: 9000 });
+  assert.deepEqual(estadoPresupuesto(50000, 71000), { estado: "excedido", diferencia: 21000 });
+  assert.deepEqual(estadoPresupuesto("", 71000), { estado: "sin-definir", diferencia: 0 });
+});
+
+test("la validación del pago simulado acepta una tarjeta de prueba y rechaza datos inválidos", () => {
+  const hoy = new Date(2026, 10, 21);
+  const valido = {
+    titular: "Ana Pérez",
+    numero: formatearNumeroTarjeta("4242424242424242"),
+    vencimiento: "12/29",
+    cvv: "123",
+  };
+  assert.equal(formatearNumeroTarjeta("4242424242424242"), "4242 4242 4242 4242");
+  assert.equal(validarPago(valido, hoy).validos, true);
+  assert.ok(validarPago({ ...valido, numero: "4242 4242 4242 4241" }, hoy).errores.numero);
+  assert.ok(validarPago({ ...valido, vencimiento: "10/26" }, hoy).errores.vencimiento);
+  assert.ok(validarPago({ ...valido, cvv: "12" }, hoy).errores.cvv);
+});
+
+test("los datos del evento pueden guardarse antes de elegir salón", () => {
+  const base = {
+    nombre: "Ana", tipoEvento: "Boda", fecha: "2099-01-01",
+    invitados: "120", presupuesto: "80000", horaInicio: "19:00", salonId: "",
+  };
+  assert.equal(validarDatosEvento(base, ["Boda"]).errores.salonId, MENSAJES.salonRequerido);
+  assert.equal(validarDatosEvento(base, ["Boda"], { requerirSalon: false }).validos, true);
 });

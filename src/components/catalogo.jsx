@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 
 import { cargarServicios } from "../api/catalogo.js";
 import { CATEGORIAS } from "../api/configuracion.js";
@@ -7,6 +8,7 @@ import { filtrarServicios } from "../logica/filtros.js";
 import { MENSAJES } from "../logica/mensajes.js";
 import { validarBusqueda } from "../logica/validacion.js";
 import TarjetaServicio from "./tarjetaServicio.jsx";
+import Guia from "./guia.jsx";
 
 export default function Catalogo({ evento, onActualizar, setAviso }) {
   const [servicios, setServicios] = useState([]);
@@ -36,13 +38,23 @@ export default function Catalogo({ evento, onActualizar, setAviso }) {
 
   return (
     <section className="pagina">
-      <header className="titulo-pagina">
+      <Guia paso={3} evento={evento} />
+
+      <header className="titulo-pagina titulo-pagina-destacado">
         <div>
-          <p className="etiqueta">Paso 1</p>
-          <h1>Catálogo de servicios</h1>
-          <p>Filtra por categoría o busca por nombre, proveedor o descripción.</p>
+          <p className="etiqueta">Paso 03 · Los servicios</p>
+          <h1>Completa tu paquete.</h1>
+          <p>
+            Explora por categoría, compara proveedores y agrega solo lo que necesitas. Tu paquete se actualiza al
+            instante.
+          </p>
         </div>
-        <p className="contador">{evento.detalles.length} servicio(s) en tu evento</p>
+        <div className="titulo-acciones">
+          <p className="contador">{evento.detalles.length} servicio(s) en tu evento</p>
+          <Link className="boton boton-secundario" to="/resumen">
+            Ir a mi paquete →
+          </Link>
+        </div>
       </header>
 
       <div className="barra-filtros">
@@ -70,6 +82,16 @@ export default function Catalogo({ evento, onActualizar, setAviso }) {
         <button type="button" className="boton boton-secundario" onClick={limpiar}>
           Limpiar
         </button>
+      </div>
+
+      <div className="paso-ayuda">
+        <span className="paso-ayuda-numero" aria-hidden="true">
+          03
+        </span>
+        <p>
+          <strong>Consejo de la ruta:</strong> cubre primero comida, mobiliario, música, decoración y fotografía.
+          Los detalles y la seguridad puedes ajustarlos al final.
+        </p>
       </div>
 
       {errorBusqueda && <p className="aviso aviso-error">{errorBusqueda}</p>}

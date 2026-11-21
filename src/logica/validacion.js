@@ -6,7 +6,7 @@ export function validarBusqueda(texto) {
   return "";
 }
 
-export function validarDatosEvento(datos, tiposEvento = []) {
+export function validarDatosEvento(datos, tiposEvento = [], opciones = {}) {
   const errores = {};
   const nombre = String(datos.nombre ?? "").trim();
   const tipoEvento = String(datos.tipoEvento ?? "");
@@ -37,7 +37,7 @@ export function validarDatosEvento(datos, tiposEvento = []) {
 
   if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(horaInicio)) errores.horaInicio = MENSAJES.horaInvalida;
 
-  if (!salonId) errores.salonId = MENSAJES.salonRequerido;
+  if (opciones.requerirSalon !== false && !salonId) errores.salonId = MENSAJES.salonRequerido;
 
   return { validos: Object.keys(errores).length === 0, errores };
 }

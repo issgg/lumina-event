@@ -1,6 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
-import { cargarServicios } from "../api/catalogo.js";
 import { TIPOS_EVENTO } from "../api/configuracion.js";
 import {
   calcularTotal,
@@ -10,6 +10,7 @@ import {
 import { formatearMoneda } from "../logica/formato.js";
 import { MENSAJES } from "../logica/mensajes.js";
 import { validarDatosEvento } from "../logica/validacion.js";
+import Guia from "./guia.jsx";
 
 const CAMPOS = [
   { clave: "nombre", etiqueta: "Nombre", tipo: "text", maxLength: 60 },
@@ -18,11 +19,10 @@ const CAMPOS = [
   { clave: "invitados", etiqueta: "Invitados", tipo: "number", min: 1, max: 10000 },
   { clave: "presupuesto", etiqueta: "Presupuesto", tipo: "number", min: 0, step: 100 },
   { clave: "horaInicio", etiqueta: "Hora de inicio", tipo: "time" },
-  { clave: "salonId", etiqueta: "Salón", tipo: "select" },
 ];
 
 export default function Armador({ evento, onActualizar, setAviso }) {
-  const [salones] = useState(() => cargarServicios().filter((servicio) => servicio.categoria === "salones"));
+  const navigate = useNavigate();
   const [formulario, setFormulario] = useState(() => ({
     nombre: evento.nombre,
     tipoEvento: evento.tipoEvento,
@@ -41,7 +41,7 @@ export default function Armador({ evento, onActualizar, setAviso }) {
 
   async function guardar(eventoFormulario) {
     eventoFormulario.preventDefault();
-    const resultado = validarDatosEvento(formulario, TIPOS_EVENTO);
+    const resultado = validarDatosEvento(formulario, TIPOS_EVENTO, { requerirSalon: false });
     setErrores(resultado.errores);
 
     if (!resultado.validos) {
@@ -57,7 +57,8 @@ export default function Armador({ evento, onActualizar, setAviso }) {
       presupuesto: Number(formulario.presupuesto),
     };
     try {
-      await onActualizar(nuevo, MENSAJES.guardado);
+      const guardado = await onActualizar(nuevo, MENSAJES.guardado);
+      if (guardado) navigate("/salon");
     } finally {
       setGuardando(false);
     }
@@ -83,8 +84,8 @@ export default function Armador({ evento, onActualizar, setAviso }) {
 
     let control;
     if (tipo === "select") {
-      const opciones = clave === "tipoEvento" ? TIPOS_EVENTO : salones.map((salon) => salon.nombre);
-      const valores = clave === "tipoEvento" ? TIPOS_EVENTO : salones.map((salon) => salon.id);
+      const opciones = TIPOS_EVENTO;
+      const valores = TIPOS_EVENTO;
       control = (
         <select {...comun}>
           <option value="">Selecciona una opción</option>
@@ -112,11 +113,19 @@ export default function Armador({ evento, onActualizar, setAviso }) {
 
   return (
     <section className="pagina">
-      <header className="titulo-pagina">
+      <Guia paso={1} evento={evento} />
+
+      <header className="titulo-pagina titulo-pagina-destacado">
         <div>
-          <p className="etiqueta">Paso 2</p>
-          <h1>Armador del evento</h1>
-          <p>Llena los datos generales y ajusta las cantidades de tu paquete.</p>
+          <p className="etiqueta">Paso 01 · Los detalles</p>
+          <h1>Primero, pongámosle nombre a tu evento.</h1>
+          <p>
+            Define el tipo, la fecha y cuántas personas esperas. Después elegiremos el salón y armaremos el paquete.
+          </p>
+        </div>
+        <div className="sello-paso" aria-hidden="true">
+          <span>01</span>
+          <small>Datos</small>
         </div>
       </header>
 
@@ -124,8 +133,8 @@ export default function Armador({ evento, onActualizar, setAviso }) {
         <form className="panel" onSubmit={guardar} noValidate>
           <h2>Datos del evento</h2>
           <div className="formulario">{CAMPOS.map(campo)}</div>
-          <button className="boton" type="submit" disabled={guardando}>
-            {guardando ? "Guardando…" : "Guardar borrador"}
+          <button className="boton boton-completo" type="submit" disabled={guardando}>
+            {guardando ? "Guardando…" : "Guardar y elegir salón →"}
           </button>
         </form>
 

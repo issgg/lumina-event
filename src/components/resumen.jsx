@@ -1,14 +1,22 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 
 import { consultarCronograma, limpiarEvento } from "../api/baseDatos.js";
+import { CATEGORIAS } from "../api/configuracion.js";
 import { agruparPorCategoria, calcularTotal } from "../logica/carrito.js";
 import { generarCronograma } from "../logica/cronograma.js";
 import { eventoVacio } from "../logica/evento.js";
 import { formatearMoneda } from "../logica/formato.js";
 import { MENSAJES } from "../logica/mensajes.js";
+import { estadoPresupuesto, evaluarCobertura } from "../logica/paquete.js";
+import Guia from "./guia.jsx";
 
 export default function Resumen({ evento, onActualizar, setAviso }) {
   const [cronograma, setCronograma] = useState([]);
+  const total = total;
+  const presupuesto = estadoPresupuesto(evento.presupuesto, total);
+  const cobertura = evaluarCobertura(evento.detalles);
+  const nombreCategoria = (clave) => CATEGORIAS.find((item) => item.id === clave)?.nombre ?? clave;
 
   useEffect(() => {
     const guardado = consultarCronograma();
@@ -26,24 +34,47 @@ export default function Resumen({ evento, onActualizar, setAviso }) {
 
   return (
     <section className="pagina">
-      <header className="titulo-pagina">
+      <Guia paso={4} evento={evento} />
+
+      <header className="titulo-pagina titulo-pagina-destacado">
         <div>
-          <p className="etiqueta">Paso 3</p>
-          <h1>Resumen del evento</h1>
+          <p className="etiqueta">Paso 04 · La revisión</p>
+          <h1>Todo tu evento, de un vistazo.</h1>
           <p>
             {evento.nombre || "Sin nombre"} · {evento.tipoEvento || "Tipo sin definir"} ·{" "}
             {evento.fecha || "Fecha sin definir"}
           </p>
         </div>
         <div className="acciones-hero">
-          <button type="button" className="boton" onClick={() => onActualizar(evento, MENSAJES.guardado)}>
-            Guardar evento
+          <Link className="boton" to="/pago">
+            Simular compra →
+          </Link>
+          <button type="button" className="boton boton-secundario" onClick={() => onActualizar(evento, MENSAJES.guardado)}>
+            Guardar
           </button>
           <button type="button" className="boton boton-peligro" onClick={reiniciar}>
             Reiniciar
           </button>
         </div>
       </header>
+
+      <div className={`presupuesto-estado ${presupuesto.estado}`}>
+        <span>
+          {presupuesto.estado === "excedido"
+            ? "Tu paquete supera el presupuesto"
+            : presupuesto.estado === "sin-definir"
+              ? "Presupuesto sin definir"
+              : "Tu paquete está dentro del presupuesto"}
+        </span>
+        <strong>{formatearMoneda(presupuesto.diferencia)}</strong>
+        <small>
+          {presupuesto.estado === "excedido"
+            ? "Vuelve al catálogo para ajustar servicios."
+            : presupuesto.estado === "sin-definir"
+              ? "Agrega un presupuesto en el paso 01 para comparar."
+              : "Este es el margen que te queda para detalles."}
+        </small>
+      </div>
 
       <div className="resumen-metricas">
         <div className="metrica">
@@ -56,8 +87,28 @@ export default function Resumen({ evento, onActualizar, setAviso }) {
         </div>
         <div className="metrica metrica-total">
           <span>Total final</span>
-          <strong>{formatearMoneda(calcularTotal(evento.detalles))}</strong>
+          <strong>{formatearMoneda(total)}</strong>
         </div>
+      </div>
+
+      <div className="panel cobertura-panel">
+        <div className="cobertura-cabecera">
+          <div>
+            <p className="etiqueta">Lista de la ruta</p>
+            <h2>Lo que ya está cubierto</h2>
+          </div>
+          <p className="contador">
+            {cobertura.filter((item) => item.completo).length} de {cobertura.length} esenciales
+          </p>
+        </div>
+        <ul className="cobertura-lista cobertura-lista-amplia">
+          {cobertura.map((item) => (
+            <li key={item.categoria} className={item.completo ? "completo" : "faltante"}>
+              <span aria-hidden="true">{item.completo ? "✓" : "+"}</span>
+              {nombreCategoria(item.categoria)}
+            </li>
+          ))}
+        </ul>
       </div>
 
       <div className="panel">
@@ -88,7 +139,7 @@ export default function Resumen({ evento, onActualizar, setAviso }) {
           />
           <div className="total">
             <span>Total final</span>
-            <strong>{formatearMoneda(calcularTotal(evento.detalles))}</strong>
+            <strong>{formatearMoneda(total)}</strong>
           </div>
         </div>
 

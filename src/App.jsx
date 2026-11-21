@@ -10,7 +10,9 @@ import Layout from "./components/layout.jsx";
 import Inicio from "./components/inicio.jsx";
 import Catalogo from "./components/catalogo.jsx";
 import Armador from "./components/armador.jsx";
+import Salon from "./components/salon.jsx";
 import Resumen from "./components/resumen.jsx";
+import Pago from "./components/pago.jsx";
 import Administrar from "./components/administrar.jsx";
 
 import "./App.css";
@@ -129,8 +131,16 @@ export default function App() {
           element={<Armador evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
         />
         <Route
+          path="salon"
+          element={<Salon evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
+        />
+        <Route
           path="resumen"
           element={<Resumen evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
+        />
+        <Route
+          path="pago"
+          element={<Pago evento={evento} onActualizar={actualizarEvento} />}
         />
         <Route path="administrar" element={<Administrar setAviso={setAviso} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
