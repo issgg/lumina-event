@@ -18,6 +18,16 @@ Una sola plataforma reúne salón, comida, mobiliario, música, decoración, fot
 
 El flujo es sencillo: datos del evento, salón, categorías de servicios, resumen y pago simulado. En cada categoría se puede **regresar**, **omitir** o **continuar**.
 
+## Paleta
+
+La paleta busca un look elegante y tranquilo:
+
+- **Marfil:** fondo general, para que leer no canse.
+- **Verde profundo:** botones principales y paneles importantes.
+- **Terracota apagado:** etiquetas y pequeños acentos.
+- **Latón:** bordes de selección y detalles finos.
+- **Arena clara:** superficies suaves y resúmenes.
+
 ## Tecnologías
 
 React + Vite, React Router con `HashRouter`, CSS propio, JavaScript ES6 y **Supabase** como base alojada. No se instaló una librería nueva: `src/api/supabase.js` usa el REST de Supabase con `fetch`. La app sigue siendo estática: GitHub Pages publica `dist/` y el navegador habla con Supabase.

@@ -13,6 +13,7 @@ Aquí anoto cuándo usé la IA, qué pedí y qué revisé yo después.
 | 21/11 | Simplificación | Quitar progreso y hacer todo más fácil | Propuso pantallas simples y una sola acción principal | Encontré un error en `resumen.jsx` y lo corregí |
 | 21/11 | Tarjetas | Abrir la tarjeta en grande | Propuso un modal con foto, descripción y datos | Revisé cierre con Escape, foco y botones |
 | 21/11 | Categorías | Ir por categorías con regresar y omitir | Propuso un parámetro `?categoria=` en la URL | Revisé que el salón mande a la primera categoría y que la última mande al resumen |
+| 21/11 | Paleta | Hacer el diseño más elegante, sobre todo los colores | Propuso marfil, verde profundo, terracota apagado y latón | Revisé contraste y apliqué variables en `index.css` y `App.css` |
 | 22/11 | Entrega y casos límite | Revisar si cumplía la rúbrica | Señaló bitácora faltante, docs viejos y riesgos de red | Agregué esta bitácora, actualicé docs y corregí los casos límite |
 
 ## Cosas que la IA propuso y yo rechacé
