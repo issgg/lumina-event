@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Lumina Event: arma tu evento eligiendo salón, servicios, precios y cronograma." />
+    <script>
+      try {
+        document.documentElement.dataset.tema = localStorage.getItem("lumina-tema") || "oscuro";
+      } catch {
+        document.documentElement.dataset.tema = "oscuro";
+      }
+    </script>
     <title>Lumina Event</title>
   </head>
   <body>

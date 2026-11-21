@@ -37,7 +37,7 @@ La idea es ayudar a una persona a organizar un evento en pocos pasos: elegir sal
 | Archivo | Qué hace |
 |---|---|
 | `src/components/acceso.jsx` | Inicia sesión o registra a la persona |
-| `src/components/layout.jsx` | Muestra encabezado, menú y pie |
+| `src/components/layout.jsx` | Muestra encabezado, menú, pie y botón para cambiar de tema |
 | `src/components/inicio.jsx` | Pantalla de bienvenida y accesos rápidos |
 | `src/components/armador.jsx` | Formulario de datos del evento y guardado del borrador |
 | `src/components/salon.jsx` | Muestra salones, permite ver el detalle grande y elegir uno |

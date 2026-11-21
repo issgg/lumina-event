@@ -4,8 +4,20 @@ import { NAVEGACION } from "../api/configuracion.js";
 
 export default function Layout({ aviso, sesion, onCerrarSesion }) {
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const [tema, setTema] = useState(() => document.documentElement.dataset.tema || "oscuro");
   const correo = sesion?.user?.email ?? sesion?.user?.user_metadata?.email ?? "Invitado";
   const cerrarMenu = () => setMenuAbierto(false);
+
+  function alternarTema() {
+    const nuevo = tema === "oscuro" ? "claro" : "oscuro";
+    document.documentElement.dataset.tema = nuevo;
+    setTema(nuevo);
+    try {
+      localStorage.setItem("lumina-tema", nuevo);
+    } catch {
+      return;
+    }
+  }
 
   return (
     <div className="aplicacion">
@@ -46,6 +58,14 @@ export default function Layout({ aviso, sesion, onCerrarSesion }) {
               </NavLink>
             ))}
           </nav>
+          <button
+            type="button"
+            className="boton-tema"
+            onClick={alternarTema}
+            aria-label={tema === "oscuro" ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+          >
+            {tema === "oscuro" ? "Ver claro" : "Ver oscuro"}
+          </button>
           <div className="usuario">
             <span className="usuario-avatar" aria-hidden="true">
               {correo.charAt(0).toUpperCase()}

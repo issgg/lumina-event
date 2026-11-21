@@ -1,4 +1,43 @@
 :root {
+  color-scheme: dark;
+  --color-tinta: #f3efe6;
+  --color-papel: #0f1715;
+  --color-papel-claro: #16221f;
+  --color-arcilla: #d08a6e;
+  --color-arcilla-oscuro: #e4a98f;
+  --color-bosque: #2f5a4f;
+  --color-bosque-oscuro: #24473f;
+  --color-arena: #cfc4ad;
+  --color-arena-claro: #1d2b27;
+  --color-oro: #c9a45c;
+  --color-noche: #0b1210;
+  --color-borde: #2c3d38;
+  --color-borde-fuerte: #4a5f57;
+  --color-texto-suave: #aab4ad;
+  --color-error: #e08b7c;
+  --color-blanco: #f7f3ec;
+  --color-primario: #c9a45c;
+  --color-primario-hover: #ddba73;
+  --color-primario-texto: #121b18;
+  --color-cabecera: rgba(15, 23, 21, 0.92);
+  --color-linea-clara: rgba(255, 255, 255, 0.06);
+  --color-peligro-borde: #83453c;
+  --color-peligro-fondo: #2a1a18;
+  --color-foco: rgba(208, 138, 110, 0.35);
+  --fuente-cuerpo: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --fuente-titulo: Georgia, "Times New Roman", serif;
+  --sombra-suave: 0 10px 30px rgba(0, 0, 0, 0.22);
+  --sombra-media: 0 20px 50px rgba(0, 0, 0, 0.3);
+  --radio: 12px;
+  font-family: var(--fuente-cuerpo);
+  color: var(--color-tinta);
+  background: var(--color-papel);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+[data-tema="claro"] {
+  color-scheme: light;
   --color-tinta: #1e2a27;
   --color-papel: #f7f3ec;
   --color-papel-claro: #fffdf9;
@@ -11,19 +50,26 @@
   --color-oro: #c9a45c;
   --color-noche: #142621;
   --color-borde: #ddd4c6;
+  --color-borde-fuerte: #bfb3a2;
   --color-texto-suave: #656a64;
   --color-error: #9b3f37;
   --color-blanco: #ffffff;
-  --fuente-cuerpo: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --fuente-titulo: Georgia, "Times New Roman", serif;
+  --color-primario: #24473f;
+  --color-primario-hover: #19352f;
+  --color-primario-texto: #ffffff;
+  --color-cabecera: rgba(247, 243, 236, 0.92);
+  --color-linea-clara: rgba(255, 255, 255, 0.75);
+  --color-peligro-borde: #d0a69b;
+  --color-peligro-fondo: #fdf0ec;
+  --color-foco: rgba(143, 81, 60, 0.28);
   --sombra-suave: 0 10px 30px rgba(30, 42, 39, 0.06);
   --sombra-media: 0 20px 50px rgba(30, 42, 39, 0.11);
-  --radio: 12px;
-  font-family: var(--fuente-cuerpo);
-  color: var(--color-tinta);
-  background: var(--color-papel);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
+}
+
+[data-tema="claro"] body {
+  background-image:
+    radial-gradient(circle at 10% 0%, rgba(201, 164, 92, 0.1), transparent 28rem),
+    radial-gradient(circle at 90% 8%, rgba(36, 71, 63, 0.08), transparent 30rem);
 }
 
 * {
@@ -41,8 +87,8 @@ body {
   overflow-x: hidden;
   background-color: var(--color-papel);
   background-image:
-    radial-gradient(circle at 10% 0%, rgba(201, 164, 92, 0.1), transparent 28rem),
-    radial-gradient(circle at 90% 8%, rgba(36, 71, 63, 0.08), transparent 30rem);
+    radial-gradient(circle at 10% 0%, rgba(201, 164, 92, 0.07), transparent 28rem),
+    radial-gradient(circle at 90% 8%, rgba(47, 90, 79, 0.18), transparent 30rem);
 }
 
 h1,
@@ -85,7 +131,7 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 3px solid rgba(143, 81, 60, 0.28);
+  outline: 3px solid var(--color-foco);
   outline-offset: 2px;
 }
 
@@ -94,11 +140,11 @@ textarea:focus-visible {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border: 1px solid var(--color-bosque);
+  border: 1px solid var(--color-primario);
   border-radius: var(--radio);
   padding: 0.8rem 1.2rem;
-  background: var(--color-bosque);
-  color: var(--color-blanco);
+  background: var(--color-primario);
+  color: var(--color-primario-texto);
   font-size: 0.9rem;
   font-weight: 800;
   letter-spacing: 0.01em;
@@ -108,9 +154,9 @@ textarea:focus-visible {
 }
 
 .boton:hover:not(:disabled) {
-  background: var(--color-bosque-oscuro);
-  border-color: var(--color-bosque-oscuro);
-  box-shadow: 0 8px 18px rgba(25, 53, 47, 0.18);
+  background: var(--color-primario-hover);
+  border-color: var(--color-primario-hover);
+  box-shadow: 0 8px 18px rgba(201, 164, 92, 0.2);
   transform: translateY(-1px);
 }
 
@@ -136,12 +182,12 @@ textarea:focus-visible {
 
 .boton-peligro {
   background: transparent;
-  border-color: #d0a69b;
+  border-color: var(--color-peligro-borde);
   color: var(--color-error);
 }
 
 .boton-peligro:hover:not(:disabled) {
-  background: #fdf0ec;
+  background: var(--color-peligro-fondo);
   border-color: var(--color-error);
 }
 
@@ -194,7 +240,7 @@ textarea {
 input:hover,
 select:hover,
 textarea:hover {
-  border-color: #bfb3a2;
+  border-color: var(--color-borde-fuerte);
 }
 
 input:focus,

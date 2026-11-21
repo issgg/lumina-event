@@ -18,6 +18,7 @@ Aquí explico por qué tomé cada decisión. Está escrito en lenguaje sencillo 
 | 21/11 | Pasar por categorías una a una | Salón y luego todas las categorías juntas era demasiado | Ahora hay regresar, omitir y continuar en cada categoría |
 | 21/11 | Hacer que el pago sea simulado | No queremos cobrar ni guardar datos bancarios | El comprobante es de ejemplo y no hace cargos |
 | 21/11 | Paleta marfil, verde profundo, terracota apagado y latón | Se ve más elegante y mantiene buen contraste | Botones en verde, acentos en terracota y selección en latón |
+| 21/11 | Modo oscuro por defecto con botón para volver al claro | El usuario pidió que el oscuro se vea mejor que todo en claro | Fondo verde oscuro, texto marfil, botones latón y preferencia guardada |
 | 22/11 | Agregar tiempo de espera a las llamadas | Si el servidor no responde, la app no debe quedarse cargando | Muestra un mensaje claro y permite reintentar |
 | 22/11 | Evitar doble guardado | Un doble clic no debe duplicar datos | Los botones se bloquean y hay guardas extra |
 | 22/11 | Dejar la bitácora al día | La rúbrica la pide dentro del repositorio | Queda lista para la pregunta de criterio |

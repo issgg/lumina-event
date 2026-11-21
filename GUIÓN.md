@@ -85,3 +85,4 @@ Abrir `DIARIO_DE_DECISIONES.md` y `PRUEBAS.md`.
 - Tener abiertos `README.md`, `MAPA.md`, `BITACORA_IA.md` y `PRUEBAS.md`.
 - Repasar los enlaces del repo y del deploy.
 - Probar una vez el flujo completo con la tarjeta de ejemplo.
+- Mostrar que el modo oscuro viene por defecto y que el botón del encabezado permite volver al claro.

@@ -30,6 +30,7 @@ Los casos de abajo están revisados en código y en la lógica. Se pueden volver
 | 10 | Servidor lento o sin red | Desactivar red o delays largos y cargar datos | La app deja de esperar, muestra “No se pudo conectar con la base de datos. Recarga la página.” y ofrece reintentar | OK |
 | 11 | Precio vacío en administrar | En `/#/administrar`, dejar precio vacío y agregar | Aparece “Escribe un precio mayor o igual a cero.” y no se agrega | OK |
 | 12 | Salón ya elegido | Elegir salón y mirar el botón en tarjeta y modal | El botón dice “Salón elegido” y queda deshabilitado | OK |
+| 13 | Cambio de tema | Abrir la app y probar el botón **Ver claro / Ver oscuro** | El tema cambia y se recuerda al recargar | OK |
 
 ## Pruebas automáticas incluidas
 

@@ -28,6 +28,8 @@ La paleta busca un look elegante y tranquilo:
 - **Latón:** bordes de selección y detalles finos.
 - **Arena clara:** superficies suaves y resúmenes.
 
+El modo oscuro viene por defecto. En el encabezado, el botón **Ver claro** permite cambiar y la preferencia queda guardada.
+
 ## Tecnologías
 
 React + Vite, React Router con `HashRouter`, CSS propio, JavaScript ES6 y **Supabase** como base alojada. No se instaló una librería nueva: `src/api/supabase.js` usa el REST de Supabase con `fetch`. La app sigue siendo estática: GitHub Pages publica `dist/` y el navegador habla con Supabase.
