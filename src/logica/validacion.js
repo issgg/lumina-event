@@ -1,4 +1,4 @@
-import { MENSAJES } from "./errores.js";
+import { MENSAJES } from "./mensajes.js";
 
 export function validarBusqueda(texto) {
   const limpio = String(texto ?? "").trim();

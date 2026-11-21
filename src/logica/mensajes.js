@@ -1,15 +1,13 @@
 export const MENSAJES = {
-  cargando: "Cargando catálogo…",
-  errorCarga: "No se pudo cargar el catálogo. Revisa la conexión e intenta de nuevo.",
-  errorBase: "No se pudo iniciar la base de datos SQLite. Recarga la página o intenta de nuevo.",
+  errorBase: "No se pudo conectar con Supabase. Revisa .env.local y recarga.",
   sinResultados: "No encontramos servicios con ese nombre. Prueba otra categoría.",
   listaVacia: "Aún no agregaste servicios. Elige uno del catálogo.",
   yaAgregado: "Ya está en tu evento.",
   agregado: "Servicio agregado a tu evento.",
   eliminado: "Servicio eliminado de tu evento.",
-  guardado: "Borrador guardado.",
+  guardado: "Borrador guardado en Supabase.",
+  falloGuardado: "No se pudo guardar en Supabase. El evento sigue en pantalla.",
   recuperado: "Retomamos tu evento guardado.",
-  falloGuardado: "No se pudo guardar en este navegador. El evento sigue en pantalla.",
   datosInvalidos: "Revisa los campos marcados.",
   nombreVacio: "Escribe tu nombre.",
   nombreLargo: "Máximo 60 caracteres.",
@@ -25,13 +23,6 @@ export const MENSAJES = {
   buscarLargo: "La búsqueda es demasiado larga.",
   adminNombre: "Escribe el nombre del servicio.",
   adminPrecio: "Escribe un precio mayor o igual a cero.",
-  adminAgregado: "Servicio agregado al catálogo local.",
-  adminEliminado: "Servicio eliminado del catálogo local."
+  adminAgregado: "Servicio agregado al catálogo de Supabase.",
+  adminEliminado: "Servicio eliminado del catálogo de Supabase.",
 };
-
-export function mostrarMensaje(id, texto, tipo = "") {
-  const nodo = typeof document === "undefined" ? null : document.getElementById(id);
-  if (!nodo) return;
-  nodo.textContent = texto;
-  nodo.className = `aviso${tipo ? ` aviso-${tipo}` : ""}`;
-}

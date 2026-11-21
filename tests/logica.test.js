@@ -1,11 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { agregarServicio, quitarServicio, cambiarCantidad, calcularTotal, agruparPorCategoria } from "../js/carrito.js";
-import { validarDatosEvento, validarBusqueda } from "../js/validacion.js";
-import { filtrarServicios, normalizar } from "../js/catalogo.js";
-import { generarCronograma, aMinutos, formatearHora } from "../js/cronograma.js";
-import { MENSAJES } from "../js/errores.js";
+import { agregarServicio, quitarServicio, cambiarCantidad, calcularTotal, agruparPorCategoria } from "../src/logica/carrito.js";
+import { validarDatosEvento, validarBusqueda } from "../src/logica/validacion.js";
+import { filtrarServicios, normalizar } from "../src/logica/filtros.js";
+import { generarCronograma, aMinutos, formatearHora } from "../src/logica/cronograma.js";
+import { MENSAJES } from "../src/logica/mensajes.js";
 
 const servicio = { id: "dj", nombre: "DJ", categoria: "musica", precio: 8000 };
 
@@ -28,7 +28,7 @@ test("quitar y cambiar cantidad mantienen límites", () => {
 test("el total convierte texto a número y respeta cantidades", () => {
   const detalles = [
     { id: "a", precioUnitario: "450", cantidad: 2 },
-    { id: "b", precioUnitario: 250, cantidad: 1 }
+    { id: "b", precioUnitario: 250, cantidad: 1 },
   ];
   assert.equal(calcularTotal(detalles), 1150);
   assert.equal(calcularTotal([]), 0);
@@ -37,7 +37,7 @@ test("el total convierte texto a número y respeta cantidades", () => {
 test("la agrupación por categoría suma subtotales", () => {
   const detalles = [
     { id: "a", categoria: "musica", precioUnitario: 8000, cantidad: 1 },
-    { id: "b", categoria: "musica", precioUnitario: 1000, cantidad: 2 }
+    { id: "b", categoria: "musica", precioUnitario: 1000, cantidad: 2 },
   ];
   assert.deepEqual(agruparPorCategoria(detalles), [{ categoria: "musica", subtotal: 10000, cantidad: 3 }]);
 });
@@ -45,7 +45,7 @@ test("la agrupación por categoría suma subtotales", () => {
 test("la validación rechaza campos vacíos, texto, negativos y nombres largos", () => {
   const base = {
     nombre: "Ana", tipoEvento: "Boda", fecha: "2099-01-01",
-    invitados: "120", presupuesto: "80000", horaInicio: "19:00", salonId: "salon"
+    invitados: "120", presupuesto: "80000", horaInicio: "19:00", salonId: "salon",
   };
   assert.equal(validarDatosEvento({ ...base, nombre: "" }).errores.nombre, MENSAJES.nombreVacio);
   assert.equal(validarDatosEvento({ ...base, invitados: "abc" }).errores.invitados, MENSAJES.invitadosNumero);
@@ -58,7 +58,7 @@ test("la validación rechaza campos vacíos, texto, negativos y nombres largos",
 test("la búsqueda ignora acentos y mayúsculas y limita la longitud", () => {
   const servicios = [
     { id: "d", nombre: "Decoración temática", descripcion: "Flores", proveedor: "Estudio", categoria: "decoracion" },
-    { id: "j", nombre: "DJ y sonido", descripcion: "Bocinas", proveedor: "Ultra", categoria: "musica" }
+    { id: "j", nombre: "DJ y sonido", descripcion: "Bocinas", proveedor: "Ultra", categoria: "musica" },
   ];
   assert.equal(normalizar("DÉCORACION"), "decoracion");
   assert.equal(filtrarServicios(servicios, "todos", "decoracion").length, 1);

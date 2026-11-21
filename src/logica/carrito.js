@@ -1,4 +1,4 @@
-import { MENSAJES } from "./errores.js";
+import { MENSAJES } from "./mensajes.js";
 
 export function agregarServicio(detalles, servicio) {
   if (detalles.some((item) => item.id === servicio.id)) {
@@ -10,7 +10,7 @@ export function agregarServicio(detalles, servicio) {
     categoria: servicio.categoria,
     proveedor: servicio.proveedor ?? "",
     precioUnitario: Number(servicio.precio) || 0,
-    cantidad: 1
+    cantidad: 1,
   };
   return { detalles: [...detalles, nuevo], agregado: true, mensaje: MENSAJES.agregado };
 }
@@ -28,7 +28,10 @@ export function cambiarCantidad(detalles, id, delta) {
 }
 
 export function calcularTotal(detalles) {
-  const total = detalles.reduce((suma, item) => suma + Number(item.precioUnitario) * Number(item.cantidad), 0);
+  const total = detalles.reduce(
+    (suma, item) => suma + Number(item.precioUnitario) * Number(item.cantidad),
+    0,
+  );
   return Math.round((Number.isFinite(total) ? total : 0) * 100) / 100;
 }
 
@@ -42,6 +45,6 @@ export function agruparPorCategoria(detalles) {
   }
   return [...grupos.values()].map((grupo) => ({
     ...grupo,
-    subtotal: Math.round(grupo.subtotal * 100) / 100
+    subtotal: Math.round(grupo.subtotal * 100) / 100,
   }));
 }
