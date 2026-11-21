@@ -76,7 +76,7 @@ export default function Administrar({ setAviso }) {
         <div>
           <p className="etiqueta">Panel básico</p>
           <h1>Administrar catálogo</h1>
-          <p>Los servicios nuevos se guardan en la tabla servicios de Supabase.</p>
+          <p>Los servicios nuevos quedan disponibles en el catálogo.</p>
         </div>
       </header>
 

@@ -11,13 +11,13 @@ export default function Inicio({ evento = { detalles: [] } }) {
   return (
     <section className="hero">
       <div className="hero-texto">
-        <p className="etiqueta">Planeador de eventos</p>
+        <p className="etiqueta">Estudio de eventos</p>
         <h1>
-          Tu evento, <span>pieza por pieza.</span>
+          Tu evento, <em>pieza por pieza.</em>
         </h1>
         <p className="subtitulo">
-          Elige un salón, agrega servicios, calcula el total y obtén un cronograma inicial. Todo queda guardado en
-          Supabase para que puedas retomarlo cuando quieras.
+          Elige el lugar, suma servicios y mira cómo toma forma el presupuesto. Guarda el avance y vuelve a él cuando
+          quieras.
         </p>
         <div className="acciones-hero">
           <Link className="boton" to="/catalogo">
@@ -29,10 +29,10 @@ export default function Inicio({ evento = { detalles: [] } }) {
         </div>
       </div>
 
-      <div className="hero-tarjeta" aria-label="Resumen del sistema">
+      <div className="hero-tarjeta" aria-label="Resumen del evento">
         <div className="hero-tarjeta-top">
           <span className="hero-punto"></span>
-          <span>Evento en curso</span>
+          <span>Ficha 01</span>
           <span className="hero-estado">Borrador</span>
         </div>
         <h2>{evento.nombre || "Tu celebración"}</h2>
@@ -58,10 +58,10 @@ export default function Inicio({ evento = { detalles: [] } }) {
           </div>
         </div>
         <ul>
-          <li>Catálogo por categoría y búsqueda</li>
-          <li>Carrito con cantidades y total</li>
-          <li>Formulario con validación</li>
-          <li>Cronograma y resumen final</li>
+          <li>Elegir servicios por categoría</li>
+          <li>Ajustar cantidades y total</li>
+          <li>Revisar el cronograma</li>
+          <li>Guardar el borrador</li>
         </ul>
       </div>
     </section>

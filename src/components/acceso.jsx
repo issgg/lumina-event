@@ -84,17 +84,24 @@ export default function Acceso({ onSesion }) {
       <div className="acceso-contenedor">
         <aside className="acceso-lado">
           <div className="acceso-marca">
-            <span className="marca-icono">✦</span>
+            <span className="marca-icono">L</span>
             <span>Lumina Event</span>
           </div>
-          <h2>Planea celebraciones que se sienten únicas.</h2>
+          <p className="acceso-kicker">Tu acceso</p>
+          <h2>Cada celebración empieza con una buena entrada.</h2>
           <p>
             Un espacio para armar tu evento con calma: servicios, presupuesto y cronograma en un solo lugar.
           </p>
           <div className="acceso-puntos">
-            <span>Catálogo organizado por categorías</span>
-            <span>Presupuesto y cantidades en tiempo real</span>
-            <span>Cronograma listo para compartir</span>
+            <span>
+              <b>01</b> Explora opciones
+            </span>
+            <span>
+              <b>02</b> Ajusta el presupuesto
+            </span>
+            <span>
+              <b>03</b> Revisa el cronograma
+            </span>
           </div>
         </aside>
 
@@ -130,7 +137,7 @@ export default function Acceso({ onSesion }) {
             Continuar con Google
           </button>
 
-          {!authConfigurado && <p className="texto-aviso">Falta configurar Supabase.</p>}
+          {!authConfigurado && <p className="texto-aviso">Falta configurar el acceso.</p>}
 
           <div className="separador">
             <span>o con tu correo</span>
