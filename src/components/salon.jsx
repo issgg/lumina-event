@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 import { cargarServicios } from "../api/catalogo.js";
@@ -10,6 +10,8 @@ export default function Salon({ evento, onActualizar, setAviso }) {
   const [orden, setOrden] = useState("recomendado");
   const [guardando, setGuardando] = useState("");
   const [avisoLocal, setAvisoLocal] = useState("");
+  const [detalleAbierto, setDetalleAbierto] = useState(null);
+  const botonCerrar = useRef(null);
 
   const salones = cargarServicios()
     .filter((servicio) => servicio.categoria === "salones")
@@ -20,7 +22,26 @@ export default function Salon({ evento, onActualizar, setAviso }) {
     });
 
   const seleccionado = salones.find((salon) => salon.id === evento.salonId);
+  const salonDetalle = salones.find((salon) => salon.id === detalleAbierto);
   const invitados = Number(evento.invitados) || 0;
+
+  useEffect(() => {
+    if (!detalleAbierto) return;
+
+    function cerrarConTecla(evento) {
+      if (evento.key === "Escape") setDetalleAbierto(null);
+    }
+
+    const overflowOriginal = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", cerrarConTecla);
+    botonCerrar.current?.focus();
+
+    return () => {
+      document.body.style.overflow = overflowOriginal;
+      document.removeEventListener("keydown", cerrarConTecla);
+    };
+  }, [detalleAbierto]);
 
   async function elegir(salon) {
     if (Number(salon.capacidad) < invitados) {
@@ -37,8 +58,12 @@ export default function Salon({ evento, onActualizar, setAviso }) {
     };
     const guardado = await onActualizar(actualizado, `Salón ${salon.nombre} elegido.`);
     setGuardando("");
-    if (guardado) navigate("/catalogo");
-    else setAviso("No se pudo guardar el salón. Intenta otra vez.");
+    if (guardado) {
+      setDetalleAbierto(null);
+      navigate("/catalogo");
+    } else {
+      setAviso("No se pudo guardar el salón. Intenta otra vez.");
+    }
   }
 
   return (
@@ -79,28 +104,45 @@ export default function Salon({ evento, onActualizar, setAviso }) {
             const activo = seleccionado?.id === salon.id;
             return (
               <article key={salon.id} className={`tarjeta salon-tarjeta ${activo ? "seleccionado" : ""}`}>
-                <figure className="tarjeta-imagen salon-imagen">
-                  <img src={salon.imagen} alt={`Salón ${salon.nombre}`} loading="lazy" />
-                  <span className={`salon-badge ${suffices ? "" : "alerta"}`}>
-                    {suffices ? `Hasta ${salon.capacidad} personas` : `Capacidad ${salon.capacidad}`}
-                  </span>
-                </figure>
-                <div className="tarjeta-cuerpo salon-cuerpo">
-                  <div className="tarjeta-cabecera">
-                    <h2>{salon.nombre}</h2>
-                    <span className="categoria">Salón</span>
+                <div
+                  className="tarjeta-clicable"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setDetalleAbierto(salon.id)}
+                  onKeyDown={(evento) => {
+                    if (evento.key === "Enter" || evento.key === " ") {
+                      evento.preventDefault();
+                      setDetalleAbierto(salon.id);
+                    }
+                  }}
+                  aria-label={`Ver detalles del salón ${salon.nombre}`}
+                >
+                  <figure className="tarjeta-imagen salon-imagen">
+                    <img src={salon.imagen} alt={`Salón ${salon.nombre}`} loading="lazy" />
+                    <span className={`salon-badge ${suffices ? "" : "alerta"}`}>
+                      {suffices ? `Hasta ${salon.capacidad} personas` : `Capacidad ${salon.capacidad}`}
+                    </span>
+                    <span className="tarjeta-ver">Ver detalle</span>
+                  </figure>
+                  <div className="tarjeta-cuerpo salon-cuerpo">
+                    <div className="tarjeta-cabecera">
+                      <h2>{salon.nombre}</h2>
+                      <span className="categoria">Salón</span>
+                    </div>
+                    <p>{salon.direccion}</p>
+                    <dl className="salon-datos">
+                      <div>
+                        <dt>Precio</dt>
+                        <dd>{formatearMoneda(salon.precio)}</dd>
+                      </div>
+                      <div>
+                        <dt>Proveedor</dt>
+                        <dd>{salon.proveedor || "No indicado"}</dd>
+                      </div>
+                    </dl>
                   </div>
-                  <p>{salon.direccion}</p>
-                  <dl className="salon-datos">
-                    <div>
-                      <dt>Precio</dt>
-                      <dd>{formatearMoneda(salon.precio)}</dd>
-                    </div>
-                    <div>
-                      <dt>Proveedor</dt>
-                      <dd>{salon.proveedor || "No indicado"}</dd>
-                    </div>
-                  </dl>
+                </div>
+                <div className="tarjeta-accion">
                   <button
                     type="button"
                     className={`boton boton-tarjeta ${activo ? "" : "boton-secundario"}`}
@@ -153,6 +195,95 @@ export default function Salon({ evento, onActualizar, setAviso }) {
           </button>
         </aside>
       </div>
+
+      {salonDetalle && (
+        <div className="modal-fondo" onClick={() => setDetalleAbierto(null)}>
+          <div
+            className="modal-tarjeta"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={`detalle-salon-${salonDetalle.id}`}
+            onClick={(evento) => evento.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="modal-cerrar"
+              aria-label="Cerrar detalle"
+              ref={botonCerrar}
+              onClick={() => setDetalleAbierto(null)}
+            >
+              ×
+            </button>
+
+            <div className="modal-imagen">
+              <img src={salonDetalle.imagen} alt={`Salón ${salonDetalle.nombre}`} />
+            </div>
+
+            <div className="modal-contenido">
+              <p className="etiqueta">Salón</p>
+              <h2 id={`detalle-salon-${salonDetalle.id}`}>{salonDetalle.nombre}</h2>
+              <p className="subtitulo">
+                {salonDetalle.descripcion || "Sin descripción disponible para este salón."}
+              </p>
+
+              {avisoLocal && <p className="aviso aviso-error">{avisoLocal}</p>}
+
+              <dl className="modal-datos">
+                <div>
+                  <dt>Precio</dt>
+                  <dd>{formatearMoneda(salonDetalle.precio)}</dd>
+                </div>
+                <div>
+                  <dt>Capacidad</dt>
+                  <dd>{salonDetalle.capacidad} personas</dd>
+                </div>
+                <div>
+                  <dt>Dirección</dt>
+                  <dd>{salonDetalle.direccion || "No indicada"}</dd>
+                </div>
+                <div>
+                  <dt>Proveedor</dt>
+                  <dd>{salonDetalle.proveedor || "No indicado"}</dd>
+                </div>
+                <div>
+                  <dt>Estado</dt>
+                  <dd>
+                    {Number(salonDetalle.capacidad) >= invitados
+                      ? "Disponible para tu evento"
+                      : "Capacidad insuficiente"}
+                  </dd>
+                </div>
+              </dl>
+
+              <p className="modal-nota">
+                {seleccionado?.id === salonDetalle.id
+                  ? "Este salón ya está fijado como la ubicación principal de tu evento."
+                  : "Al elegirlo, se guardará como la ubicación principal de tu evento."}
+              </p>
+
+              <div className="modal-acciones">
+                <button
+                  type="button"
+                  className="boton"
+                  onClick={() => elegir(salonDetalle)}
+                  disabled={
+                    Number(salonDetalle.capacidad) < invitados || guardando === salonDetalle.id
+                  }
+                >
+                  {guardando === salonDetalle.id
+                    ? "Guardando…"
+                    : seleccionado?.id === salonDetalle.id
+                      ? "Salón elegido"
+                      : "Elegir este salón"}
+                </button>
+                <button type="button" className="boton boton-secundario" onClick={() => setDetalleAbierto(null)}>
+                  Seguir comparando
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

@@ -406,8 +406,8 @@
   color: #ffffff;
   font-size: 0.7rem;
   font-weight: 800;
-  opacity: 0;
-  transform: translateY(4px);
+  opacity: 0.95;
+  transform: none;
   transition: opacity 0.16s ease, transform 0.16s ease;
 }
 
