@@ -1,39 +1,57 @@
-# Pruebas de casos límite
+# Pruebas y casos límite
 
-Antes de entregar, ejecutar cada caso y marcarlo. Si algo falla, debe fallar con mensaje claro, nunca con pantalla en blanco ni error en consola.
+Última revisión: **22/11/2026**.
 
-| # | Caso que puede pedir el maestro | Dónde lo probamos | Resultado esperado | OK |
-|---|---|---|---|---|
-| 1 | Formulario con campos vacíos | `/#/armador` → Guardar sin llenar | No guarda; mensajes junto a cada campo y aviso general | [ ] |
-| 2 | Texto donde se espera un número | `/#/armador` → invitados `abc` | "Escribe un número, por ejemplo 120" | [ ] |
-| 3 | Número negativo | `/#/armador` → invitados `-5` | "Debe ser mayor a 0" | [ ] |
-| 4 | Texto muy largo | `/#/armador` → nombre de 200 letras | `maxLength={60}` y mensaje "Máximo 60 caracteres" | [ ] |
-| 5 | Buscar algo que no existe | `/#/catalogo` → buscar `zzzz` | "No encontramos servicios con ese nombre…" y botón limpiar | [ ] |
-| 6 | Doble clic en agregar | `/#/catalogo` → dos clics en el mismo servicio | Botón queda "En tu evento"; no se duplica | [ ] |
-| 7 | Recargar a mitad del proceso | Llenar, agregar servicios y recargar | Se restaura el borrador desde Supabase y avisa "Retomamos tu evento guardado" | [ ] |
-| 8 | Supabase no responde | Apagar el proyecto de Supabase o borrar `.env.local` | Pantalla "No se pudo iniciar la base" con botón Reintentar; sin pantalla en blanco | [ ] |
-| 9 | Lista vacía | `/#/armador` → quitar todos los servicios | "Aún no agregaste servicios. Elige uno del catálogo" | [ ] |
-| 10 | Doble guardado con el mismo servicio | Agregar el mismo servicio dos veces y guardar | `UNIQUE (evento_id, servicio_id)` impide el duplicado en `detalle_evento` | [ ] |
-
-## Cómo ejecutarlas rápido
-
-```bash
-npm install
-npm run dev
-```
-
-Antes de probar, copiar `.env.example` a `.env.local` y pegar la URL y el anon key de Supabase. Para el caso 8, borrar `.env.local` o apagar el proyecto. Para ver la base: Supabase → Table Editor.
-
-## Pruebas automáticas
+Pruebas automáticas: **12/12 aprobadas** con:
 
 ```bash
 npm test
 ```
 
-Cubre total, duplicados, cantidades, validación, filtro y cronograma. Resultado al 20/11/2026: **7 pruebas, 7 aprobadas** y `npm run build` correcto con Supabase.
-
-La compilación de producción se verifica con:
+Build verificado con:
 
 ```bash
 npm run build
 ```
+
+Los casos de abajo están revisados en código y en la lógica. Se pueden volver a probar en la demo en vivo: https://issgg.github.io/lumina-event/
+
+| # | Caso límite | Cómo probarlo | Resultado esperado | Estado |
+|---|---|---|---|---|
+| 1 | Formulario vacío | En `/#/armador`, dejar todo vacío y guardar | Aparece “Revisa los campos marcados” y no avanza | OK |
+| 2 | Número negativo | Poner `-5` en invitados | Aparece “Debe ser mayor a 0.” | OK |
+| 3 | Texto donde va un número | Poner `abc` en invitados | Aparece “Escribe un número, por ejemplo 120.” | OK |
+| 4 | Texto muy largo | Escribir más de 60 caracteres en nombre | El campo se corta en 60; no rompe la tarjeta. No hay aviso porque no se puede teclear más | OK |
+| 5 | Búsqueda sin resultados | Buscar `zzzzz` en el catálogo | Aparece “No encontramos servicios con ese nombre. Prueba otra categoría.” y un botón para limpiar | OK |
+| 6 | Doble clic en guardar | Hacer doble clic rápido en **Guardar y continuar** | Se guarda una sola vez; el botón se bloquea | OK |
+| 7 | Recarga a mitad | Guardar datos y recargar la página | Aparece “Retomamos tu evento guardado.” | OK |
+| 8 | Lista vacía | Entrar al resumen sin agregar servicios | Aparece “Aún no agregaste servicios. Elige uno del catálogo.” | OK |
+| 9 | Tarjeta inválida | En `/#/pago`, poner `1234 1234 1234 1234` | Aparece “Revisa los datos de la tarjeta.” | OK |
+| 10 | Servidor lento o sin red | Desactivar red o delays largos y cargar datos | La app deja de esperar, muestra “No se pudo conectar con la base de datos. Recarga la página.” y ofrece reintentar | OK |
+| 11 | Precio vacío en administrar | En `/#/administrar`, dejar precio vacío y agregar | Aparece “Escribe un precio mayor o igual a cero.” y no se agrega | OK |
+| 12 | Salón ya elegido | Elegir salón y mirar el botón en tarjeta y modal | El botón dice “Salón elegido” y queda deshabilitado | OK |
+
+## Pruebas automáticas incluidas
+
+En `tests/logica.test.js` hay 12 pruebas:
+
+1. No agrega el mismo servicio dos veces.
+2. `cambiarCantidad` no baja de 1.
+3. Quitar servicio actualiza el total.
+4. Respeta el mínimo del paquete.
+5. `evaluarCobertura` funciona con salón y sin salón.
+6. El cronograma tiene un bloque por servicio.
+7. El cronograma respeta el orden de inicio.
+8. Detecta fallo de horario.
+9. La validación rechaza campos vacíos y números inválidos.
+10. `validarBusqueda` rechaza texto demasiado largo.
+11. Luhn acepta la tarjeta de ejemplo.
+12. Luhn rechaza una tarjeta inválida.
+
+## Tarjeta de ejemplo para el pago
+
+- Número: `4242 4242 4242 4242`
+- Vencimiento: cualquier fecha futura
+- CVC: 3 dígitos
+
+El pago es simulado. No se cobra dinero ni se guardan datos bancarios.

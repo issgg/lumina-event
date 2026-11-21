@@ -1,10 +1,22 @@
 # Lumina Event
 
-Sistema web para planificar y armar eventos sociales y empresariales. El módulo principal se llama **EventBuilder** y funciona como un carrito: el usuario elige un salón, agrega servicios por categoría, ve el costo aproximado y obtiene un cronograma.
+Sistema web para planificar y armar eventos sociales y empresariales. El módulo principal se llama **EventBuilder** y funciona como un carrito: el usuario elige un salón, pasa por categorías de servicios, ve el costo aproximado y obtiene un cronograma.
+
+## Enlaces de entrega
+
+- Repositorio de GitHub: https://github.com/issgg/lumina-event
+- Proyecto desplegado: https://issgg.github.io/lumina-event/
+- Bitácora de IA: `BITACORA_IA.md`
+- Diario de decisiones: `DIARIO_DE_DECISIONES.md`
+- Mapa del sistema: `MAPA.md`
+- Guion de presentación: `GUIÓN.md`
+- Casos límite: `PRUEBAS.md`
 
 ## Idea
 
 Una sola plataforma reúne salón, comida, mobiliario, música, decoración, fotografía y detalles, para que el usuario no tenga que buscar proveedor por proveedor.
+
+El flujo es sencillo: datos del evento, salón, categorías de servicios, resumen y pago simulado. En cada categoría se puede **regresar**, **omitir** o **continuar**.
 
 ## Tecnologías
 
@@ -53,7 +65,7 @@ Para habilitar Google:
    - `https://issgg.github.io/lumina-event/**`
 3. Pegar el `Client ID` y el `Client Secret` de Google OAuth en Supabase.
 
-Si la confirmación de correo está activa, el registro muestra un aviso y la persona debe confirmar su correo antes de entrar.
+Si no está el `Client Secret`, el botón de Google muestra un aviso y la app sigue funcionando con correo.
 
 ## Estructura
 
@@ -64,6 +76,12 @@ LuminaEvent/
 ├─ .env.example
 ├─ .env.production
 ├─ .github/workflows/pages.yml
+├─ BITACORA_IA.md
+├─ DIARIO_DE_DECISIONES.md
+├─ GUIÓN.md
+├─ MAPA.md
+├─ MODELADO.md
+├─ PRUEBAS.md
 ├─ index.html
 ├─ vite.config.js
 ├─ src/
@@ -76,18 +94,23 @@ LuminaEvent/
 │  │  ├─ baseDatos.js
 │  │  ├─ catalogo.js
 │  │  ├─ configuracion.js
+│  │  ├─ red.js
 │  │  └─ supabase.js
 │  ├─ components/
 │  │  ├─ acceso.jsx
 │  │  ├─ layout.jsx
 │  │  ├─ inicio.jsx
+│  │  ├─ armador.jsx
+│  │  ├─ salon.jsx
 │  │  ├─ catalogo.jsx
 │  │  ├─ tarjetaServicio.jsx
-│  │  ├─ armador.jsx
 │  │  ├─ resumen.jsx
+│  │  ├─ pago.jsx
 │  │  └─ administrar.jsx
 │  └─ logica/
 │     ├─ carrito.js
+│     ├─ paquete.js
+│     ├─ pago.js
 │     ├─ cronograma.js
 │     ├─ validacion.js
 │     ├─ filtros.js
@@ -98,7 +121,7 @@ LuminaEvent/
 │  ├─ .nojekyll
 │  ├─ data/catalogo.json
 │  ├─ db/supabase.sql
-│  └─ assets/img/*.svg
+│  └─ assets/fotos/*.jpg
 └─ tests/
 ```
 
