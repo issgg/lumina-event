@@ -847,7 +847,28 @@ tbody tr:last-child td {
   margin-bottom: 0.4rem;
 }
 
-.catalogo-pie {
+.catalogo-pista {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.2rem;
+  border: 1px solid var(--color-borde);
+  border-radius: 10px;
+  background: var(--color-papel-claro);
+}
+
+.catalogo-pista p {
+  margin: 0;
+  color: var(--color-texto-suave);
+  font-size: 0.85rem;
+}
+
+.catalogo-pista strong {
+  color: var(--color-tinta);
+}
+
+.flujo-acciones {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -856,11 +877,6 @@ tbody tr:last-child td {
   border: 1px solid var(--color-borde);
   border-radius: 12px;
   background: var(--color-arena);
-}
-
-.catalogo-pie p {
-  margin: 0;
-  font-weight: 700;
 }
 
 .resumen-metricas {
@@ -1464,12 +1480,17 @@ tbody tr:last-child td {
     grid-template-columns: 1fr;
   }
 
-  .catalogo-pie,
+  .catalogo-pista,
+  .flujo-acciones,
   .resumen-cierre,
   .ticket-cabecera,
   .ticket-pie {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .flujo-acciones .acciones-principales {
+    width: 100%;
   }
 
   .ticket-referencia {
@@ -1529,7 +1550,7 @@ tbody tr:last-child td {
 
   .acciones-principales .boton,
   .acciones-formulario .boton,
-  .catalogo-pie .boton,
+  .flujo-acciones .boton,
   .resumen-cierre .boton {
     width: 100%;
   }

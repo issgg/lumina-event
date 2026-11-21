@@ -50,6 +50,9 @@ export default function Resumen({ evento, onActualizar, setAviso }) {
           <Link className="boton" to="/pago">
             Simular compra <span aria-hidden="true">→</span>
           </Link>
+          <Link className="boton-texto" to="/catalogo">
+            Ajustar servicios
+          </Link>
           <button type="button" className="boton-texto" onClick={() => onActualizar(evento, MENSAJES.guardado)}>
             Guardar
           </button>

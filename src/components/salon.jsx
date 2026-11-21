@@ -2,8 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 import { cargarServicios } from "../api/catalogo.js";
+import { CATEGORIAS } from "../api/configuracion.js";
 import { formatearMoneda } from "../logica/formato.js";
 import { seleccionarSalon } from "../logica/paquete.js";
+
+const PRIMERA_CATEGORIA = CATEGORIAS.filter((item) => item.id !== "salones")[0].id;
 
 export default function Salon({ evento, onActualizar, setAviso }) {
   const navigate = useNavigate();
@@ -60,7 +63,7 @@ export default function Salon({ evento, onActualizar, setAviso }) {
     setGuardando("");
     if (guardado) {
       setDetalleAbierto(null);
-      navigate("/catalogo");
+      navigate(`/catalogo?categoria=${PRIMERA_CATEGORIA}`);
     } else {
       setAviso("No se pudo guardar el salón. Intenta otra vez.");
     }
@@ -75,9 +78,16 @@ export default function Salon({ evento, onActualizar, setAviso }) {
           <p>Revisa la capacidad y el precio. El salón aparecerá en tu resumen final.</p>
         </div>
         <div className="titulo-acciones">
-          <Link className="boton-texto" to="/armador">
-            Cambiar datos del evento
+          <Link className="boton boton-secundario" to="/armador">
+            ← Regresar
           </Link>
+          <button
+            type="button"
+            className="boton-texto"
+            onClick={() => navigate(`/catalogo?categoria=${PRIMERA_CATEGORIA}`)}
+          >
+            Omitir salón
+          </button>
         </div>
       </header>
 
@@ -188,10 +198,17 @@ export default function Salon({ evento, onActualizar, setAviso }) {
           <button
             type="button"
             className="boton boton-completo"
-            onClick={() => navigate("/catalogo")}
+            onClick={() => navigate(`/catalogo?categoria=${PRIMERA_CATEGORIA}`)}
             disabled={!seleccionado}
           >
             Continuar a servicios
+          </button>
+          <button
+            type="button"
+            className="boton-texto"
+            onClick={() => navigate(`/catalogo?categoria=${PRIMERA_CATEGORIA}`)}
+          >
+            Omitir salón y continuar
           </button>
         </aside>
       </div>
@@ -278,6 +295,13 @@ export default function Salon({ evento, onActualizar, setAviso }) {
                 </button>
                 <button type="button" className="boton boton-secundario" onClick={() => setDetalleAbierto(null)}>
                   Seguir comparando
+                </button>
+                <button
+                  type="button"
+                  className="boton-texto"
+                  onClick={() => navigate(`/catalogo?categoria=${PRIMERA_CATEGORIA}`)}
+                >
+                  Omitir salón
                 </button>
               </div>
             </div>
