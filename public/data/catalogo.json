@@ -9,7 +9,7 @@
       "descripcion": "Salón principal para 200 personas con pista de baile y jardín.",
       "direccion": "Ensenada, Baja California",
       "capacidad": 200,
-      "imagen": "assets/img/salon.svg"
+      "imagen": "assets/fotos/salones-1.jpg"
     },
     {
       "id": "salon-jardin",
@@ -20,7 +20,73 @@
       "descripcion": "Espacio abierto para 120 invitados, ideal para bodas al atardecer.",
       "direccion": "Ensenada, Baja California",
       "capacidad": 120,
-      "imagen": "assets/img/salon.svg"
+      "imagen": "assets/fotos/salones-2.jpg"
+    },
+    {
+      "id": "salon-cristal",
+      "categoria": "salones",
+      "nombre": "Salón Cristal",
+      "proveedor": "Grupo Eleganza",
+      "precio": 17500,
+      "descripcion": "Salón interior con piso de cristal, luces empotradas y cabecera principal.",
+      "direccion": "Tijuana, Baja California",
+      "capacidad": 160,
+      "imagen": "assets/fotos/salones-3.jpg"
+    },
+    {
+      "id": "salon-terraza",
+      "categoria": "salones",
+      "nombre": "Terraza Marítima",
+      "proveedor": "Eventos Costa",
+      "precio": 13200,
+      "descripcion": "Terraza frente al mar para celebraciones íntimas y cenas al aire libre.",
+      "direccion": "Ensenada, Baja California",
+      "capacidad": 90,
+      "imagen": "assets/fotos/salones-4.jpg"
+    },
+    {
+      "id": "salon-colonial",
+      "categoria": "salones",
+      "nombre": "Salón Colonial",
+      "proveedor": "Haciendas del Valle",
+      "precio": 15800,
+      "descripcion": "Espacio histórico con patios, arcos y zona para ceremonia civil.",
+      "direccion": "Tecate, Baja California",
+      "capacidad": 140,
+      "imagen": "assets/fotos/salones-5.jpg"
+    },
+    {
+      "id": "salon-valle",
+      "categoria": "salones",
+      "nombre": "Casa de Eventos Valle",
+      "proveedor": "Haciendas del Valle",
+      "precio": 11800,
+      "descripcion": "Casa adaptable con sala principal, cocina y área de descanso.",
+      "direccion": "Mexicali, Baja California",
+      "capacidad": 110,
+      "imagen": "assets/fotos/salones-6.jpg"
+    },
+    {
+      "id": "salon-auditorio",
+      "categoria": "salones",
+      "nombre": "Auditorio Norte",
+      "proveedor": "Centro Norte",
+      "precio": 21000,
+      "descripcion": "Auditorio con butacas, pantalla y sonido base para eventos formales.",
+      "direccion": "Tijuana, Baja California",
+      "capacidad": 250,
+      "imagen": "assets/fotos/salones-7.jpg"
+    },
+    {
+      "id": "salon-hacienda",
+      "categoria": "salones",
+      "nombre": "Hacienda del Sol",
+      "proveedor": "Haciendas del Valle",
+      "precio": 24000,
+      "descripcion": "Hacienda con jardín, sala climatizada y estacionamiento amplio.",
+      "direccion": "Ensenada, Baja California",
+      "capacidad": 220,
+      "imagen": "assets/fotos/salones-8.jpg"
     },
     {
       "id": "comida-banquete",
@@ -29,7 +95,7 @@
       "proveedor": "Cocina del Puerto",
       "precio": 18000,
       "descripcion": "Menú de tres tiempos para 120 personas con servicio de mesa.",
-      "imagen": "assets/img/comida.svg"
+      "imagen": "assets/fotos/comida-1.jpg"
     },
     {
       "id": "comida-catering",
@@ -38,7 +104,61 @@
       "proveedor": "Sabores del Valle",
       "precio": 9500,
       "descripcion": "Bocadillos y bebidas para 100 invitados.",
-      "imagen": "assets/img/comida.svg"
+      "imagen": "assets/fotos/comida-2.jpg"
+    },
+    {
+      "id": "comida-gourmet",
+      "categoria": "comida",
+      "nombre": "Menú gourmet",
+      "proveedor": "Cocina del Puerto",
+      "precio": 22500,
+      "descripcion": "Menú de autor con entrada, plato fuerte y postre para 150 invitados.",
+      "imagen": "assets/fotos/comida-3.jpg"
+    },
+    {
+      "id": "comida-postres",
+      "categoria": "comida",
+      "nombre": "Barra de postres",
+      "proveedor": "Dulce Momento",
+      "precio": 6400,
+      "descripcion": "Mesa de postres, pasteles individuales y café para 80 personas.",
+      "imagen": "assets/fotos/comida-4.jpg"
+    },
+    {
+      "id": "comida-en-vivo",
+      "categoria": "comida",
+      "nombre": "Cocina en vivo",
+      "proveedor": "Sabores del Valle",
+      "precio": 12900,
+      "descripcion": "Estaciones de cocina frente al invitado con personal de servicio.",
+      "imagen": "assets/fotos/comida-5.jpg"
+    },
+    {
+      "id": "comida-brunch",
+      "categoria": "comida",
+      "nombre": "Brunch corporativo",
+      "proveedor": "Cocina del Puerto",
+      "precio": 8900,
+      "descripcion": "Opciones ligeras, jugos y café para reuniones de trabajo.",
+      "imagen": "assets/fotos/comida-6.jpg"
+    },
+    {
+      "id": "comida-vegetariana",
+      "categoria": "comida",
+      "nombre": "Menú vegetariano",
+      "proveedor": "Sabores del Valle",
+      "precio": 7800,
+      "descripcion": "Menú completo sin carne con opciones veganas y sin gluten.",
+      "imagen": "assets/fotos/comida-7.jpg"
+    },
+    {
+      "id": "comida-barra",
+      "categoria": "comida",
+      "nombre": "Servicio de barra",
+      "proveedor": "Cocina del Puerto",
+      "precio": 11500,
+      "descripcion": "Barra de bebidas, hielo, cristalería y personal para 120 invitados.",
+      "imagen": "assets/fotos/comida-8.jpg"
     },
     {
       "id": "mobiliario-basico",
@@ -47,7 +167,7 @@
       "proveedor": "Rentas Norte",
       "precio": 7000,
       "descripcion": "15 mesas redondas, 150 sillas y manteles a juego.",
-      "imagen": "assets/img/mobiliario.svg"
+      "imagen": "assets/fotos/mobiliario-1.jpg"
     },
     {
       "id": "mobiliario-carpas",
@@ -56,7 +176,61 @@
       "proveedor": "Rentas Norte",
       "precio": 5200,
       "descripcion": "Carpa para 80 personas, vajilla y cristalería.",
-      "imagen": "assets/img/mobiliario.svg"
+      "imagen": "assets/fotos/mobiliario-2.jpg"
+    },
+    {
+      "id": "mobiliario-sillas",
+      "categoria": "mobiliario",
+      "nombre": "Sillas elegantes",
+      "proveedor": "Rentas Norte",
+      "precio": 4800,
+      "descripcion": "Sillas tapizadas para ceremonia y recepción con cojines.",
+      "imagen": "assets/fotos/mobiliario-3.jpg"
+    },
+    {
+      "id": "mobiliario-altas",
+      "categoria": "mobiliario",
+      "nombre": "Mesas altas",
+      "proveedor": "Rentas Norte",
+      "precio": 3400,
+      "descripcion": "Mesas altas con banquetas para cóctel y convivencia.",
+      "imagen": "assets/fotos/mobiliario-4.jpg"
+    },
+    {
+      "id": "mobiliario-lounge",
+      "categoria": "mobiliario",
+      "nombre": "Lounge exterior",
+      "proveedor": "Rentas Norte",
+      "precio": 6100,
+      "descripcion": "Salas, mesas bajas y tapetes para crear una zona de descanso.",
+      "imagen": "assets/fotos/mobiliario-5.jpg"
+    },
+    {
+      "id": "mobiliario-manteles",
+      "categoria": "mobiliario",
+      "nombre": "Manteles premium",
+      "proveedor": "Rentas Norte",
+      "precio": 2900,
+      "descripcion": "Manteles y servilletas en tonos neutros con acabados de lino.",
+      "imagen": "assets/fotos/mobiliario-6.jpg"
+    },
+    {
+      "id": "mobiliario-bistro",
+      "categoria": "mobiliario",
+      "nombre": "Bistró portátil",
+      "proveedor": "Rentas Norte",
+      "precio": 4200,
+      "descripcion": "Mobiliario compacto para estaciones de comida y bebida.",
+      "imagen": "assets/fotos/mobiliario-7.jpg"
+    },
+    {
+      "id": "mobiliario-cafe",
+      "categoria": "mobiliario",
+      "nombre": "Estación de café",
+      "proveedor": "Rentas Norte",
+      "precio": 3900,
+      "descripcion": "Mostrador, jaraberas y accesorios para servicio de café.",
+      "imagen": "assets/fotos/mobiliario-8.jpg"
     },
     {
       "id": "musica-dj",
@@ -65,7 +239,7 @@
       "proveedor": "Sonido Ultra",
       "precio": 8000,
       "descripcion": "DJ, bocinas, iluminación y prueba de audio antes del evento.",
-      "imagen": "assets/img/musica.svg"
+      "imagen": "assets/fotos/musica-1.jpg"
     },
     {
       "id": "musica-grupo",
@@ -74,7 +248,61 @@
       "proveedor": "Sonido Ultra",
       "precio": 11500,
       "descripcion": "Cuarteto musical con equipo de sonido incluido.",
-      "imagen": "assets/img/musica.svg"
+      "imagen": "assets/fotos/musica-2.jpg"
+    },
+    {
+      "id": "musica-acustico",
+      "categoria": "musica",
+      "nombre": "Sesión acústica",
+      "proveedor": "Sonido Ultra",
+      "precio": 5900,
+      "descripcion": "Dúo acústico para ceremonia, cena y recepción.",
+      "imagen": "assets/fotos/musica-3.jpg"
+    },
+    {
+      "id": "musica-covers",
+      "categoria": "musica",
+      "nombre": "Banda de covers",
+      "proveedor": "Sonido Ultra",
+      "precio": 13800,
+      "descripcion": "Banda con repertorio de clásicos, pop y ritmos latinos.",
+      "imagen": "assets/fotos/musica-4.jpg"
+    },
+    {
+      "id": "musica-piano",
+      "categoria": "musica",
+      "nombre": "Piano en vivo",
+      "proveedor": "Sonido Ultra",
+      "precio": 7200,
+      "descripcion": "Pianista con repertorio para cena y cóctel.",
+      "imagen": "assets/fotos/musica-5.jpg"
+    },
+    {
+      "id": "musica-conferencia",
+      "categoria": "musica",
+      "nombre": "Sonido para conferencias",
+      "proveedor": "Sonido Ultra",
+      "precio": 6300,
+      "descripcion": "Sonido, micrófonos y técnico para charlas y presentaciones.",
+      "imagen": "assets/fotos/musica-6.jpg"
+    },
+    {
+      "id": "musica-microfonos",
+      "categoria": "musica",
+      "nombre": "Micrófonos inalámbricos",
+      "proveedor": "Sonido Ultra",
+      "precio": 3200,
+      "descripcion": "Set de micrófonos inalámbricos con soportes y respaldo.",
+      "imagen": "assets/fotos/musica-7.jpg"
+    },
+    {
+      "id": "musica-nocturno",
+      "categoria": "musica",
+      "nombre": "DJ set nocturno",
+      "proveedor": "Sonido Ultra",
+      "precio": 9800,
+      "descripcion": "Sesión nocturna con selección musical y control de luces.",
+      "imagen": "assets/fotos/musica-8.jpg"
     },
     {
       "id": "decoracion-tematic",
@@ -83,7 +311,7 @@
       "proveedor": "Estudio Flores",
       "precio": 12000,
       "descripcion": "Centros de mesa, globos, flores y mesa principal.",
-      "imagen": "assets/img/decoracion.svg"
+      "imagen": "assets/fotos/decoracion-1.jpg"
     },
     {
       "id": "decoracion-luces",
@@ -92,7 +320,61 @@
       "proveedor": "Estudio Flores",
       "precio": 4300,
       "descripcion": "Luces cálidas, cortinas y fondo para fotografías.",
-      "imagen": "assets/img/decoracion.svg"
+      "imagen": "assets/fotos/decoracion-2.jpg"
+    },
+    {
+      "id": "decoracion-flores",
+      "categoria": "decoracion",
+      "nombre": "Arreglos florales",
+      "proveedor": "Estudio Flores",
+      "precio": 6800,
+      "descripcion": "Arreglos para mesas, ceremonia y zona principal.",
+      "imagen": "assets/fotos/decoracion-3.jpg"
+    },
+    {
+      "id": "decoracion-fondo",
+      "categoria": "decoracion",
+      "nombre": "Fondo de fotos",
+      "proveedor": "Estudio Flores",
+      "precio": 3600,
+      "descripcion": "Panel decorativo con flores, luces y letrero personalizado.",
+      "imagen": "assets/fotos/decoracion-4.jpg"
+    },
+    {
+      "id": "decoracion-mesa",
+      "categoria": "decoracion",
+      "nombre": "Mesa principal",
+      "proveedor": "Estudio Flores",
+      "precio": 5400,
+      "descripcion": "Mesa destacada con mantel, flores y sillas decoradas.",
+      "imagen": "assets/fotos/decoracion-5.jpg"
+    },
+    {
+      "id": "decoracion-globos",
+      "categoria": "decoracion",
+      "nombre": "Globos y guirnaldas",
+      "proveedor": "Estudio Flores",
+      "precio": 3100,
+      "descripcion": "Globos, guirnaldas y arcos para dar ambiente al lugar.",
+      "imagen": "assets/fotos/decoracion-6.jpg"
+    },
+    {
+      "id": "decoracion-velas",
+      "categoria": "decoracion",
+      "nombre": "Velas y centros",
+      "proveedor": "Estudio Flores",
+      "precio": 2750,
+      "descripcion": "Velas decorativas y centros de mesa para cenas y ceremonial.",
+      "imagen": "assets/fotos/decoracion-7.jpg"
+    },
+    {
+      "id": "decoracion-alfombras",
+      "categoria": "decoracion",
+      "nombre": "Alfombras y cortinas",
+      "proveedor": "Estudio Flores",
+      "precio": 4100,
+      "descripcion": "Alfombras de pasillo y cortinas para transformar el espacio.",
+      "imagen": "assets/fotos/decoracion-8.jpg"
     },
     {
       "id": "foto-paquete",
@@ -101,7 +383,7 @@
       "proveedor": "Lente Estudio",
       "precio": 6000,
       "descripcion": "Fotógrafo, video, sesión previa y 200 fotografías editadas.",
-      "imagen": "assets/img/fotografia.svg"
+      "imagen": "assets/fotos/fotografia-1.jpg"
     },
     {
       "id": "foto-cabina",
@@ -110,7 +392,61 @@
       "proveedor": "Lente Estudio",
       "precio": 3500,
       "descripcion": "Cabina automática con impresiones para los invitados.",
-      "imagen": "assets/img/fotografia.svg"
+      "imagen": "assets/fotos/fotografia-2.jpg"
+    },
+    {
+      "id": "foto-detalles",
+      "categoria": "fotografia",
+      "nombre": "Fotógrafo de detalle",
+      "proveedor": "Lente Estudio",
+      "precio": 4200,
+      "descripcion": "Cobertura de detalle, decoración, mesa y momentos espontáneos.",
+      "imagen": "assets/fotos/fotografia-3.jpg"
+    },
+    {
+      "id": "foto-highlight",
+      "categoria": "fotografia",
+      "nombre": "Video highlight",
+      "proveedor": "Lente Estudio",
+      "precio": 5100,
+      "descripcion": "Video corto editado con música para compartir en redes.",
+      "imagen": "assets/fotos/fotografia-4.jpg"
+    },
+    {
+      "id": "foto-previa",
+      "categoria": "fotografia",
+      "nombre": "Sesión previa",
+      "proveedor": "Lente Estudio",
+      "precio": 3800,
+      "descripcion": "Sesión fotográfica antes del evento en locación acordada.",
+      "imagen": "assets/fotos/fotografia-5.jpg"
+    },
+    {
+      "id": "foto-dron",
+      "categoria": "fotografia",
+      "nombre": "Fotos con dron",
+      "proveedor": "Lente Estudio",
+      "precio": 4700,
+      "descripcion": "Tomas aéreas del lugar y de los invitados, sujetas a normativa local.",
+      "imagen": "assets/fotos/fotografia-6.jpg"
+    },
+    {
+      "id": "foto-galeria",
+      "categoria": "fotografia",
+      "nombre": "Galería instantánea",
+      "proveedor": "Lente Estudio",
+      "precio": 3300,
+      "descripcion": "Galería digital con acceso por enlace para los invitados.",
+      "imagen": "assets/fotos/fotografia-7.jpg"
+    },
+    {
+      "id": "foto-album",
+      "categoria": "fotografia",
+      "nombre": "Álbum impreso",
+      "proveedor": "Lente Estudio",
+      "precio": 5600,
+      "descripcion": "Álbum fotográfico impreso con selección de 80 imágenes.",
+      "imagen": "assets/fotos/fotografia-8.jpg"
     },
     {
       "id": "detalle-pastel",
@@ -119,7 +455,70 @@
       "proveedor": "Dulce Momento",
       "precio": 2800,
       "descripcion": "Pastel para 120 personas e invitaciones impresas.",
-      "imagen": "assets/img/detalles.svg"
+      "imagen": "assets/fotos/detalles-1.jpg"
+    },
+    {
+      "id": "detalle-recuerdos",
+      "categoria": "detalles",
+      "nombre": "Recuerdos personalizados",
+      "proveedor": "Dulce Momento",
+      "precio": 3400,
+      "descripcion": "Recuerdos para invitados con empaque y etiquetas personalizadas.",
+      "imagen": "assets/fotos/detalles-2.jpg"
+    },
+    {
+      "id": "detalle-dulces",
+      "categoria": "detalles",
+      "nombre": "Mesa de dulces",
+      "proveedor": "Dulce Momento",
+      "precio": 4600,
+      "descripcion": "Mesa de dulces con frascos, bases y decoración coordinada.",
+      "imagen": "assets/fotos/detalles-3.jpg"
+    },
+    {
+      "id": "detalle-papeleria",
+      "categoria": "detalles",
+      "nombre": "Papelería fina",
+      "proveedor": "Dulce Momento",
+      "precio": 3900,
+      "descripcion": "Menús, tarjetas, placeholders y señalización impresa.",
+      "imagen": "assets/fotos/detalles-4.jpg"
+    },
+    {
+      "id": "detalle-velas",
+      "categoria": "detalles",
+      "nombre": "Velas personalizadas",
+      "proveedor": "Dulce Momento",
+      "precio": 2200,
+      "descripcion": "Velas conmemorativas con etiqueta y empaque individual.",
+      "imagen": "assets/fotos/detalles-5.jpg"
+    },
+    {
+      "id": "detalle-bomboneras",
+      "categoria": "detalles",
+      "nombre": "Bomboneras",
+      "proveedor": "Dulce Momento",
+      "precio": 2600,
+      "descripcion": "Bomboneras dulces para 100 invitados con lazos a juego.",
+      "imagen": "assets/fotos/detalles-6.jpg"
+    },
+    {
+      "id": "detalle-carteles",
+      "categoria": "detalles",
+      "nombre": "Carteles y letreros",
+      "proveedor": "Dulce Momento",
+      "precio": 2900,
+      "descripcion": "Letreros de bienvenida, mesas y señalización del evento.",
+      "imagen": "assets/fotos/detalles-7.jpg"
+    },
+    {
+      "id": "detalle-protocolo",
+      "categoria": "detalles",
+      "nombre": "Kit de protocolo",
+      "proveedor": "Dulce Momento",
+      "precio": 3100,
+      "descripcion": "Kit con arreglos, tarjetas y detalles para la mesa principal.",
+      "imagen": "assets/fotos/detalles-8.jpg"
     },
     {
       "id": "seguridad-basica",
@@ -128,7 +527,70 @@
       "proveedor": "Proteger",
       "precio": 3900,
       "descripcion": "Cuatro personas de seguridad y control de acceso.",
-      "imagen": "assets/img/seguridad.svg"
+      "imagen": "assets/fotos/seguridad-1.jpg"
+    },
+    {
+      "id": "seguridad-accesos",
+      "categoria": "seguridad",
+      "nombre": "Control de accesos",
+      "proveedor": "Proteger",
+      "precio": 5100,
+      "descripcion": "Personal en entradas, revisión de listas y manejo de invitados.",
+      "imagen": "assets/fotos/seguridad-2.jpg"
+    },
+    {
+      "id": "seguridad-vallas",
+      "categoria": "seguridad",
+      "nombre": "Personal de valla",
+      "proveedor": "Proteger",
+      "precio": 4400,
+      "descripcion": "Equipo para ordenar filas, perímetro y zonas de alto flujo.",
+      "imagen": "assets/fotos/seguridad-3.jpg"
+    },
+    {
+      "id": "seguridad-nocturna",
+      "categoria": "seguridad",
+      "nombre": "Vigilancia nocturna",
+      "proveedor": "Proteger",
+      "precio": 6200,
+      "descripcion": "Vigilancia durante montaje, evento y retiro del equipo.",
+      "imagen": "assets/fotos/seguridad-4.jpg"
+    },
+    {
+      "id": "seguridad-escaner",
+      "categoria": "seguridad",
+      "nombre": "Escáner de entradas",
+      "proveedor": "Proteger",
+      "precio": 3600,
+      "descripcion": "Lectores digitales y soporte para control de boletos.",
+      "imagen": "assets/fotos/seguridad-5.jpg"
+    },
+    {
+      "id": "seguridad-vip",
+      "categoria": "seguridad",
+      "nombre": "Seguridad para VIP",
+      "proveedor": "Proteger",
+      "precio": 4800,
+      "descripcion": "Atención privada para invitados especiales y área reservada.",
+      "imagen": "assets/fotos/seguridad-6.jpg"
+    },
+    {
+      "id": "seguridad-camaras",
+      "categoria": "seguridad",
+      "nombre": "Cámaras portátiles",
+      "proveedor": "Proteger",
+      "precio": 5300,
+      "descripcion": "Cámaras portátiles y monitoreo en puntos estratégicos.",
+      "imagen": "assets/fotos/seguridad-7.jpg"
+    },
+    {
+      "id": "seguridad-emergencias",
+      "categoria": "seguridad",
+      "nombre": "Coordinación de emergencias",
+      "proveedor": "Proteger",
+      "precio": 5800,
+      "descripcion": "Coordinador de seguridad, rutas de salida y protocolo de emergencia.",
+      "imagen": "assets/fotos/seguridad-8.jpg"
     }
   ]
 }
