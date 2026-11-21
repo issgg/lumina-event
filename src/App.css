@@ -626,11 +626,26 @@
   box-shadow: var(--sombra-media);
 }
 
+.tarjeta-clicable {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.tarjeta-clicable:focus-visible {
+  border-radius: 20px;
+  outline: 3px solid rgba(109, 94, 252, 0.35);
+  outline-offset: -3px;
+}
+
 .tarjeta-imagen {
+  position: relative;
   display: grid;
   place-items: center;
   height: 145px;
   margin: 0;
+  overflow: hidden;
   background:
     radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.95), transparent 60%),
     linear-gradient(135deg, #eeebff, #fff3e8);
@@ -641,6 +656,28 @@
   height: 100px;
   object-fit: contain;
   transition: transform 0.2s ease;
+}
+
+.tarjeta-ver {
+  position: absolute;
+  right: 0.7rem;
+  bottom: 0.7rem;
+  border-radius: 999px;
+  padding: 0.35rem 0.65rem;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--color-primario-oscuro);
+  font-size: 0.68rem;
+  font-weight: 900;
+  box-shadow: 0 6px 18px rgba(38, 31, 89, 0.12);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.tarjeta:hover .tarjeta-ver,
+.tarjeta-clicable:focus-visible .tarjeta-ver {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .tarjeta:hover .tarjeta-imagen img {
@@ -700,9 +737,12 @@
   font-weight: 900;
 }
 
+.tarjeta-accion {
+  padding: 0 1.1rem 1.1rem;
+}
+
 .boton-tarjeta {
   width: 100%;
-  margin-top: auto;
 }
 
 .paneles {
@@ -907,6 +947,132 @@ tbody tr:hover {
   text-align: center;
 }
 
+.modal-fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(18, 17, 42, 0.62);
+  backdrop-filter: blur(8px);
+}
+
+.modal-tarjeta {
+  position: relative;
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  width: min(820px, 100%);
+  max-height: min(88vh, 720px);
+  overflow: auto;
+  border-radius: 26px;
+  background: #ffffff;
+  box-shadow: 0 40px 100px rgba(18, 17, 42, 0.35);
+  animation: aparecer 0.2s ease;
+}
+
+.modal-cerrar {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--color-borde);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: #5e6580;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.modal-cerrar:hover {
+  border-color: var(--color-primario);
+  color: var(--color-primario-oscuro);
+}
+
+.modal-imagen {
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.95), transparent 60%),
+    linear-gradient(150deg, #eeebff, #fff3e8);
+}
+
+.modal-imagen img {
+  width: min(240px, 100%);
+  height: auto;
+  object-fit: contain;
+}
+
+.modal-contenido {
+  padding: 2.5rem 2rem 2rem;
+}
+
+.modal-contenido h2 {
+  margin-bottom: 0.6rem;
+  font-size: 1.9rem;
+}
+
+.modal-contenido .subtitulo {
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.modal-datos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+.modal-datos div {
+  border: 1px solid var(--color-borde);
+  border-radius: 14px;
+  padding: 0.8rem;
+  background: #fbfaff;
+}
+
+.modal-datos dt {
+  margin-bottom: 0.25rem;
+  color: var(--color-texto-suave);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.modal-datos dd {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 900;
+  text-transform: capitalize;
+}
+
+.modal-nota {
+  margin-bottom: 1.2rem;
+  color: var(--color-texto-suave);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.modal-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
 @media (max-width: 960px) {
   .acceso-contenedor {
     grid-template-columns: 1fr;
@@ -971,5 +1137,22 @@ tbody tr:hover {
 
   .hero-texto h1 {
     font-size: 2.7rem;
+  }
+
+  .modal-tarjeta {
+    grid-template-columns: 1fr;
+    max-height: 92vh;
+  }
+
+  .modal-imagen {
+    min-height: 180px;
+  }
+
+  .modal-contenido {
+    padding: 1.5rem;
+  }
+
+  .modal-datos {
+    grid-template-columns: 1fr;
   }
 }
