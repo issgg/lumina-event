@@ -51,7 +51,7 @@ test("la validación rechaza campos vacíos, texto, negativos y nombres largos",
   };
   assert.equal(validarDatosEvento({ ...base, nombre: "" }).errores.nombre, MENSAJES.nombreVacio);
   assert.equal(validarDatosEvento({ ...base, invitados: "abc" }).errores.invitados, MENSAJES.invitadosNumero);
-  assert.equal(validarDatosEvento({ ...base, invitados: "-5" }).errores.invitados, MENSAJES.invitadosNumero);
+  assert.equal(validarDatosEvento({ ...base, invitados: "-5" }).errores.invitados, MENSAJES.invitadosPositivo);
   assert.equal(validarDatosEvento({ ...base, nombre: "a".repeat(200) }).errores.nombre, MENSAJES.nombreLargo);
   assert.equal(validarDatosEvento({ ...base, fecha: "2020-01-01" }).errores.fecha, MENSAJES.fechaPasada);
   assert.equal(validarDatosEvento(base, ["Boda"]).validos, true);

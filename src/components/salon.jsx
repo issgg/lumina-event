@@ -47,6 +47,8 @@ export default function Salon({ evento, onActualizar, setAviso }) {
   }, [detalleAbierto]);
 
   async function elegir(salon) {
+    if (guardando || seleccionado?.id === salon.id) return;
+
     if (Number(salon.capacidad) < invitados) {
       setAvisoLocal(`Este salón recibe hasta ${salon.capacidad} personas y tu evento tiene ${invitados}.`);
       return;
@@ -157,7 +159,7 @@ export default function Salon({ evento, onActualizar, setAviso }) {
                     type="button"
                     className={`boton boton-tarjeta ${activo ? "" : "boton-secundario"}`}
                     onClick={() => elegir(salon)}
-                    disabled={!suffices || guardando === salon.id}
+                    disabled={activo || !suffices || guardando === salon.id}
                   >
                     {guardando === salon.id
                       ? "Guardando…"
@@ -284,7 +286,9 @@ export default function Salon({ evento, onActualizar, setAviso }) {
                   className="boton"
                   onClick={() => elegir(salonDetalle)}
                   disabled={
-                    Number(salonDetalle.capacidad) < invitados || guardando === salonDetalle.id
+                    seleccionado?.id === salonDetalle.id ||
+                    Number(salonDetalle.capacidad) < invitados ||
+                    guardando === salonDetalle.id
                   }
                 >
                   {guardando === salonDetalle.id

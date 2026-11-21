@@ -1,3 +1,5 @@
+import { solicitarConTiempo } from "./red.js";
+
 const URL_BASE = String(import.meta.env.VITE_SUPABASE_URL ?? "").replace(/\/+$/, "");
 const CLAVE = String(import.meta.env.VITE_SUPABASE_ANON_KEY ?? "").trim();
 
@@ -15,7 +17,7 @@ function consulta(filtros) {
 async function solicitar(tabla, { metodo = "GET", filtros, cuerpo, prefer } = {}) {
   if (!supabaseConfigurado) throw new Error("Supabase no está configurado");
 
-  const respuesta = await fetch(`${URL_BASE}/rest/v1/${tabla}${consulta(metodo === "GET" ? { select: "*", ...filtros } : filtros)}`, {
+  const respuesta = await solicitarConTiempo(`${URL_BASE}/rest/v1/${tabla}${consulta(metodo === "GET" ? { select: "*", ...filtros } : filtros)}`, {
     method: metodo,
     headers: {
       apikey: CLAVE,

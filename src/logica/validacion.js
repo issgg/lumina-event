@@ -26,7 +26,7 @@ export function validarDatosEvento(datos, tiposEvento = [], opciones = {}) {
   else if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) errores.fecha = MENSAJES.fechaRequerida;
   else if (fecha < new Date().toISOString().slice(0, 10)) errores.fecha = MENSAJES.fechaPasada;
 
-  if (!/^\d+$/.test(invitados)) errores.invitados = MENSAJES.invitadosNumero;
+  if (!/^-?\d+$/.test(invitados)) errores.invitados = MENSAJES.invitadosNumero;
   else if (Number(invitados) < 1) errores.invitados = MENSAJES.invitadosPositivo;
   else if (Number(invitados) > 10000) errores.invitados = MENSAJES.invitadosMaximo;
 

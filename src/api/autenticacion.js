@@ -1,3 +1,5 @@
+import { solicitarConTiempo } from "./red.js";
+
 const URL_BASE = String(import.meta.env.VITE_SUPABASE_URL ?? "").replace(/\/+$/, "");
 const CLAVE = String(import.meta.env.VITE_SUPABASE_ANON_KEY ?? "").trim();
 const CLAVE_LOCAL = "lumina-sesion";
@@ -44,7 +46,7 @@ export function limpiarSesion() {
 async function solicitarAuth(ruta, { metodo = "GET", cuerpo, token } = {}) {
   if (!authConfigurado) throw new Error("Falta configurar Supabase");
 
-  const respuesta = await fetch(`${URL_BASE}/auth/v1${ruta}`, {
+  const respuesta = await solicitarConTiempo(`${URL_BASE}/auth/v1${ruta}`, {
     method: metodo,
     headers: {
       apikey: CLAVE,

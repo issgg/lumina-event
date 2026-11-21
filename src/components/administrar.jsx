@@ -28,13 +28,14 @@ export default function Administrar({ setAviso }) {
   async function agregar(eventoFormulario) {
     eventoFormulario.preventDefault();
     const nombre = formulario.nombre.trim();
-    const precio = Number(formulario.precio);
+    const textoPrecio = String(formulario.precio ?? "").trim();
+    const precio = Number(textoPrecio);
 
     if (!nombre) {
       setAviso(MENSAJES.adminNombre);
       return;
     }
-    if (!Number.isFinite(precio) || precio < 0) {
+    if (!textoPrecio || !Number.isFinite(precio) || precio < 0) {
       setAviso(MENSAJES.adminPrecio);
       return;
     }

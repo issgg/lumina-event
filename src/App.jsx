@@ -53,8 +53,8 @@ export default function App() {
         }
         setListo(true);
       })
-      .catch(() => {
-        setErrorBase(MENSAJES.errorBase);
+      .catch((error) => {
+        setErrorBase(error?.name === "ErrorDeRed" ? error.message : MENSAJES.errorBase);
         setListo(true);
       });
   }, [sesion]);

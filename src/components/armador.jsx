@@ -34,15 +34,18 @@ export default function Armador({ evento, onActualizar, setAviso }) {
 
   async function guardar(eventoFormulario) {
     eventoFormulario.preventDefault();
+    if (guardando) return;
+    setGuardando(true);
+
     const resultado = validarDatosEvento(formulario, TIPOS_EVENTO, { requerirSalon: false });
     setErrores(resultado.errores);
 
     if (!resultado.validos) {
       setAviso(MENSAJES.datosInvalidos);
+      setGuardando(false);
       return;
     }
 
-    setGuardando(true);
     const nuevo = {
       ...evento,
       ...formulario,

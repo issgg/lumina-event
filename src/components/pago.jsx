@@ -23,6 +23,7 @@ export default function Pago({ evento, onActualizar }) {
   const [formulario, setFormulario] = useState(FORMULARIO_VACIO);
   const [errores, setErrores] = useState({});
   const [confirmado, setConfirmado] = useState(null);
+  const [procesando, setProcesando] = useState(false);
 
   const total = calcularTotal(evento.detalles);
   const grupos = agruparPorCategoria(evento.detalles);
@@ -37,10 +38,13 @@ export default function Pago({ evento, onActualizar }) {
 
   function confirmar(eventoFormulario) {
     eventoFormulario.preventDefault();
+    if (procesando || confirmado) return;
+
     const resultado = validarPago(formulario);
     setErrores(resultado.errores);
     if (!resultado.validos) return;
 
+    setProcesando(true);
     setConfirmado({
       referencia: `LM-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`,
       fecha: new Date().toLocaleString("es-MX", { dateStyle: "long", timeStyle: "short" }),
@@ -49,6 +53,7 @@ export default function Pago({ evento, onActualizar }) {
     });
     setFormulario(FORMULARIO_VACIO);
     onActualizar(evento, "Compra simulada completada. No se realizó ningún cobro.", false);
+    setProcesando(false);
   }
 
   if (evento.detalles.length === 0) {
@@ -221,7 +226,7 @@ export default function Pago({ evento, onActualizar }) {
                 </span>
               </label>
             </div>
-            <button type="submit" className="boton boton-completo">
+            <button type="submit" className="boton boton-completo" disabled={procesando || Boolean(confirmado)}>
               Generar comprobante
             </button>
             <p className="pago-nota">
