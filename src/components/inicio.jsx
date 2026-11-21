@@ -1,6 +1,5 @@
 import { Link } from "react-router";
 
-import { CATEGORIAS } from "../api/configuracion.js";
 import { calcularTotal } from "../logica/carrito.js";
 import { formatearMoneda } from "../logica/formato.js";
 
@@ -27,11 +26,6 @@ export default function Inicio({ evento = { detalles: [] } }) {
           <Link className="boton boton-secundario" to="/armador">
             Ver mi evento
           </Link>
-        </div>
-        <div className="hero-confianza">
-          <span>{CATEGORIAS.length} categorías</span>
-          <span>Cronograma automático</span>
-          <span>Datos en Supabase</span>
         </div>
       </div>
 

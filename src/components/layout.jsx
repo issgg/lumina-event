@@ -43,7 +43,7 @@ export default function Layout({ aviso, sesion, onCerrarSesion }) {
       </main>
 
       <footer className="pie">
-        <p>Lumina Event · Datos con Supabase · Proyecto de Aplicaciones Web</p>
+        <p>Lumina Event</p>
       </footer>
     </div>
   );
