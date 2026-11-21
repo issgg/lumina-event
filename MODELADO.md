@@ -1,6 +1,6 @@
 # Modelo de datos
 
-Ocho tablas. Este archivo explica el modelo; `schema.sql` contiene la definición SQL.
+Ocho tablas. Este archivo explica el modelo; `public/db/supabase.sql` contiene la definición SQL.
 
 ## Tablas
 
@@ -35,9 +35,11 @@ Ocho tablas. Este archivo explica el modelo; `schema.sql` contiene la definició
 
 ## Cómo se refleja en la app
 
-GitHub Pages no ejecuta un servidor de base de datos, pero la app usa **SQLite real dentro del navegador** con sql.js (WASM). `inicializarBase()` en `js/base-datos.js` ejecuta este mismo `schema.sql`, siembra `categorias`, `proveedores`, `salones` y `servicios` desde `data/catalogo.json`, y guarda la base exportada en `localStorage` con la clave `lumina.db.v1`.
+`inicializarBase()` usa **Supabase** siempre: `src/api/supabase.js` llama a `/rest/v1/<tabla>`, `public/db/supabase.sql` crea las 8 tablas con RLS y la primera carga siembra el catálogo desde `public/data/catalogo.json`. Los datos se ven en Table Editor y se consultan en consola con `luminaDB.consultar("servicios")`.
 
-- Guardar el evento = `INSERT`/`UPDATE` en `eventos` + `detalle_evento` + `cronograma`.
-- Recargar = reabrir la base exportada desde `localStorage`.
+Si faltan `VITE_SUPABASE_URL` o `VITE_SUPABASE_ANON_KEY`, la app no inventa una base local: muestra el error de inicio.
+
+- Guardar el evento = `upsert` en `eventos` + borrado e `insert` en `detalle_evento` y `cronograma`.
+- Recargar = leer el evento desde Supabase.
 - El armador tipo carrito corresponde a `detalle_evento`; el `UNIQUE (evento_id, servicio_id)` evita duplicados por doble clic.
-- `node --test tests/*.test.js` ejecuta el esquema y las consultas con SQLite real.
+- `node --test tests/*.test.js` ejecuta las pruebas de lógica pura.

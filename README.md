@@ -6,44 +6,98 @@ Sistema web para planificar y armar eventos sociales y empresariales. El módulo
 
 Una sola plataforma reúne salón, comida, mobiliario, música, decoración, fotografía y detalles, para que el usuario no tenga que buscar proveedor por proveedor.
 
-## Problema
-
-Organizar un evento implica coordinar muchos proveedores, comparar precios, revisar ubicaciones y acomodar horarios. Esa información suele estar separada, por lo que el proceso toma tiempo y el costo total no es claro.
-
-## Objetivo
-
-Permitir construir un paquete personalizado y obtener un resumen con servicios, precios y horarios propuestos.
-
-## Alcance
-
-Incluye: catálogo por categorías, selección de salón, armador tipo carrito, costo aproximado, modificación y eliminación de servicios, resumen final, cronograma, persistencia del borrador y panel básico de catálogo.
-
-No incluye: pagos reales, contratos, facturación ni confirmaciones externas.
-
 ## Tecnologías
 
-HTML5 semántico, CSS (Flexbox, Grid, media queries, `:focus-visible`), JavaScript ES6 (`fetch`, `async/await`, módulos), **SQLite real ejecutado en el navegador con sql.js (WASM)**, GitHub Pages. `db/schema.sql` se ejecuta tal cual; la base se exporta y se guarda en `localStorage` con la clave `lumina.db.v1` para que sobreviva recargas. `data/catalogo.json` solo se usa para sembrar las tablas la primera vez.
+React + Vite, React Router con `HashRouter`, CSS propio, JavaScript ES6 y **Supabase** como base alojada. No se instaló una librería nueva: `src/api/supabase.js` usa el REST de Supabase con `fetch`. La app sigue siendo estática: GitHub Pages publica `dist/` y el navegador habla con Supabase.
 
-Para ver los datos: **F12 → Application → Local Storage → clave `lumina.db.v1`** (base exportada en base64). Para consultar tablas en la consola: `luminaDB.consultar("SELECT * FROM eventos")` o `luminaDB.servicios()`. Las pruebas ejecutan el mismo SQL con `node --test tests/*.test.js`.
+No hay modo local: si faltan las variables de entorno, la app muestra un error claro. `public/data/catalogo.json` solo siembra Supabase la primera vez.
 
 ## Cómo ejecutarlo
 
 ```bash
-python3 -m http.server 8000
+npm install
+npm run dev
 ```
 
-Después abre `http://localhost:8000`. Se necesita servidor porque el catálogo se carga con `fetch`.
+Abre la URL que muestra Vite. Para production:
+
+```bash
+npm run build
+npm run preview
+```
+
+Para probar la lógica:
+
+```bash
+npm test
+```
+
+## Conectar Supabase
+
+1. Crear proyecto gratuito en Supabase.
+2. Pegar `public/db/supabase.sql` en **SQL Editor → New query → Run**.
+3. Copiar `.env.example` a `.env.local` y rellenar `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` del proyecto.
+4. Reiniciar Vite. La primera carga siembra las 8 tablas desde `public/data/catalogo.json`.
+
+El `anon key` es público y debe ir en el frontend; el `service_role` **nunca** se pone aquí. Las políticas RLS del SQL permiten el acceso de demostración; para producción habría que reducirlas.
 
 ## Estructura
 
-| Carpeta / archivo | Contenido |
-|---|---|
-| `index.html`, `eventos.html`, `catalogo.html`, `armador.html`, `resumen.html`, `admin.html` | Páginas del sitio |
-| `css/` | Estilos base y componentes |
-| `js/` | Lógica: base de datos SQL, navegación, catálogo, carrito, cronograma, validación, almacenamiento, errores |
-| `data/` | Catálogo JSON de siembra y configuración de menú, categorías y reglas |
-| `db/` | Modelo ER y `schema.sql` ejecutado por la app |
-| `vendor/` | `sql-wasm.js` y `sql-wasm.wasm` (SQLite en el navegador) |
-| `MAPA.md`, `GUIÓN.md`, `BITÁCORA.md`, `PRUEBAS.md`, `KIT-VIVO.md` | Material de la presentación |
+La organización es la misma idea del proyecto Pokédex: `src/api` para traer datos, `src/components` para componentes, `App.jsx` para rutas y estado, `main.jsx` como entrada, y `public/` para archivos que se sirven directo.
 
-Deploy: pendiente de configurar en Settings → Pages → `main / root`.
+```text
+LuminaEvent/
+├─ .env.example
+├─ index.html
+├─ vite.config.js
+├─ src/
+│  ├─ main.jsx
+│  ├─ App.jsx
+│  ├─ App.css
+│  ├─ index.css
+│  ├─ api/
+│  │  ├─ baseDatos.js
+│  │  ├─ catalogo.js
+│  │  ├─ configuracion.js
+│  │  └─ supabase.js
+│  ├─ components/
+│  │  ├─ layout.jsx
+│  │  ├─ inicio.jsx
+│  │  ├─ catalogo.jsx
+│  │  ├─ tarjetaServicio.jsx
+│  │  ├─ armador.jsx
+│  │  ├─ resumen.jsx
+│  │  └─ administrar.jsx
+│  └─ logica/
+│     ├─ carrito.js
+│     ├─ cronograma.js
+│     ├─ validacion.js
+│     ├─ filtros.js
+│     ├─ formato.js
+│     ├─ evento.js
+│     └─ mensajes.js
+├─ public/
+│  ├─ data/catalogo.json
+│  ├─ db/supabase.sql
+│  └─ assets/img/*.svg
+└─ tests/
+```
+
+## Base de datos en la presentación
+
+En la consola del navegador:
+
+```js
+luminaDB.modo
+luminaDB.consultar("servicios")
+luminaDB.consultar("eventos")
+luminaDB.consultar("detalle_evento")
+luminaDB.cronograma()
+luminaDB.tablas()
+```
+
+`luminaDB.consultar("servicios")` devuelve las filas en caché y los datos también se ven en **Table Editor**. Si no hay `.env.local`, la pantalla muestra "No se pudo iniciar la base" con botón Reintentar.
+
+## Deploy
+
+Compilar con `npm run build` y publicar la carpeta `dist/` en GitHub Pages. El `base: "./"` de `vite.config.js` permite que funcione en una URL de proyecto. Las variables `VITE_SUPABASE_*` deben existir **antes de compilar**; en Pages se configuran como Secrets del workflow o del entorno de build.

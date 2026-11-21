@@ -4,31 +4,35 @@ Guía para responder "¿dónde vive esto?" sin explicar línea por línea.
 
 | Si te preguntan por... | Abrir | Buscar |
 |---|---|---|
-| El menú y las opciones de navegación | `data/config.js` | `NAVEGACION` |
-| Cómo se pinta el menú en todas las páginas | `js/navegacion.js` | `renderizarMenu` |
-| Los servicios, precios y proveedores en la app | `js/base-datos.js` | `consultarServicios()` (consulta SQL) |
-| Los datos de siembra del catálogo | `data/catalogo.json` | arreglo `servicios` |
-| La definición de las 8 tablas | `db/schema.sql` | `CREATE TABLE` |
-| SQLite en el navegador | `js/base-datos.js`, `vendor/sql-wasm.js` | `inicializarBase()` |
-| La base guardada entre recargas | `localStorage` | clave `lumina.db.v1` |
-| Ver tablas en la consola | `js/base-datos.js` | `window.luminaDB.consultar(sql)` |
-| Las categorías del catálogo y sus nombres | `data/config.js` | `CATEGORIAS` |
-| La carga del catálogo y el estado "Cargando" | `js/catalogo.js` | `cargarCatalogo` (llama a SQL) |
-| La búsqueda y el filtro por categoría | `js/catalogo.js` | `filtrarServicios` |
-| El estado vacío de búsqueda | `js/errores.js` | `sinResultados` |
-| Agregar, quitar o cambiar cantidad | `js/carrito.js` | `agregarServicio`, `quitarServicio`, `cambiarCantidad` |
-| El cálculo del total | `js/carrito.js` | `calcularTotal` |
-| Evitar el doble clic en guardar | `js/almacenamiento.js` | `guardarEvento` y `boton.disabled` en `js/main.js` |
-| Recuperar el evento después de recargar | `js/base-datos.js` | `leerEvento` (SELECT + base exportada) |
-| Las reglas del formulario | `js/validacion.js` | `validarDatosEvento` |
-| Los mensajes de error | `js/errores.js` | `MENSAJES` |
-| Los horarios del cronograma | `data/config.js` | `REGLAS_CRONOGRAMA` |
-| La generación del cronograma | `js/cronograma.js` | `generarCronograma` |
-| La tabla final del cronograma | `resumen.html` | `<table id="tabla-cronograma">` |
-| El panel del administrador | `admin.html` + `js/main.js` | bloque `admin` |
-| Las tablas SQL y relaciones | `db/schema.sql`, `db/MODELO.md` | 8 tablas ejecutadas por `inicializarBase` |
-| El cronograma guardado en SQL | `db/schema.sql` | tabla `cronograma` |
-| Los casos límite probados | `PRUEBAS.md` | tabla de 9 casos |
-| La explicación de la presentación | `GUIÓN.md` | momentos 1 a 4 |
+| La entrada de la app | `src/main.jsx` | `createRoot`, `HashRouter` |
+| Las rutas y el estado del evento | `src/App.jsx` | `<Routes>`, `actualizarEvento` |
+| El menú y el aviso general | `src/components/layout.jsx` | `NAVEGACION`, `<Outlet />` |
+| Las opciones del menú | `src/api/configuracion.js` | `NAVEGACION` |
+| Las categorías del catálogo | `src/api/configuracion.js` | `CATEGORIAS` |
+| Los tipos de evento | `src/api/configuracion.js` | `TIPOS_EVENTO` |
+| Las reglas del cronograma | `src/api/configuracion.js` | `REGLAS_CRONOGRAMA` |
+| La página de inicio | `src/components/inicio.jsx` | `hero` |
+| La página del catálogo | `src/components/catalogo.jsx` | `filtrarServicios`, `agregar` |
+| La tarjeta de cada servicio | `src/components/tarjetaServicio.jsx` | `TarjetaServicio` |
+| Traer servicios desde la capa de datos | `src/api/catalogo.js` | `cargarServicios` |
+| El armador tipo carrito | `src/components/armador.jsx` | `guardar`, `cambiarCantidadServicio` |
+| El resumen y las tablas | `src/components/resumen.jsx` | `Tabla`, `consultarCronograma` |
+| El panel del administrador | `src/components/administrar.jsx` | `agregar`, `eliminar` |
+| Conectar con Supabase | `src/api/baseDatos.js` | `inicializarBase` |
+| Llamadas REST a Supabase | `src/api/supabase.js` | `solicitar` |
+| Esquema de 8 tablas | `public/db/supabase.sql` | `create table` |
+| El modelo explicado | `MODELADO.md` | tablas y relaciones |
+| Los datos de siembra | `public/data/catalogo.json` | arreglo `servicios` |
+| Variables de conexión | `.env.local` | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` |
+| Consultar tablas en consola | `src/api/baseDatos.js` | `window.luminaDB.consultar(tabla)` |
+| Agregar, quitar y cantidades | `src/logica/carrito.js` | `agregarServicio`, `quitarServicio` |
+| El total y los subtotales | `src/logica/carrito.js` | `calcularTotal`, `agruparPorCategoria` |
+| La búsqueda y el filtro | `src/logica/filtros.js` | `normalizar`, `filtrarServicios` |
+| La validación del formulario | `src/logica/validacion.js` | `validarDatosEvento` |
+| Los mensajes | `src/logica/mensajes.js` | `MENSAJES` |
+| La generación de horarios | `src/logica/cronograma.js` | `generarCronograma` |
+| Los estilos generales | `src/index.css` | variables y botones |
+| Los estilos por pantalla | `src/App.css` | `.hero`, `.panel`, `.rejilla` |
+| Los casos límite probados | `PRUEBAS.md` | tabla de 10 casos |
 
-Respuesta corta que conviene usar: "Eso vive en **[archivo]**, en la función **[nombre]**; lo abro y lo muestro".
+Respuesta corta: "Eso vive en **[archivo]**, en la función **[nombre]**; lo abro y lo muestro".

@@ -4,31 +4,36 @@ Antes de entregar, ejecutar cada caso y marcarlo. Si algo falla, debe fallar con
 
 | # | Caso que puede pedir el maestro | Dónde lo probamos | Resultado esperado | OK |
 |---|---|---|---|---|
-| 1 | Formulario con campos vacíos | `armador.html` → Guardar sin llenar | No guarda; mensajes junto a cada campo y foco en el primero | [ ] |
-| 2 | Texto donde se espera un número | `armador.html` → invitados `abc` | "Escribe un número, por ejemplo 120" | [ ] |
-| 3 | Número negativo | `armador.html` → invitados `-5` | "Debe ser mayor a 0" | [ ] |
-| 4 | Texto muy largo | `armador.html` → nombre de 200 letras | `maxlength="60"` y mensaje "Máximo 60 caracteres" | [ ] |
-| 5 | Buscar algo que no existe | `catalogo.html` → buscar `zzzz` | "No encontramos 'zzzz'. Prueba otra categoría" y botón limpiar | [ ] |
-| 6 | Doble clic en guardar | `armador.html` → dos clics rápidos | Botón deshabilitado; el servicio no se duplica; mensaje "Ya está en tu evento" | [ ] |
-| 7 | Recargar a mitad del proceso | Llenar, agregar servicios y recargar | Se restaura el borrador y avisa "Retomamos tu evento guardado" | [ ] |
-| 8 | SQLite/WASM tarda o no carga | `catalogo.html` sin el archivo `vendor/sql-wasm.wasm` | "Cargando catálogo…" y luego error con botón Reintentar; sin pantalla en blanco ni consola rota | [ ] |
-| 9 | Lista vacía | `armador.html` → quitar todos los servicios | "Aún no agregaste servicios. Elige uno del catálogo" | [ ] |
+| 1 | Formulario con campos vacíos | `/#/armador` → Guardar sin llenar | No guarda; mensajes junto a cada campo y aviso general | [ ] |
+| 2 | Texto donde se espera un número | `/#/armador` → invitados `abc` | "Escribe un número, por ejemplo 120" | [ ] |
+| 3 | Número negativo | `/#/armador` → invitados `-5` | "Debe ser mayor a 0" | [ ] |
+| 4 | Texto muy largo | `/#/armador` → nombre de 200 letras | `maxLength={60}` y mensaje "Máximo 60 caracteres" | [ ] |
+| 5 | Buscar algo que no existe | `/#/catalogo` → buscar `zzzz` | "No encontramos servicios con ese nombre…" y botón limpiar | [ ] |
+| 6 | Doble clic en agregar | `/#/catalogo` → dos clics en el mismo servicio | Botón queda "En tu evento"; no se duplica | [ ] |
+| 7 | Recargar a mitad del proceso | Llenar, agregar servicios y recargar | Se restaura el borrador desde Supabase y avisa "Retomamos tu evento guardado" | [ ] |
+| 8 | Supabase no responde | Apagar el proyecto de Supabase o borrar `.env.local` | Pantalla "No se pudo iniciar la base" con botón Reintentar; sin pantalla en blanco | [ ] |
+| 9 | Lista vacía | `/#/armador` → quitar todos los servicios | "Aún no agregaste servicios. Elige uno del catálogo" | [ ] |
 | 10 | Doble guardado con el mismo servicio | Agregar el mismo servicio dos veces y guardar | `UNIQUE (evento_id, servicio_id)` impide el duplicado en `detalle_evento` | [ ] |
 
 ## Cómo ejecutarlas rápido
 
 ```bash
-python3 -m http.server 8000
+npm install
+npm run dev
 ```
 
-Abrir `http://localhost:8000`. Para el caso 8, renombrar temporalmente `vendor/sql-wasm.wasm`. Para ver la base real: F12 → Application → Local Storage → `lumina.db.v1`.
+Antes de probar, copiar `.env.example` a `.env.local` y pegar la URL y el anon key de Supabase. Para el caso 8, borrar `.env.local` o apagar el proyecto. Para ver la base: Supabase → Table Editor.
 
-## Pruebas automáticas de lógica
+## Pruebas automáticas
 
 ```bash
-node --test tests/*.test.js
+npm test
 ```
 
-No instala nada: usa `node:test`, incluido en Node. Cubre total, duplicados, cantidades, validación, filtro, cronograma y las 8 tablas SQLite reales. Resultado al 19/11/2026: **10 pruebas, 10 aprobadas**.
+Cubre total, duplicados, cantidades, validación, filtro y cronograma. Resultado al 20/11/2026: **7 pruebas, 7 aprobadas** y `npm run build` correcto con Supabase.
 
-También se verificó que todos los `id` usados por JavaScript existen en el HTML y que el servidor local devuelve 200 para páginas, JSON, CSS, JS e imágenes.
+La compilación de producción se verifica con:
+
+```bash
+npm run build
+```
