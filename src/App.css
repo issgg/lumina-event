@@ -85,6 +85,147 @@
   color: var(--color-texto-suave);
 }
 
+.encabezado-derecha {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.usuario {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-left: 1px solid var(--color-borde);
+  padding-left: 0.8rem;
+  color: #475467;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.usuario span {
+  max-width: 13rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.usuario .boton-texto {
+  color: var(--color-primario-oscuro);
+  font-size: 0.8rem;
+}
+
+.acceso {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  background: radial-gradient(circle at top, #efedff 0, transparent 55%);
+}
+
+.acceso-tarjeta {
+  width: min(440px, 100%);
+  border: 1px solid var(--color-borde);
+  border-radius: 22px;
+  padding: 2rem;
+  background: #ffffff;
+  box-shadow: 0 24px 60px rgba(23, 32, 50, 0.1);
+}
+
+.acceso-tarjeta h1 {
+  margin-bottom: 0.35rem;
+  font-size: 1.8rem;
+}
+
+.acceso-tarjeta .subtitulo {
+  font-size: 0.92rem;
+}
+
+.pestanas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3rem;
+  margin: 1.4rem 0 1rem;
+  border-radius: 999px;
+  padding: 0.25rem;
+  background: #f2f1fb;
+}
+
+.pestanas button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.55rem;
+  background: transparent;
+  color: #667085;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.pestanas button.activo {
+  background: #ffffff;
+  color: var(--color-primario-oscuro);
+  box-shadow: 0 4px 12px rgba(23, 32, 50, 0.08);
+}
+
+.boton-google {
+  width: 100%;
+  gap: 0.7rem;
+}
+
+.google-marca {
+  display: grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #4285f4;
+  font-weight: 900;
+}
+
+.separador {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.2rem 0;
+  color: #98a2b3;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.separador::before,
+.separador::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-borde);
+}
+
+.formulario-acceso {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.formulario-acceso label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.error-acceso,
+.texto-aviso {
+  margin: 0;
+  color: #a22626;
+  font-size: 0.82rem;
+}
+
+.mensaje-acceso {
+  margin: 0;
+  color: #17694a;
+  font-size: 0.82rem;
+}
+
 .hero {
   display: grid;
   grid-template-columns: 1.4fr 0.8fr;
@@ -380,6 +521,21 @@ th {
   .encabezado {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .encabezado-derecha {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .usuario {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .acceso-tarjeta {
+    padding: 1.5rem;
   }
 
   .hero,

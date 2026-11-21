@@ -6,6 +6,8 @@ Guía para responder "¿dónde vive esto?" sin explicar línea por línea.
 |---|---|---|
 | La entrada de la app | `src/main.jsx` | `createRoot`, `HashRouter` |
 | Las rutas y el estado del evento | `src/App.jsx` | `<Routes>`, `actualizarEvento` |
+| La pantalla de acceso | `src/components/acceso.jsx` | `enviar`, `google` |
+| Correo, Google y sesión | `src/api/autenticacion.js` | `obtenerSesion`, `iniciarConGoogle` |
 | El menú y el aviso general | `src/components/layout.jsx` | `NAVEGACION`, `<Outlet />` |
 | Las opciones del menú | `src/api/configuracion.js` | `NAVEGACION` |
 | Las categorías del catálogo | `src/api/configuracion.js` | `CATEGORIAS` |

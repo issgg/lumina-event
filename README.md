@@ -41,6 +41,20 @@ npm test
 
 El `anon key` es público y debe ir en el frontend; el `service_role` **nunca** se pone aquí. Las políticas RLS del SQL permiten el acceso de demostración; para producción habría que reducirlas.
 
+## Inicio de sesión
+
+La pantalla de acceso permite entrar o registrarse con correo y contraseña usando Supabase Auth. La sesión se guarda en `localStorage` y se renueva sola cuando todavía hay un `refresh_token`.
+
+Para habilitar Google:
+
+1. En Supabase, entrar a **Authentication → Providers → Google** y activarlo.
+2. Agregar las URLs permitidas:
+   - `http://localhost:4173/**`
+   - `https://issgg.github.io/lumina-event/**`
+3. Pegar el `Client ID` y el `Client Secret` de Google OAuth en Supabase.
+
+Si la confirmación de correo está activa, el registro muestra un aviso y la persona debe confirmar su correo antes de entrar.
+
 ## Estructura
 
 La organización es la misma idea del proyecto Pokédex: `src/api` para traer datos, `src/components` para componentes, `App.jsx` para rutas y estado, `main.jsx` como entrada, y `public/` para archivos que se sirven directo.
@@ -58,11 +72,13 @@ LuminaEvent/
 │  ├─ App.css
 │  ├─ index.css
 │  ├─ api/
+│  │  ├─ autenticacion.js
 │  │  ├─ baseDatos.js
 │  │  ├─ catalogo.js
 │  │  ├─ configuracion.js
 │  │  └─ supabase.js
 │  ├─ components/
+│  │  ├─ acceso.jsx
 │  │  ├─ layout.jsx
 │  │  ├─ inicio.jsx
 │  │  ├─ catalogo.jsx

@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router";
 
 import { inicializarBase, guardarEvento, leerEvento } from "./api/baseDatos.js";
+import { cerrarSesion, obtenerSesion } from "./api/autenticacion.js";
 import { eventoVacio } from "./logica/evento.js";
 import { MENSAJES } from "./logica/mensajes.js";
+import Acceso from "./components/acceso.jsx";
 import Layout from "./components/layout.jsx";
 import Inicio from "./components/inicio.jsx";
 import Catalogo from "./components/catalogo.jsx";
@@ -14,12 +16,32 @@ import Administrar from "./components/administrar.jsx";
 import "./App.css";
 
 export default function App() {
+  const [sesion, setSesion] = useState(null);
+  const [verificandoSesion, setVerificandoSesion] = useState(true);
   const [listo, setListo] = useState(false);
   const [errorBase, setErrorBase] = useState("");
   const [evento, setEvento] = useState(eventoVacio());
   const [aviso, setAviso] = useState("");
 
   useEffect(() => {
+    let activo = true;
+    obtenerSesion()
+      .then((encontrada) => {
+        if (activo) setSesion(encontrada);
+      })
+      .catch(() => {
+        if (activo) setSesion(null);
+      })
+      .finally(() => {
+        if (activo) setVerificandoSesion(false);
+      });
+    return () => {
+      activo = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!sesion) return;
     inicializarBase()
       .then(async () => {
         const guardado = await leerEvento();
@@ -33,7 +55,7 @@ export default function App() {
         setErrorBase(MENSAJES.errorBase);
         setListo(true);
       });
-  }, []);
+  }, [sesion]);
 
   async function actualizarEvento(nuevo, mensaje = "", guardar = true) {
     setEvento(nuevo);
@@ -53,6 +75,25 @@ export default function App() {
       setAviso(MENSAJES.falloGuardado);
       return false;
     }
+  }
+
+  async function salir() {
+    await cerrarSesion();
+    setSesion(null);
+    setEvento(eventoVacio());
+    setAviso("");
+  }
+
+  if (verificandoSesion) {
+    return (
+      <main className="estado">
+        <p>Verificando acceso…</p>
+      </main>
+    );
+  }
+
+  if (!sesion) {
+    return <Acceso onSesion={setSesion} />;
   }
 
   if (!listo) {
@@ -77,7 +118,7 @@ export default function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Layout aviso={aviso} />}>
+      <Route path="/" element={<Layout aviso={aviso} sesion={sesion} onCerrarSesion={salir} />}>
         <Route index element={<Inicio />} />
         <Route
           path="catalogo"
