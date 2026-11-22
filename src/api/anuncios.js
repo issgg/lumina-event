@@ -1,6 +1,12 @@
 import { guardarServiciosExtra, leerServiciosExtra } from "./baseDatos.js";
+import {
+  actualizarFilas,
+  eliminarFilas,
+  insertarFilas,
+  leerTabla,
+} from "./supabase.js";
 
-const CLAVE = "lumina-anuncios";
+const EVENTO = "lumina-anuncios";
 
 const IMAGENES = {
   musica: "musica",
@@ -12,26 +18,40 @@ const IMAGENES = {
   detalles: "detalles",
 };
 
-function leerTodo() {
-  if (typeof window === "undefined") return [];
-  try {
-    const datos = JSON.parse(window.localStorage.getItem(CLAVE) ?? "[]");
-    return Array.isArray(datos) ? datos : [];
-  } catch {
-    return [];
-  }
+const ESTADOS = ["pendiente", "aprobado", "rechazado"];
+
+function notificar() {
+  if (typeof window !== "undefined") window.dispatchEvent(new Event(EVENTO));
 }
 
-function escribirTodo(lista) {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(CLAVE, JSON.stringify(lista));
-  } catch {
-    return;
-  }
+export function suscribirseAnuncios(callback) {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener(EVENTO, callback);
+  return () => window.removeEventListener(EVENTO, callback);
 }
 
-function nuevoId() {
+function texto(valor) {
+  return String(valor ?? "");
+}
+
+function desdeFila(fila) {
+  return {
+    id: texto(fila.clave),
+    correo: texto(fila.correo),
+    negocio: texto(fila.negocio),
+    categoria: texto(fila.categoria),
+    nombre: texto(fila.nombre),
+    descripcion: texto(fila.descripcion),
+    precio: Number(fila.precio) || 0,
+    imagen: texto(fila.imagen) || imagenDe(fila.categoria),
+    estado: ESTADOS.includes(fila.estado) ? fila.estado : "pendiente",
+    motivo: texto(fila.motivo),
+    creadoEn: texto(fila.creado_en),
+    revisadoEn: texto(fila.revisado_en),
+  };
+}
+
+function nuevoClave() {
   const azar = Math.random().toString(36).slice(2, 7);
   return `anuncio-${Date.now()}-${azar}`;
 }
@@ -44,59 +64,111 @@ export function fotoDe(categoria) {
   return `assets/fotos/${IMAGENES[categoria] ?? "detalles"}-1.jpg`;
 }
 
-function comoServicios(lista) {
-  return lista.map((anuncio) => {
-    const id = String(anuncio.id);
-    return {
-      id: id.startsWith("extra-") ? id : `extra-${id}`,
-      categoria: anuncio.categoria,
-      nombre: anuncio.nombre,
-      descripcion: anuncio.descripcion,
-      precio: Number(anuncio.precio) || 0,
-      proveedor: anuncio.negocio || "Proveedor local",
-      imagen: imagenDe(anuncio.categoria),
-    };
-  });
+function comoServicio(anuncio) {
+  const id = texto(anuncio.id);
+  return {
+    id: id.startsWith("extra-") ? id : `extra-${id}`,
+    categoria: anuncio.categoria,
+    nombre: anuncio.nombre,
+    descripcion: anuncio.descripcion,
+    precio: Number(anuncio.precio) || 0,
+    proveedor: anuncio.negocio || "Proveedor local",
+    imagen: imagenDe(anuncio.categoria),
+  };
 }
 
-async function sincronizar(lista) {
-  const anteriores = leerServiciosExtra().filter(
-    (servicio) => !servicio.id.startsWith("extra-anuncio-"),
-  );
-  await guardarServiciosExtra([...anteriores, ...comoServicios(lista)]);
+export async function listarAnuncios(filtros = {}) {
+  const filas = await leerTabla("anuncios", filtros);
+  return filas
+    .map(desdeFila)
+    .sort((primero, segundo) => segundo.creadoEn.localeCompare(primero.creadoEn));
 }
 
 export function leerAnuncios(correo) {
-  const todos = leerTodo();
-  if (!correo) return todos;
-  return todos.filter((anuncio) => anuncio.correo === correo);
+  return listarAnuncios(correo ? { correo: `eq.${correo}` } : {});
+}
+
+export function leerAnunciosPendientes() {
+  return listarAnuncios({ estado: "eq.pendiente" });
+}
+
+export function leerAnunciosAprobados() {
+  return listarAnuncios({ estado: "eq.aprobado" });
+}
+
+export function leerExtrasManuales() {
+  return leerServiciosExtra().filter((servicio) => !servicio.id.startsWith("extra-anuncio-"));
+}
+
+export async function sincronizarCatalogo() {
+  const aprobados = await leerAnunciosAprobados();
+  const manuales = leerExtrasManuales();
+  await guardarServiciosExtra([...manuales, ...aprobados.map(comoServicio)]);
+  notificar();
 }
 
 export async function publicarAnunciosGuardados() {
-  await sincronizar(leerTodo());
+  return sincronizarCatalogo();
+}
+
+export async function guardarExtrasManuales(servicios) {
+  const aprobados = await leerAnunciosAprobados();
+  await guardarServiciosExtra([...servicios, ...aprobados.map(comoServicio)]);
+  notificar();
 }
 
 export async function guardarAnuncio(correo, datos) {
-  const anuncio = {
-    id: nuevoId(),
-    correo,
-    negocio: String(datos.negocio ?? "").trim(),
-    categoria: datos.categoria,
-    nombre: String(datos.nombre ?? "").trim(),
-    descripcion: String(datos.descripcion ?? "").trim(),
+  const fila = {
+    clave: nuevoClave(),
+    correo: texto(correo),
+    negocio: texto(datos.negocio ?? "").trim(),
+    categoria: texto(datos.categoria),
+    nombre: texto(datos.nombre ?? "").trim(),
+    descripcion: texto(datos.descripcion ?? "").trim(),
     precio: Number(datos.precio) || 0,
-    creadoEn: new Date().toISOString(),
+    imagen: imagenDe(datos.categoria),
+    estado: "pendiente",
+    motivo: null,
   };
-  const lista = [...leerTodo(), anuncio];
-  escribirTodo(lista);
-  await sincronizar(lista);
-  return anuncio;
+  await insertarFilas("anuncios", [fila]);
+  notificar();
+  return desdeFila(fila);
 }
 
-export async function borrarAnuncio(correo, id) {
-  const lista = leerTodo().filter(
-    (anuncio) => !(anuncio.id === id && anuncio.correo === correo),
+export async function corregirAnuncio(clave, datos) {
+  await actualizarFilas(
+    "anuncios",
+    { clave: `eq.${clave}` },
+    {
+      negocio: texto(datos.negocio ?? "").trim(),
+      categoria: texto(datos.categoria),
+      nombre: texto(datos.nombre ?? "").trim(),
+      descripcion: texto(datos.descripcion ?? "").trim(),
+      precio: Number(datos.precio) || 0,
+      imagen: imagenDe(datos.categoria),
+      estado: "pendiente",
+      motivo: null,
+      revisado_en: null,
+    },
   );
-  escribirTodo(lista);
-  await sincronizar(lista);
+  await sincronizarCatalogo();
+}
+
+export async function revisarAnuncio(clave, estado, motivo = "") {
+  if (!ESTADOS.includes(estado)) throw new Error("Estado de anuncio no válido");
+  await actualizarFilas(
+    "anuncios",
+    { clave: `eq.${clave}` },
+    {
+      estado,
+      motivo: estado === "rechazado" ? texto(motivo).trim().slice(0, 200) : null,
+      revisado_en: new Date().toISOString(),
+    },
+  );
+  await sincronizarCatalogo();
+}
+
+export async function borrarAnuncio(correo, clave) {
+  await eliminarFilas("anuncios", { clave: `eq.${clave}`, correo: `eq.${correo}` });
+  await sincronizarCatalogo();
 }

@@ -16,6 +16,7 @@ const TABLAS = [
   "categorias",
   "salones",
   "servicios",
+  "anuncios",
   "eventos",
   "detalle_evento",
   "cronograma",

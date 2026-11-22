@@ -42,6 +42,22 @@ create table if not exists servicios (
   imagen varchar(160)
 );
 
+create table if not exists anuncios (
+  id bigint generated always as identity primary key,
+  clave varchar(80) not null unique,
+  correo varchar(120) not null,
+  negocio varchar(80) not null default '',
+  categoria varchar(20) not null,
+  nombre varchar(80) not null,
+  descripcion varchar(200),
+  precio decimal(10,2) not null default 0 check (precio >= 0),
+  imagen varchar(160),
+  estado varchar(12) not null default 'pendiente' check (estado in ('pendiente', 'aprobado', 'rechazado')),
+  motivo varchar(200),
+  creado_en timestamptz not null default now(),
+  revisado_en timestamptz
+);
+
 create table if not exists eventos (
   id integer primary key,
   usuario_id integer not null references usuarios(id),
@@ -77,6 +93,7 @@ alter table proveedores enable row level security;
 alter table categorias enable row level security;
 alter table salones enable row level security;
 alter table servicios enable row level security;
+alter table anuncios enable row level security;
 alter table eventos enable row level security;
 alter table detalle_evento enable row level security;
 alter table cronograma enable row level security;
@@ -95,6 +112,9 @@ create policy anon_all_salones on salones for all to anon, authenticated using (
 
 drop policy if exists anon_all_servicios on servicios;
 create policy anon_all_servicios on servicios for all to anon, authenticated using (true) with check (true);
+
+drop policy if exists anon_all_anuncios on anuncios;
+create policy anon_all_anuncios on anuncios for all to anon, authenticated using (true) with check (true);
 
 drop policy if exists anon_all_eventos on eventos;
 create policy anon_all_eventos on eventos for all to anon, authenticated using (true) with check (true);

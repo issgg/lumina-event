@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { guardarServiciosExtra, leerServiciosExtra } from "../api/baseDatos.js";
+import { guardarExtrasManuales, leerExtrasManuales } from "../api/anuncios.js";
 import { CATEGORIAS } from "../api/configuracion.js";
 import { formatearMoneda } from "../logica/formato.js";
 import { MENSAJES } from "../logica/mensajes.js";
@@ -18,7 +18,7 @@ export default function Administrar({ setAviso }) {
   const [formulario, setFormulario] = useState(FORMULARIO_VACIO);
 
   useEffect(() => {
-    setExtras(leerServiciosExtra());
+    setExtras(leerExtrasManuales());
   }, []);
 
   function cambiar(campo, valor) {
@@ -41,7 +41,7 @@ export default function Administrar({ setAviso }) {
     }
 
     try {
-      await guardarServiciosExtra([
+      await guardarExtrasManuales([
         ...extras,
         {
           id: `extra-${Date.now()}`,
@@ -53,7 +53,7 @@ export default function Administrar({ setAviso }) {
           imagen: "assets/img/detalles.svg",
         },
       ]);
-      setExtras(leerServiciosExtra());
+      setExtras(leerExtrasManuales());
       setFormulario(FORMULARIO_VACIO);
       setAviso(MENSAJES.adminAgregado);
     } catch {
@@ -63,8 +63,8 @@ export default function Administrar({ setAviso }) {
 
   async function eliminar(id) {
     try {
-      await guardarServiciosExtra(extras.filter((servicio) => servicio.id !== id));
-      setExtras(leerServiciosExtra());
+      await guardarExtrasManuales(extras.filter((servicio) => servicio.id !== id));
+      setExtras(leerExtrasManuales());
       setAviso(MENSAJES.adminEliminado);
     } catch {
       setAviso(MENSAJES.falloGuardado);

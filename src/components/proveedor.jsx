@@ -7,7 +7,8 @@ import {
   guardarAnuncio,
   imagenDe,
   leerAnuncios,
-  publicarAnunciosGuardados,
+  sincronizarCatalogo,
+  suscribirseAnuncios,
 } from "../api/anuncios.js";
 import { CATEGORIAS, CATEGORIAS_PROVEEDOR } from "../api/configuracion.js";
 import { formatearMoneda } from "../logica/formato.js";
@@ -28,15 +29,41 @@ function nombreCategoria(id) {
 export default function Proveedor({ sesion, setAviso, formularioAbierto = false }) {
   const navegar = useNavigate();
   const correo = sesion?.user?.email ?? "sin-correo";
-  const [anuncios, setAnuncios] = useState(() => leerAnuncios(correo));
+  const [anuncios, setAnuncios] = useState([]);
   const [formulario, setFormulario] = useState(FORMULARIO_VACIO);
   const [error, setError] = useState("");
   const [ocupado, setOcupado] = useState(false);
 
   useEffect(() => {
-    setAnuncios(leerAnuncios(correo));
-    publicarAnunciosGuardados().catch(() => {});
+    let activo = true;
+    async function cargar() {
+      try {
+        const lista = await leerAnuncios(correo);
+        if (activo) setAnuncios(lista);
+      } catch {
+        if (activo) setAnuncios([]);
+      }
+      try {
+        await sincronizarCatalogo();
+      } catch {
+        return;
+      }
+    }
+    cargar();
+    return () => {
+      activo = false;
+    };
   }, [correo]);
+
+  useEffect(
+    () =>
+      suscribirseAnuncios(() => {
+        leerAnuncios(correo)
+          .then(setAnuncios)
+          .catch(() => setAnuncios([]));
+      }),
+    [correo],
+  );
 
   function cambiar(campo, valor) {
     setFormulario((actual) => ({ ...actual, [campo]: valor }));
@@ -70,7 +97,7 @@ export default function Proveedor({ sesion, setAviso, formularioAbierto = false 
     setOcupado(true);
     try {
       await guardarAnuncio(correo, { ...formulario, nombre, descripcion, precio });
-      setAnuncios(leerAnuncios(correo));
+      setAnuncios(await leerAnuncios(correo));
       setFormulario(FORMULARIO_VACIO);
       setAviso(MENSAJES.anuncioAgregado);
       navegar("/proveedor");
@@ -85,7 +112,7 @@ export default function Proveedor({ sesion, setAviso, formularioAbierto = false 
     setOcupado(true);
     try {
       await borrarAnuncio(correo, id);
-      setAnuncios(leerAnuncios(correo));
+      setAnuncios(await leerAnuncios(correo));
       setAviso(MENSAJES.anuncioEliminado);
     } catch {
       setAviso(MENSAJES.anuncioSinPublicar);
@@ -101,7 +128,7 @@ export default function Proveedor({ sesion, setAviso, formularioAbierto = false 
           <p className="etiqueta">Mi puesto</p>
           <h1>Anuncia lo que sabes hacer</h1>
           <p>
-            Publica DJ, comida, decoración u otros servicios. Los organizadores los verán dentro del catálogo.
+            Publica DJ, comida, decoración u otros servicios. Un administrador revisa cada anuncio antes de mostrarlo.
           </p>
         </div>
         {!formularioAbierto && (
