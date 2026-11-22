@@ -16,17 +16,18 @@ const TABLAS = [
   "categorias",
   "salones",
   "servicios",
-  "anuncios",
   "eventos",
   "detalle_evento",
   "cronograma",
 ];
 
+const TABLAS_OPCIONALES = ["anuncios"];
+
 let datos = tablasVacias();
 let promesa = null;
 
 function tablasVacias() {
-  return TABLAS.reduce((acumulado, tabla) => {
+  return [...TABLAS, ...TABLAS_OPCIONALES].reduce((acumulado, tabla) => {
     acumulado[tabla] = [];
     return acumulado;
   }, {});
@@ -109,6 +110,15 @@ function serviciosDesdeTablas() {
 async function leerTablas() {
   const pares = await Promise.all(TABLAS.map(async (tabla) => [tabla, await leerTabla(tabla)]));
   datos = Object.fromEntries(pares);
+  await Promise.all(
+    TABLAS_OPCIONALES.map(async (tabla) => {
+      try {
+        datos[tabla] = await leerTabla(tabla);
+      } catch {
+        datos[tabla] = [];
+      }
+    }),
+  );
 }
 
 async function sembrar() {
@@ -339,7 +349,9 @@ function exponerDepuracion() {
     modo: "supabase",
     consultar: (tabla) => {
       const nombre = valorTexto(tabla);
-      if (!(nombre in datos)) throw new Error(`Tabla desconocida. Usa una de: ${TABLAS.join(", ")}`);
+      if (!(nombre in datos)) {
+        throw new Error(`Tabla desconocida. Usa una de: ${[...TABLAS, ...TABLAS_OPCIONALES].join(", ")}`);
+      }
       return datos[nombre].map((fila) => ({ ...fila }));
     },
     servicios: consultarServicios,

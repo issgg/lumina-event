@@ -40,6 +40,7 @@ Los casos de abajo están revisados en código y en la lógica. Se pueden volver
 | 20 | Anuncio pendiente | Enviar un anuncio como proveedor y abrir Inicio y catálogo | No aparece en ninguno de los dos hasta que el administrador lo apruebe | OK |
 | 21 | Corregir anuncio rechazado | Rechazar con motivo, volver como proveedor y usar **Corregir** | Se abre el formulario con los datos; al guardar vuelve a `pendiente` y el motivo se borra | OK |
 | 22 | Extras manuales y anuncios | Agregar un servicio en `/#/administrar` con un anuncio aprobado | El servicio manual y el anuncio aprobado siguen en el catálogo | OK |
+| 23 | Falta la tabla `anuncios` | Abrir la app con Supabase sin correr la migración | La app abre igual; el panel de revisión muestra un aviso pidiendo la migración | OK |
 
 ## Pruebas automáticas incluidas
 

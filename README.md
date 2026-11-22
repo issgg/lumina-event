@@ -62,7 +62,7 @@ npm test
 
 1. Crear proyecto gratuito en Supabase.
 2. Pegar `public/db/supabase.sql` en **SQL Editor → New query → Run**.
-3. Si el proyecto ya estaba creado, pegar también `public/db/migracion_anuncios.sql` para agregar la tabla de anuncios.
+3. Si el proyecto ya estaba creado, pegar también `public/db/migracion_anuncios.sql` para agregar la tabla de anuncios. Sin esta migración el resto de la app sigue abriendo, pero revisar y enviar anuncios no funcionará.
 4. Copiar `.env.example` a `.env.local` y rellenar `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` del proyecto.
 5. Reiniciar Vite. La primera carga siembra las 8 tablas base desde `public/data/catalogo.json`; la novena tabla es `anuncios`.
 

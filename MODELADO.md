@@ -1,6 +1,6 @@
 # Modelo de datos
 
-Nueve tablas. Este archivo explica el modelo; `public/db/supabase.sql` contiene la definición SQL y `public/db/migracion_anuncios.sql` agrega la tabla de anuncios a proyectos ya creados.
+Nueve tablas. Este archivo explica el modelo; `public/db/supabase.sql` contiene la definición SQL y `public/db/migracion_anuncios.sql` agrega la tabla de anuncios a proyectos ya creados. `anuncios` es opcional en el arranque: si falta, el resto de la app sigue funcionando.
 
 ## Tablas
 

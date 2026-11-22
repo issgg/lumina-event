@@ -1529,6 +1529,10 @@ tbody tr:last-child td {
   color: var(--color-oro);
 }
 
+.revision-aviso {
+  margin-bottom: 1.2rem;
+}
+
 .revision-filtros {
   flex-wrap: wrap;
   margin-bottom: 1.2rem;

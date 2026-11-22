@@ -41,15 +41,22 @@ export default function Aprobaciones({ setAviso }) {
   const [filtro, setFiltro] = useState("pendiente");
   const [motivos, setMotivos] = useState({});
   const [ocupado, setOcupado] = useState("");
+  const [sinTabla, setSinTabla] = useState(false);
 
   useEffect(() => {
     let activo = true;
     listarAnuncios()
       .then((lista) => {
-        if (activo) setAnuncios(lista);
+        if (activo) {
+          setAnuncios(lista);
+          setSinTabla(false);
+        }
       })
       .catch(() => {
-        if (activo) setAnuncios([]);
+        if (activo) {
+          setAnuncios([]);
+          setSinTabla(true);
+        }
       });
     return () => {
       activo = false;
@@ -60,8 +67,14 @@ export default function Aprobaciones({ setAviso }) {
     () =>
       suscribirseAnuncios(() => {
         listarAnuncios()
-          .then(setAnuncios)
-          .catch(() => setAnuncios([]));
+          .then((lista) => {
+            setAnuncios(lista);
+            setSinTabla(false);
+          })
+          .catch(() => {
+            setAnuncios([]);
+            setSinTabla(true);
+          });
       }),
     [],
   );
@@ -107,6 +120,12 @@ export default function Aprobaciones({ setAviso }) {
           <p className="contador">{pendientes} por revisar</p>
         </div>
       </header>
+
+      {sinTabla && (
+        <p className="aviso aviso-error revision-aviso">
+          Falta la tabla de anuncios en Supabase. Ejecuta `public/db/migracion_anuncios.sql` y recarga.
+        </p>
+      )}
 
       <div className="barra-filtros revision-filtros">
         {FILTROS.map((opcion) => (
