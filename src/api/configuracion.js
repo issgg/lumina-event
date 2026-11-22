@@ -45,6 +45,10 @@ export const CATEGORIAS = [
   { id: "seguridad", nombre: "Seguridad", descripcion: "Personal y control de acceso" },
 ];
 
+export const CATEGORIAS_PROVEEDOR = CATEGORIAS.filter(
+  (categoria) => categoria.id !== "salones",
+);
+
 export const TIPOS_EVENTO = [
   "XV años",
   "Boda",

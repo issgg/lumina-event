@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Navigate, Route, Routes } from "react-router";
+import { Navigate, Route, Routes, useNavigate } from "react-router";
 
 import { inicializarBase, guardarEvento, leerEvento } from "./api/baseDatos.js";
-import { cerrarSesion, obtenerSesion } from "./api/autenticacion.js";
+import { actualizarRol, cerrarSesion, obtenerSesion } from "./api/autenticacion.js";
+import { RUTA_POR_ROL } from "./api/configuracion.js";
 import { eventoVacio } from "./logica/evento.js";
 import { MENSAJES } from "./logica/mensajes.js";
 import Acceso from "./components/acceso.jsx";
@@ -14,10 +15,12 @@ import Salon from "./components/salon.jsx";
 import Resumen from "./components/resumen.jsx";
 import Pago from "./components/pago.jsx";
 import Administrar from "./components/administrar.jsx";
+import Proveedor from "./components/proveedor.jsx";
 
 import "./App.css";
 
 export default function App() {
+  const navegar = useNavigate();
   const [sesion, setSesion] = useState(null);
   const [verificandoSesion, setVerificandoSesion] = useState(true);
   const [listo, setListo] = useState(false);
@@ -86,6 +89,20 @@ export default function App() {
     setAviso("");
   }
 
+  async function cambiarRol(nuevo) {
+    try {
+      const actualizada = await actualizarRol(nuevo, sesion);
+      if (!actualizada) return;
+      setSesion(actualizada);
+      setAviso(
+        actualizada.rol === "proveedor" ? MENSAJES.modoProveedor : MENSAJES.modoOrganizador,
+      );
+      navegar(RUTA_POR_ROL[actualizada.rol] ?? "/");
+    } catch {
+      setAviso(MENSAJES.datosInvalidos);
+    }
+  }
+
   if (verificandoSesion) {
     return (
       <main className="estado">
@@ -118,32 +135,59 @@ export default function App() {
     );
   }
 
+  const esProveedor = sesion?.rol === "proveedor";
+
   return (
     <Routes>
-      <Route path="/" element={<Layout aviso={aviso} sesion={sesion} onCerrarSesion={salir} />}>
-        <Route index element={<Inicio evento={evento} />} />
-        <Route
-          path="catalogo"
-          element={<Catalogo evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
-        />
-        <Route
-          path="armador"
-          element={<Armador evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
-        />
-        <Route
-          path="salon"
-          element={<Salon evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
-        />
-        <Route
-          path="resumen"
-          element={<Resumen evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
-        />
-        <Route
-          path="pago"
-          element={<Pago evento={evento} onActualizar={actualizarEvento} />}
-        />
-        <Route path="administrar" element={<Administrar setAviso={setAviso} />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+      <Route
+        path="/"
+        element={
+          <Layout
+            aviso={aviso}
+            sesion={sesion}
+            onCerrarSesion={salir}
+            onCambiarRol={cambiarRol}
+          />
+        }
+      >
+        {esProveedor ? (
+          <>
+            <Route index element={<Navigate to="/proveedor" replace />} />
+            <Route path="proveedor" element={<Proveedor sesion={sesion} setAviso={setAviso} />} />
+            <Route
+              path="proveedor/anunciar"
+              element={<Proveedor sesion={sesion} setAviso={setAviso} formularioAbierto />}
+            />
+            <Route path="*" element={<Navigate to="/proveedor" replace />} />
+          </>
+        ) : (
+          <>
+            <Route index element={<Inicio evento={evento} />} />
+            <Route
+              path="catalogo"
+              element={<Catalogo evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
+            />
+            <Route
+              path="armador"
+              element={<Armador evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
+            />
+            <Route
+              path="salon"
+              element={<Salon evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
+            />
+            <Route
+              path="resumen"
+              element={<Resumen evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
+            />
+            <Route
+              path="pago"
+              element={<Pago evento={evento} onActualizar={actualizarEvento} />}
+            />
+            <Route path="administrar" element={<Administrar setAviso={setAviso} />} />
+            <Route path="proveedor" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </>
+        )}
       </Route>
     </Routes>
   );

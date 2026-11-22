@@ -25,4 +25,13 @@ export const MENSAJES = {
   adminPrecio: "Escribe un precio mayor o igual a cero.",
   adminAgregado: "Servicio agregado al catálogo.",
   adminEliminado: "Servicio eliminado del catálogo.",
+  anuncioNombre: "Escribe el nombre de tu servicio.",
+  anuncioNombreLargo: "Máximo 60 caracteres.",
+  anuncioPrecio: "Escribe un precio mayor o igual a cero.",
+  anuncioDescripcionLarga: "La descripción debe ser corta, máximo 160 caracteres.",
+  anuncioAgregado: "Anuncio publicado en el catálogo.",
+  anuncioEliminado: "Anuncio eliminado.",
+  anuncioSinPublicar: "Guardado aquí, pero no se pudo publicar en el catálogo.",
+  modoProveedor: "Ahora estás anunciando tus servicios.",
+  modoOrganizador: "Ahora estás armando tu evento.",
 };

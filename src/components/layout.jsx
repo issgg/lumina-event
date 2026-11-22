@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Link, NavLink, Outlet } from "react-router";
-import { NAVEGACION } from "../api/configuracion.js";
+import { NAVEGACION, NAVEGACION_PROVEEDOR } from "../api/configuracion.js";
 
-export default function Layout({ aviso, sesion, onCerrarSesion }) {
+export default function Layout({ aviso, sesion, onCerrarSesion, onCambiarRol }) {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [tema, setTema] = useState(() => document.documentElement.dataset.tema || "oscuro");
   const correo = sesion?.user?.email ?? sesion?.user?.user_metadata?.email ?? "Invitado";
+  const esProveedor = sesion?.rol === "proveedor";
+  const enlaces = esProveedor ? NAVEGACION_PROVEEDOR : NAVEGACION;
   const cerrarMenu = () => setMenuAbierto(false);
 
   function alternarTema() {
@@ -22,7 +24,7 @@ export default function Layout({ aviso, sesion, onCerrarSesion }) {
   return (
     <div className="aplicacion">
       <header className="encabezado">
-        <NavLink to="/" className="marca" onClick={cerrarMenu}>
+        <NavLink to={esProveedor ? "/proveedor" : "/"} className="marca" onClick={cerrarMenu}>
           <span className="marca-icono">L</span>
           <span>Lumina Event</span>
         </NavLink>
@@ -46,7 +48,7 @@ export default function Layout({ aviso, sesion, onCerrarSesion }) {
             aria-label="Navegación principal"
             className={menuAbierto ? "abierto" : undefined}
           >
-            {NAVEGACION.map((item) => (
+            {enlaces.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
@@ -58,6 +60,14 @@ export default function Layout({ aviso, sesion, onCerrarSesion }) {
               </NavLink>
             ))}
           </nav>
+          <span className="rol-etiqueta">{esProveedor ? "Proveedor" : "Organizador"}</span>
+          <button
+            type="button"
+            className="boton-rol"
+            onClick={() => onCambiarRol(esProveedor ? "organizador" : "proveedor")}
+          >
+            {esProveedor ? "Armar mi evento" : "Anunciar servicio"}
+          </button>
           <button
             type="button"
             className="boton-tema"
@@ -86,8 +96,8 @@ export default function Layout({ aviso, sesion, onCerrarSesion }) {
 
       <footer className="pie">
         <p>Lumina Event</p>
-        <Link className="pie-enlace" to="/administrar">
-          Administrar
+        <Link className="pie-enlace" to={esProveedor ? "/proveedor/anunciar" : "/administrar"}>
+          {esProveedor ? "Anunciar" : "Administrar"}
         </Link>
       </footer>
     </div>

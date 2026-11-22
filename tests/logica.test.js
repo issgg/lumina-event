@@ -8,6 +8,7 @@ import { generarCronograma, aMinutos, formatearHora } from "../src/logica/cronog
 import { seleccionarSalon, evaluarCobertura, estadoPresupuesto } from "../src/logica/paquete.js";
 import { validarPago, formatearNumeroTarjeta } from "../src/logica/pago.js";
 import { MENSAJES } from "../src/logica/mensajes.js";
+import { CATEGORIAS_PROVEEDOR, NAVEGACION_PROVEEDOR, RUTA_POR_ROL, rolValido } from "../src/api/configuracion.js";
 
 const servicio = { id: "dj", nombre: "DJ", categoria: "musica", precio: 8000 };
 
@@ -135,4 +136,12 @@ test("los datos del evento pueden guardarse antes de elegir salón", () => {
   };
   assert.equal(validarDatosEvento(base, ["Boda"]).errores.salonId, MENSAJES.salonRequerido);
   assert.equal(validarDatosEvento(base, ["Boda"], { requerirSalon: false }).validos, true);
+});
+
+test("el proveedor tiene su propio menú y no ve salones", () => {
+  assert.equal(rolValido("proveedor"), "proveedor");
+  assert.equal(rolValido("otro"), "organizador");
+  assert.equal(RUTA_POR_ROL.proveedor, "/proveedor");
+  assert.deepEqual(NAVEGACION_PROVEEDOR.map((item) => item.to), ["/proveedor", "/proveedor/anunciar"]);
+  assert.equal(CATEGORIAS_PROVEEDOR.some((categoria) => categoria.id === "salones"), false);
 });
