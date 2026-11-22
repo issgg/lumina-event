@@ -19,6 +19,10 @@ Aquí anoto cuándo usé la IA, qué pedí y qué revisé yo después.
 | 22/11 | Tipo proveedor | Agregar otro usuario que anuncie DJ, comida y otros servicios | Propuso rol en el acceso, sesión con rol y menú distinto | Revisé que el proveedor no vea el armador y que el rol no se pierda al recargar |
 | 22/11 | Anuncios | Crear una pantalla sencilla para publicar ofertas | Propuso guardar los anuncios como servicios `extra-` del catálogo | Verifiqué que no se borren los servicios del administrador y que el precio inválido no pase |
 | 22/11 | Botón de anunciar | El botón del encabezado parecía no responder | Propuso cambiar el rol en local y navegar antes de sincronizar con Supabase | Revisé que abra el formulario directo y que una falla de red solo muestre aviso |
+| 22/11 | Tercer rol | Pedir un administrador que revise lo que publican los proveedores | Propuso acceso fijo de demo, menú propio y rutas separadas | Revisé que no aparezca en el registro y que no pueda cambiar de rol |
+| 22/11 | Estados de anuncio | Guardar aprobación o rechazo en Supabase | Propuso la tabla `anuncios` con `pendiente`, `aprobado` y `rechazado` | Revisé la migración SQL, las políticas y que solo lo aprobado se copie al catálogo |
+| 22/11 | Panel de revisión | Necesitar una pantalla clara para decidir | Propuso filtros, motivo de rechazo y botones de aprobar/rechazar | Revisé que el motivo sea obligatorio y que el proveedor pueda corregir y reenviar |
+| 22/11 | Pruebas y docs | Cerrar la entrega con tres roles | Amplió pruebas a 17 y actualizó guion, mapa y modelo | Corrí diff, pruebas, build y confirmé los assets del deploy |
 
 ## Cosas que la IA propuso y yo rechacé
 
@@ -27,7 +31,8 @@ Aquí anoto cuándo usé la IA, qué pedí y qué revisé yo después.
 - **Cobro real:** no lo acepté. El pago es solo una simulación y no guarda datos bancarios.
 - **SQLite en el navegador:** la dejé atrás porque el proyecto debía usar Supabase.
 - **Google OAuth sin secret:** lo dejé pendiente. Sin `Client Secret` la app muestra un mensaje claro y no se rompe.
-- **Tabla nueva para anuncios:** no la agregué. Los anuncios reutilizan los servicios `extra-` y así no hace falta volver a correr el SQL.
+- **Administrador en el registro:** no lo acepté. El registro deja solo organizador y proveedor; el administrador entra con credenciales fijas de demo.
+- **Publicar anuncios sin revisión:** no lo acepté. Ahora pasan por `pendiente`, y solo los aprobados llegan al catálogo.
 
 ## Cómo revisé el trabajo de la IA
 

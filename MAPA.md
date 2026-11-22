@@ -16,7 +16,7 @@ Lumina Event es una app estática hecha con React y Vite. El navegador habla con
 
 La idea es ayudar a una persona a organizar un evento en pocos pasos: elegir salón, pasar por categorías de servicios, ver el resumen y recibir un comprobante de pago simulado.
 
-También ayuda a otra persona a ofrecer servicios. Según el tipo de cuenta, la app muestra un menú distinto: el organizador arma el paquete y el proveedor publica anuncios de DJ, comida, decoración u otras categorías.
+También ayuda a otra persona a ofrecer servicios y a un administrador a revisarlos. Según el tipo de cuenta, la app muestra un menú distinto: el organizador arma el paquete, el proveedor publica anuncios y el administrador aprueba o rechaza esos anuncios antes de que lleguen al catálogo.
 
 ## Estructura de carpetas
 
@@ -29,7 +29,7 @@ También ayuda a otra persona a ofrecer servicios. Según el tipo de cuenta, la 
 | Componentes | `src/components/*.jsx` | Pantallas y piezas visuales |
 | Lógica | `src/logica/*.js` | Cálculos que se pueden probar sin pantalla |
 | Datos | `public/data/catalogo.json` | Datos iniciales para sembrar Supabase |
-| SQL | `public/db/supabase.sql` | Crea tablas, llaves y políticas |
+| SQL | `public/db/supabase.sql`, `public/db/migracion_anuncios.sql` | Crea tablas, llaves y políticas; la migración agrega `anuncios` |
 | Imágenes | `public/assets/fotos/*.jpg` | Fotos locales de salones y servicios |
 | Pruebas | `tests/*.test.js` | Pruebas de la lógica |
 | Deploy | `.github/workflows/pages.yml` | Publica el build en GitHub Pages |
@@ -47,8 +47,9 @@ También ayuda a otra persona a ofrecer servicios. Según el tipo de cuenta, la 
 | `src/components/tarjetaServicio.jsx` | Modal con foto, descripción y precio de cada servicio |
 | `src/components/resumen.jsx` | Resume salón, servicios y costo aproximado |
 | `src/components/pago.jsx` | Valida tarjeta de ejemplo y muestra comprobante |
-| `src/components/administrar.jsx` | Agrega y elimina servicios del catálogo |
-| `src/components/proveedor.jsx` | Publica, muestra y quita anuncios del proveedor |
+| `src/components/administrar.jsx` | Agrega y elimina servicios manuales del catálogo |
+| `src/components/aprobaciones.jsx` | Muestra anuncios pendientes y permite aprobarlos o rechazarlos |
+| `src/components/proveedor.jsx` | Envía, muestra, corrige y quita anuncios del proveedor |
 
 ## FLUJO DE UNA PANTALLA A OTRA
 
@@ -70,6 +71,12 @@ Flujo del proveedor:
 /#/acceso  →  /#/proveedor  →  /#/proveedor/anunciar  →  /#/proveedor
 ```
 
+Flujo del administrador:
+
+```text
+/#/acceso  →  /#/admin  →  aprobar o rechazar  →  /#/administrar
+```
+
 En cada categoría:
 
 - **Regresar** vuelve a la categoría anterior; la primera vuelve al salón.
@@ -85,12 +92,12 @@ En cada categoría:
 | `src/api/supabase.js` | Lee, inserta, actualiza y borra filas con REST |
 | `src/api/baseDatos.js` | Siembra tablas, arma el cache `luminaDB` y calcula el cronograma |
 | `src/api/autenticacion.js` | Sesión con correo, Google, renovación de token y rol guardado |
-| `src/api/anuncios.js` | Guarda anuncios del proveedor y los publica como servicios `extra-` |
+| `src/api/anuncios.js` | Guarda anuncios en Supabase, cambia estados y sincroniza solo los aprobados como servicios `extra-` |
 | `src/api/catalogo.js` | Trae catálogo y categorías desde Supabase |
 | `src/api/configuracion.js` | Roles, navegación por rol, categorías, tipos de evento y reglas del cronograma |
 | `src/api/red.js` | Corta la espera si una llamada tarda demasiado |
 
-Tablas: `perfiles`, `salones`, `categorias`, `servicios`, `eventos`, `detalle_evento`, `cronograma`, `pagos`.
+Tablas: `usuarios`, `proveedores`, `categorias`, `salones`, `servicios`, `anuncios`, `eventos`, `detalle_evento`, `cronograma`.
 
 El frontend solo usa la llave pública. El `service_role` no aparece en el código.
 
@@ -121,6 +128,8 @@ El frontend solo usa la llave pública. El `service_role` no aparece en el códi
 - Cambio de rol: se cambia desde el encabezado sin cerrar sesión, el menú se ajusta y **Anunciar servicio** abre el formulario aunque Supabase tarde.
 - Anuncio sin nombre o con precio negativo: muestra mensaje y no se publica.
 - Proveedor sin anuncios: muestra un texto invitando a publicar el primero.
+- Anuncio rechazado: aparece con su motivo y el proveedor puede corregirlo y reenviarlo.
+- Anuncio pendiente o rechazado: no aparece en el Inicio ni en el catálogo.
 
 Detalle y pasos para probarlos: `PRUEBAS.md`.
 
@@ -132,7 +141,7 @@ Detalle y pasos para probarlos: `PRUEBAS.md`.
 - Pago simulado: no se cobra nada ni se guardan datos de tarjeta.
 - Sin barra de progreso: el flujo quedó más simple.
 - Categorías por pasos: se puede regresar u omitir sin perder el avance.
-- Dos tipos de cuenta: el menú cambia según el rol para no mezclar armar paquetes con anunciar servicios.
-- Anuncios como servicios `extra-`: reutilizan el catálogo y no piden una tabla nueva.
+- Tres tipos de cuenta: el menú cambia según el rol para no mezclar armar paquetes, anunciar servicios y revisar anuncios.
+- Tabla `anuncios`: guarda el estado de cada envío; solo los aprobados se copian como servicios `extra-` al catálogo.
 
 Las razones completas están en `DIARIO_DE_DECISIONES.md`. El registro de trabajo con IA está en `BITACORA_IA.md`.

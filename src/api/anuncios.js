@@ -1,4 +1,5 @@
 import { guardarServiciosExtra, leerServiciosExtra } from "./baseDatos.js";
+import { anuncioPublicable, estadoAnuncioValido } from "../logica/validacion.js";
 import {
   actualizarFilas,
   eliminarFilas,
@@ -17,8 +18,6 @@ const IMAGENES = {
   seguridad: "seguridad",
   detalles: "detalles",
 };
-
-const ESTADOS = ["pendiente", "aprobado", "rechazado"];
 
 function notificar() {
   if (typeof window !== "undefined") window.dispatchEvent(new Event(EVENTO));
@@ -44,7 +43,7 @@ function desdeFila(fila) {
     descripcion: texto(fila.descripcion),
     precio: Number(fila.precio) || 0,
     imagen: texto(fila.imagen) || imagenDe(fila.categoria),
-    estado: ESTADOS.includes(fila.estado) ? fila.estado : "pendiente",
+    estado: estadoAnuncioValido(fila.estado) ? fila.estado : "pendiente",
     motivo: texto(fila.motivo),
     creadoEn: texto(fila.creado_en),
     revisadoEn: texto(fila.revisado_en),
@@ -101,7 +100,7 @@ export function leerExtrasManuales() {
 }
 
 export async function sincronizarCatalogo() {
-  const aprobados = await leerAnunciosAprobados();
+  const aprobados = (await leerAnunciosAprobados()).filter(anuncioPublicable);
   const manuales = leerExtrasManuales();
   await guardarServiciosExtra([...manuales, ...aprobados.map(comoServicio)]);
   notificar();
@@ -112,7 +111,7 @@ export async function publicarAnunciosGuardados() {
 }
 
 export async function guardarExtrasManuales(servicios) {
-  const aprobados = await leerAnunciosAprobados();
+  const aprobados = (await leerAnunciosAprobados()).filter(anuncioPublicable);
   await guardarServiciosExtra([...servicios, ...aprobados.map(comoServicio)]);
   notificar();
 }
@@ -155,7 +154,7 @@ export async function corregirAnuncio(clave, datos) {
 }
 
 export async function revisarAnuncio(clave, estado, motivo = "") {
-  if (!ESTADOS.includes(estado)) throw new Error("Estado de anuncio no válido");
+  if (!estadoAnuncioValido(estado)) throw new Error("Estado de anuncio no válido");
   await actualizarFilas(
     "anuncios",
     { clave: `eq.${clave}` },

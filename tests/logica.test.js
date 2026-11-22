@@ -2,13 +2,19 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { agregarServicio, quitarServicio, cambiarCantidad, calcularTotal, agruparPorCategoria } from "../src/logica/carrito.js";
-import { validarDatosEvento, validarBusqueda } from "../src/logica/validacion.js";
+import {
+  anuncioPublicable,
+  estadoAnuncioValido,
+  motivoRechazoValido,
+  validarDatosEvento,
+  validarBusqueda,
+} from "../src/logica/validacion.js";
 import { filtrarServicios, normalizar } from "../src/logica/filtros.js";
 import { generarCronograma, aMinutos, formatearHora } from "../src/logica/cronograma.js";
 import { seleccionarSalon, evaluarCobertura, estadoPresupuesto } from "../src/logica/paquete.js";
 import { validarPago, formatearNumeroTarjeta } from "../src/logica/pago.js";
 import { MENSAJES } from "../src/logica/mensajes.js";
-import { CATEGORIAS_PROVEEDOR, NAVEGACION_ADMIN, NAVEGACION_PROVEEDOR, ROLES_REGISTRO, RUTA_ACCION_POR_ROL, RUTA_POR_ROL, rolValido } from "../src/api/configuracion.js";
+import { ADMIN, CATEGORIAS_PROVEEDOR, NAVEGACION_ADMIN, NAVEGACION_PROVEEDOR, ROLES_REGISTRO, RUTA_ACCION_POR_ROL, RUTA_POR_ROL, rolValido } from "../src/api/configuracion.js";
 
 const servicio = { id: "dj", nombre: "DJ", categoria: "musica", precio: 8000 };
 
@@ -152,4 +158,28 @@ test("el administrador no se ofrece en el registro y tiene menú propio", () => 
   assert.equal(ROLES_REGISTRO.some((rol) => rol.id === "admin"), false);
   assert.equal(RUTA_POR_ROL.admin, "/admin");
   assert.deepEqual(NAVEGACION_ADMIN.map((item) => item.to), ["/admin", "/administrar"]);
+  assert.equal(ADMIN.correo, "admin@lumina.local");
+  assert.equal(ADMIN.clave, "LuminaAdmin2026!");
+});
+
+test("solo los estados conocidos son válidos para un anuncio", () => {
+  assert.equal(estadoAnuncioValido("pendiente"), true);
+  assert.equal(estadoAnuncioValido("aprobado"), true);
+  assert.equal(estadoAnuncioValido("rechazado"), true);
+  assert.equal(estadoAnuncioValido("otro"), false);
+  assert.equal(estadoAnuncioValido(""), false);
+});
+
+test("solo un anuncio aprobado puede mostrarse en el catálogo", () => {
+  assert.equal(anuncioPublicable({ estado: "aprobado" }), true);
+  assert.equal(anuncioPublicable({ estado: "pendiente" }), false);
+  assert.equal(anuncioPublicable({ estado: "rechazado" }), false);
+  assert.equal(anuncioPublicable(null), false);
+});
+
+test("rechazar un anuncio pide un motivo corto y no vacío", () => {
+  assert.equal(motivoRechazoValido("Falta el precio"), true);
+  assert.equal(motivoRechazoValido("   "), false);
+  assert.equal(motivoRechazoValido(""), false);
+  assert.equal(motivoRechazoValido("x".repeat(201)), false);
 });

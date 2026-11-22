@@ -10,6 +10,7 @@ import {
 import { CATEGORIAS } from "../api/configuracion.js";
 import { formatearMoneda } from "../logica/formato.js";
 import { MENSAJES } from "../logica/mensajes.js";
+import { motivoRechazoValido } from "../logica/validacion.js";
 
 const FILTROS = [
   { id: "pendiente", texto: "Pendientes" },
@@ -74,7 +75,7 @@ export default function Aprobaciones({ setAviso }) {
 
   async function revisar(anuncio, estado) {
     const motivo = String(motivos[anuncio.id] ?? "").trim();
-    if (estado === "rechazado" && !motivo) {
+    if (estado === "rechazado" && !motivoRechazoValido(motivo)) {
       setAviso(MENSAJES.adminMotivo);
       return;
     }

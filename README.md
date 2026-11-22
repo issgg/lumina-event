@@ -18,7 +18,7 @@ Una sola plataforma reúne salón, comida, mobiliario, música, decoración, fot
 
 El flujo es sencillo: datos del evento, salón, categorías de servicios, resumen y pago simulado. En cada categoría se puede **regresar**, **omitir** o **continuar**.
 
-También hay dos tipos de cuenta. El **organizador** arma su paquete con el flujo anterior. El **proveedor** anuncia lo que ofrece, por ejemplo DJ, comida o decoración. El tipo se elige al entrar y se puede cambiar desde el encabezado sin cerrar sesión; cada uno ve solo su menú. El botón **Anunciar servicio** abre directo el formulario del proveedor.
+También hay tres tipos de cuenta. El **organizador** arma su paquete con el flujo anterior. El **proveedor** anuncia lo que ofrece, por ejemplo DJ, comida o decoración. El **administrador** revisa esos anuncios y aprueba o rechaza cada uno. Organizador y proveedor se eligen al entrar y se pueden cambiar desde el encabezado sin cerrar sesión; el administrador entra con credenciales fijas de demostración y tiene menú propio. El botón **Anunciar servicio** abre directo el formulario del proveedor.
 
 ## Paleta
 
@@ -62,16 +62,17 @@ npm test
 
 1. Crear proyecto gratuito en Supabase.
 2. Pegar `public/db/supabase.sql` en **SQL Editor → New query → Run**.
-3. Copiar `.env.example` a `.env.local` y rellenar `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` del proyecto.
-4. Reiniciar Vite. La primera carga siembra las 8 tablas desde `public/data/catalogo.json`.
+3. Si el proyecto ya estaba creado, pegar también `public/db/migracion_anuncios.sql` para agregar la tabla de anuncios.
+4. Copiar `.env.example` a `.env.local` y rellenar `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` del proyecto.
+5. Reiniciar Vite. La primera carga siembra las 8 tablas base desde `public/data/catalogo.json`; la novena tabla es `anuncios`.
 
 El `anon key` es público y debe ir en el frontend; el `service_role` **nunca** se pone aquí. Las políticas RLS del SQL permiten el acceso de demostración; para producción habría que reducirlas.
 
 ## Inicio de sesión
 
-La pantalla de acceso permite entrar o registrarse con correo y contraseña usando Supabase Auth. Antes de entrar se elige el tipo de cuenta: **Armar mi evento** o **Anunciar servicios**. La sesión se guarda en `localStorage`, conserva ese rol y se renueva sola cuando todavía hay un `refresh_token`.
+La pantalla de acceso permite entrar o registrarse con correo y contraseña usando Supabase Auth. Antes de entrar se elige el tipo de cuenta: **Armar mi evento** o **Anunciar servicios**. La sesión se guarda en `localStorage`, conserva ese rol y se renueva sola cuando todavía hay un `refresh_token`. El administrador no aparece en el registro: entra desde el recuadro **Acceso de revisión** con `admin@lumina.local` y `LuminaAdmin2026!`.
 
-Los anuncios del proveedor se guardan en el navegador y se publican en el catálogo como servicios `extra-` dentro de la tabla `servicios` de Supabase. Así el organizador los ve sin que haya una tabla nueva. El proveedor no publica salones porque esos tienen dirección y capacidad aparte.
+Los anuncios del proveedor se guardan en la tabla `anuncios` de Supabase con estado `pendiente`, `aprobado` o `rechazado`. El administrador ve los pendientes en `/#/admin`; si rechaza, escribe un motivo y el proveedor puede corregir y reenviar. Solo los aprobados se copian al catálogo como servicios `extra-`; por eso aparecen en el Inicio y en las categorías. El proveedor no publica salones porque esos tienen dirección y capacidad aparte.
 
 Para habilitar Google:
 
@@ -124,6 +125,7 @@ LuminaEvent/
 │  │  ├─ resumen.jsx
 │  │  ├─ pago.jsx
 │  │  ├─ administrar.jsx
+│  │  ├─ aprobaciones.jsx
 │  │  └─ proveedor.jsx
 │  └─ logica/
 │     ├─ carrito.js
@@ -138,6 +140,7 @@ LuminaEvent/
 ├─ public/
 │  ├─ .nojekyll
 │  ├─ data/catalogo.json
+│  ├─ db/migracion_anuncios.sql
 │  ├─ db/supabase.sql
 │  └─ assets/fotos/*.jpg
 └─ tests/
@@ -150,6 +153,7 @@ En la consola del navegador:
 ```js
 luminaDB.modo
 luminaDB.consultar("servicios")
+luminaDB.consultar("anuncios")
 luminaDB.consultar("eventos")
 luminaDB.consultar("detalle_evento")
 luminaDB.cronograma()

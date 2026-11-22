@@ -2,7 +2,7 @@
 
 Última revisión: **22/11/2026**.
 
-Pruebas automáticas: **13/13 aprobadas** con:
+Pruebas automáticas: **17/17 aprobadas** con:
 
 ```bash
 npm test
@@ -35,10 +35,15 @@ Los casos de abajo están revisados en código y en la lógica. Se pueden volver
 | 15 | Anuncio inválido | Dejar nombre vacío o precio negativo y publicar | Aparece el mensaje claro y no se publica | OK |
 | 16 | Cambio de rol sin salir | Probar **Anunciar servicio** y **Armar mi evento** en el encabezado | El menú cambia, la sesión se mantiene y ninguna ruta ajena se abre | OK |
 | 17 | Botón Anunciar servicio lento | Activar modo proveedor con Supabase lento o sin red | El formulario abre al instante; si no se pudo sincronizar aparece un aviso, pero no se bloquea | OK |
+| 18 | Acceso del administrador | Usar **Acceso de revisión** con `admin@lumina.local` / `LuminaAdmin2026!` | Entra en `/#/admin`, ve el menú de revisión y no aparece en el registro | OK |
+| 19 | Rechazo sin motivo | En `/#/admin`, intentar rechazar sin escribir motivo | Aparece “Escribe un motivo para rechazar el anuncio.” y no cambia el estado | OK |
+| 20 | Anuncio pendiente | Enviar un anuncio como proveedor y abrir Inicio y catálogo | No aparece en ninguno de los dos hasta que el administrador lo apruebe | OK |
+| 21 | Corregir anuncio rechazado | Rechazar con motivo, volver como proveedor y usar **Corregir** | Se abre el formulario con los datos; al guardar vuelve a `pendiente` y el motivo se borra | OK |
+| 22 | Extras manuales y anuncios | Agregar un servicio en `/#/administrar` con un anuncio aprobado | El servicio manual y el anuncio aprobado siguen en el catálogo | OK |
 
 ## Pruebas automáticas incluidas
 
-En `tests/logica.test.js` hay 13 pruebas:
+En `tests/logica.test.js` hay 17 pruebas:
 
 1. No agrega el mismo servicio dos veces.
 2. `cambiarCantidad` no baja de 1.
@@ -53,6 +58,10 @@ En `tests/logica.test.js` hay 13 pruebas:
 11. Luhn acepta la tarjeta de ejemplo.
 12. Luhn rechaza una tarjeta inválida.
 13. El proveedor tiene su propio menú y no ve salones.
+14. El administrador no se ofrece en el registro y tiene menú propio.
+15. Solo los estados conocidos son válidos para un anuncio.
+16. Solo un anuncio aprobado puede mostrarse en el catálogo.
+17. Rechazar un anuncio pide un motivo corto y no vacío.
 
 ## Tarjeta de ejemplo para el pago
 

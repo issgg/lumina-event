@@ -24,15 +24,22 @@ Aquí explico por qué tomé cada decisión. Está escrito en lenguaje sencillo 
 | 22/11 | Dejar la bitácora al día | La rúbrica la pide dentro del repositorio | Queda lista para la pregunta de criterio |
 | 22/11 | Dos tipos de cuenta | El usuario pidió otro tipo enfocado en anunciar lo que ofrece | Organizador y proveedor tienen menús distintos, sin mezclar tareas |
 | 22/11 | Guardar el rol en la sesión | Para no perder el contexto al recargar o renovar el token | El rol elegido al entrar se conserva y también se puede cambiar desde el encabezado |
-| 22/11 | Anuncios como servicios `extra-` | No quería pedir una tabla nueva ni volver a correr el SQL | Los anuncios aparecen en el catálogo y se pueden quitar |
+| 22/11 | Anuncios como servicios `extra-` | Primero reutilicé el catálogo para no correr SQL otra vez | Después cambié: los envíos van a `anuncios` y solo los aprobados se copian como `extra-` |
 | 22/11 | El proveedor no publica salones | Los salones tienen dirección, capacidad y modal propio | El proveedor elige solo categorías de servicios |
 | 22/11 | Cambio de rol sin esperar a Supabase | El botón de anunciar parecía no responder si la llamada tardaba | El menú y la ruta cambian al instante; la sincronización va en segundo plano |
+| 22/11 | Tercer rol de administrador | El usuario pidió revisar lo que publican los proveedores | El administrador tiene menú propio, no aparece en el registro y usa credenciales fijas de demo |
+| 22/11 | Tabla `anuncios` con estados | Necesitábamos saber qué anuncio está pendiente, aprobado o rechazado | Supabase guarda el estado y el motivo; hay una migración SQL para proyectos ya creados |
+| 22/11 | Solo anuncios aprobados en el catálogo | No queremos mostrar ofertas sin revisar | El Inicio y el catálogo leen lo aprobado; el proveedor ve el estado y puede corregir rechazos |
+| 22/11 | Motivo obligatorio al rechazar | El proveedor debe saber qué corregir | El panel pide un motivo corto y el anuncio vuelve a `pendiente` al guardarse |
 
-## Qué respondería si me preguntan por una decisión
+## Qué respondería si me preguntan
+ por una decisión
 
 - **¿Por qué Supabase y no SQLite?** Porque el proyecto necesita guardar datos en la nube y funcionar desde el deploy.
 - **¿Qué rechacé de la IA?** La barra de progreso y la idea de juntar todo en pocas pantallas.
 - **¿Dónde se equivocó la IA?** Dejó `const total = total;` en el resumen. Lo detecté al revisar el archivo y lo corregí.
 - **¿Por qué el proveedor no ve el armador?** Porque su trabajo es anunciar servicios, no elegir salón ni armar paquetes.
-- **¿Cómo aparecen los anuncios en el catálogo?** Se guardan como servicios `extra-`, el mismo mecanismo que ya usaba el administrador.
+- **¿Cómo aparecen los anuncios en el catálogo?** El proveedor los envía a la tabla `anuncios`; el administrador los aprueba y solo entonces se copian como servicios `extra-`.
+- **¿Por qué hay un administrador fijo?** Es una demo: así se puede probar la revisión sin depender de otro registro ni de permisos complejos.
+- **¿Qué pasa si rechazan mi anuncio?** Aparece el motivo en **Mis anuncios** y el botón **Corregir** lo devuelve a revisión.
 - **¿Qué haría diferente?** Pediría el secret de Google antes y pondría tiempo de espera en las llamadas desde el inicio.

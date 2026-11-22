@@ -6,6 +6,19 @@ export function validarBusqueda(texto) {
   return "";
 }
 
+export function estadoAnuncioValido(estado) {
+  return ["pendiente", "aprobado", "rechazado"].includes(estado);
+}
+
+export function anuncioPublicable(anuncio) {
+  return Boolean(anuncio) && anuncio.estado === "aprobado";
+}
+
+export function motivoRechazoValido(motivo) {
+  const limpio = String(motivo ?? "").trim();
+  return limpio.length > 0 && limpio.length <= 200;
+}
+
 export function validarDatosEvento(datos, tiposEvento = [], opciones = {}) {
   const errores = {};
   const nombre = String(datos.nombre ?? "").trim();

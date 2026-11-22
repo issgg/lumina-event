@@ -31,10 +31,22 @@ Entrar con la opción **Anunciar servicios** y abrir `/#/proveedor`.
 
 - Mostrar que el menú solo tiene **Mi puesto** y **Anunciar**.
 - Clic en **Anunciar servicio**, llenar DJ o comida, precio y descripción. Desde el organizador, el botón del encabezado abre directo este formulario.
-- Publicar y mostrar que el anuncio queda en **Mis anuncios**.
+- Enviar y mostrar que el anuncio queda en **Mis anuncios** con el estado **En revisión**.
+- Si hay un anuncio rechazado, mostrar el motivo y el botón **Corregir**.
 - Clic en **Armar mi evento** en el encabezado para volver al otro menú sin salir.
 
-> "Este es el otro tipo de usuario. No arma paquetes: publica lo que ofrece. El anuncio entra al catálogo como un servicio más y se puede quitar cuando ya no aplica."
+> "Este es el otro tipo de usuario. No arma paquetes: publica lo que ofrece. El anuncio queda pendiente hasta que el administrador lo revisa; si se rechaza, aparece el motivo y se puede corregir y reenviar."
+
+## 4b. Administrador (35 segundos)
+
+Volver a `/#/acceso`, usar el recuadro **Acceso de revisión** con `admin@lumina.local` y `LuminaAdmin2026!`.
+
+- Mostrar que el menú solo tiene **Revisar anuncios** y **Catálogo manual**.
+- En **Pendientes**, aprobar un anuncio; luego cambiar a **Aprobados** y mostrar que ya está en el catálogo.
+- Rechazar otro anuncio escribiendo un motivo; cambiar a **Rechazados** para verlo.
+- Volver como proveedor y mostrar que ese anuncio permite **Corregir**.
+
+> "El administrador no se registra: entra con una cuenta fija de demostración. Aprueba o rechaza en Supabase. Solo lo aprobado se copia al catálogo, y un rechazo siempre lleva un motivo para que el proveedor sepa qué cambiar."
 
 ## 5. Datos del evento (30 segundos)
 
@@ -85,7 +97,8 @@ Abrir `DIARIO_DE_DECISIONES.md` y `PRUEBAS.md`.
 ## Qué decir si preguntan
 
 - **¿Dónde viven los datos?** En Supabase; se ven en Table Editor y en la consola con `luminaDB`.
-- **¿Cómo funciona el proveedor?** Publica servicios con precio y categoría; entran al catálogo como servicios `extra-` y el organizador los puede ver.
+- **¿Cómo funciona el proveedor?** Publica servicios con precio y categoría; quedan pendientes. Cuando el administrador los aprueba, se copian al catálogo como servicios `extra-` y el organizador los puede ver.
+- **¿Cómo entra el administrador?** Desde el recuadro de revisión en la pantalla de acceso, con las credenciales fijas de la demo.
 - **¿Se pierde el evento al cambiar de rol?** No. El cambio solo cambia el menú y la ruta; la sesión y el borrador siguen ahí.
 - **¿Qué es lo más complicado?** El cálculo del cronograma, porque respeta horarios y tiempos de cada servicio.
 - **¿Qué cambiaste después de probar?** Quité la barra de progreso porque hacía la app más complicada.
@@ -100,3 +113,5 @@ Abrir `DIARIO_DE_DECISIONES.md` y `PRUEBAS.md`.
 - Probar una vez el flujo completo con la tarjeta de ejemplo.
 - Mostrar que el modo oscuro viene por defecto y que el botón del encabezado permite volver al claro.
 - Probar el cambio entre **Anunciar servicio** y **Armar mi evento** sin cerrar sesión.
+- Confirmar que en Supabase se corrió `public/db/migracion_anuncios.sql` si el proyecto ya existía.
+- Recordar las credenciales del administrador: `admin@lumina.local` / `LuminaAdmin2026!`.
