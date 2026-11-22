@@ -39,7 +39,7 @@ Entrar con la opción **Anunciar servicios** y abrir `/#/proveedor`.
 
 ## 4b. Administrador (35 segundos)
 
-Volver a `/#/acceso`, usar el recuadro **Acceso de revisión** con `admin@lumina.local` y `LuminaAdmin2026!`.
+Volver a `/#/acceso` y entrar con las credenciales privadas del administrador en el formulario normal. No mostrar ni leer credenciales en pantalla.
 
 - Mostrar que el menú solo tiene **Revisar anuncios** y **Catálogo manual**.
 - En **Pendientes**, aprobar un anuncio; luego cambiar a **Aprobados** y mostrar que ya está en el catálogo.
@@ -114,4 +114,4 @@ Abrir `DIARIO_DE_DECISIONES.md` y `PRUEBAS.md`.
 - Mostrar que el modo oscuro viene por defecto y que el botón del encabezado permite volver al claro.
 - Probar el cambio entre **Anunciar servicio** y **Armar mi evento** sin cerrar sesión.
 - Confirmar que en Supabase se corrió `public/db/migracion_anuncios.sql` si el proyecto ya existía.
-- Recordar las credenciales del administrador: `admin@lumina.local` / `LuminaAdmin2026!`.
+- Tener a mano las credenciales privadas del administrador; no están visibles en la app ni en el guion.

@@ -35,7 +35,7 @@ Los casos de abajo están revisados en código y en la lógica. Se pueden volver
 | 15 | Anuncio inválido | Dejar nombre vacío o precio negativo y publicar | Aparece el mensaje claro y no se publica | OK |
 | 16 | Cambio de rol sin salir | Probar **Anunciar servicio** y **Armar mi evento** en el encabezado | El menú cambia, la sesión se mantiene y ninguna ruta ajena se abre | OK |
 | 17 | Botón Anunciar servicio lento | Activar modo proveedor con Supabase lento o sin red | El formulario abre al instante; si no se pudo sincronizar aparece un aviso, pero no se bloquea | OK |
-| 18 | Acceso del administrador | Usar **Acceso de revisión** con `admin@lumina.local` / `LuminaAdmin2026!` | Entra en `/#/admin`, ve el menú de revisión y no aparece en el registro | OK |
+| 18 | Acceso del administrador | Escribir las credenciales privadas en el formulario normal de acceso | Entra en `/#/admin`, ve el menú de revisión y no aparece ningún botón ni dato admin en la pantalla | OK |
 | 19 | Rechazo sin motivo | En `/#/admin`, intentar rechazar sin escribir motivo | Aparece “Escribe un motivo para rechazar el anuncio.” y no cambia el estado | OK |
 | 20 | Anuncio pendiente | Enviar un anuncio como proveedor y abrir Inicio y catálogo | No aparece en ninguno de los dos hasta que el administrador lo apruebe | OK |
 | 21 | Corregir anuncio rechazado | Rechazar con motivo, volver como proveedor y usar **Corregir** | Se abre el formulario con los datos; al guardar vuelve a `pendiente` y el motivo se borra | OK |

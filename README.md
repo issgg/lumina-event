@@ -70,7 +70,7 @@ El `anon key` es público y debe ir en el frontend; el `service_role` **nunca** 
 
 ## Inicio de sesión
 
-La pantalla de acceso permite entrar o registrarse con correo y contraseña usando Supabase Auth. Antes de entrar se elige el tipo de cuenta: **Armar mi evento** o **Anunciar servicios**. La sesión se guarda en `localStorage`, conserva ese rol y se renueva sola cuando todavía hay un `refresh_token`. El administrador no aparece en el registro: entra desde el recuadro **Acceso de revisión** con `admin@lumina.local` y `LuminaAdmin2026!`.
+La pantalla de acceso permite entrar o registrarse con correo y contraseña usando Supabase Auth. Antes de entrar se elige el tipo de cuenta: **Armar mi evento** o **Anunciar servicios**. La sesión se guarda en `localStorage`, conserva ese rol y se renueva sola cuando todavía hay un `refresh_token`. El administrador no aparece en el registro ni tiene un botón visible: entra escribiendo sus credenciales privadas en el formulario normal.
 
 Los anuncios del proveedor se guardan en la tabla `anuncios` de Supabase con estado `pendiente`, `aprobado` o `rechazado`. El administrador ve los pendientes en `/#/admin`; si rechaza, escribe un motivo y el proveedor puede corregir y reenviar. Solo los aprobados se copian al catálogo como servicios `extra-`; por eso aparecen en el Inicio y en las categorías. El proveedor no publica salones porque esos tienen dirección y capacidad aparte.
 

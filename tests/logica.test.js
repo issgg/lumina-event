@@ -158,8 +158,8 @@ test("el administrador no se ofrece en el registro y tiene menú propio", () => 
   assert.equal(ROLES_REGISTRO.some((rol) => rol.id === "admin"), false);
   assert.equal(RUTA_POR_ROL.admin, "/admin");
   assert.deepEqual(NAVEGACION_ADMIN.map((item) => item.to), ["/admin", "/administrar"]);
-  assert.equal(ADMIN.correo, "admin@lumina.local");
-  assert.equal(ADMIN.clave, "LuminaAdmin2026!");
+  assert.ok(String(ADMIN.correo).length > 0);
+  assert.ok(String(ADMIN.clave).length >= 6);
 });
 
 test("solo los estados conocidos son válidos para un anuncio", () => {

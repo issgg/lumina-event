@@ -58,6 +58,22 @@ export default function Acceso({ onSesion }) {
       return;
     }
 
+    if (
+      modo === "entrar" &&
+      correo.trim().toLowerCase() === ADMIN.correo &&
+      clave === ADMIN.clave
+    ) {
+      setOcupado(true);
+      try {
+        onSesion(iniciarSesionAdmin(ADMIN.correo, ADMIN.clave));
+      } catch (fallo) {
+        setError(fallo.message || "No se pudo completar el acceso.");
+      } finally {
+        setOcupado(false);
+      }
+      return;
+    }
+
     setOcupado(true);
     try {
       if (modo === "entrar") {
@@ -86,17 +102,6 @@ export default function Acceso({ onSesion }) {
       iniciarConGoogle(rol);
     } catch (fallo) {
       setError(fallo.message || "No se pudo abrir Google.");
-    }
-  }
-
-  function entrarAdmin() {
-    setError("");
-    setMensaje("");
-    olvidarError();
-    try {
-      onSesion(iniciarSesionAdmin(ADMIN.correo, ADMIN.clave));
-    } catch (fallo) {
-      setError(fallo.message || "No se pudo abrir el panel de revisión.");
     }
   }
 
@@ -239,18 +244,6 @@ export default function Acceso({ onSesion }) {
               {ocupado ? "Un momento…" : modo === "entrar" ? "Entrar" : "Crear cuenta"}
             </button>
           </form>
-
-          <div className="acceso-admin">
-            <p className="etiqueta">Acceso de revisión</p>
-            <p>
-              Correo: <code>{ADMIN.correo}</code>
-              <br />
-              Contraseña: <code>{ADMIN.clave}</code>
-            </p>
-            <button type="button" className="boton boton-secundario" onClick={entrarAdmin}>
-              Entrar como administrador
-            </button>
-          </div>
         </section>
       </div>
     </main>
