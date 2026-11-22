@@ -63,8 +63,17 @@ function categoriaIdRemota(clave) {
   return Number(filaPorClave("categorias", clave)?.id ?? 7);
 }
 
-function proveedorIdRemota(nombre) {
-  return Number(datos.proveedores.find((fila) => fila.nombre === nombre)?.id ?? 1);
+async function proveedorIdRemota(nombre) {
+  const texto = valorTexto(nombre) || "Proveedor local";
+  const existente = datos.proveedores.find((fila) => fila.nombre === texto);
+  if (existente) return Number(existente.id);
+
+  const siguiente = Math.max(2000, ...datos.proveedores.map((fila) => Number(fila.id) || 0)) + 1;
+  await insertarFilas("proveedores", [
+    { id: siguiente, nombre: texto, telefono: null, correo: null },
+  ]);
+  datos.proveedores.push({ id: siguiente, nombre: texto, telefono: null, correo: null });
+  return siguiente;
 }
 
 function serviciosDesdeTablas() {
@@ -301,16 +310,19 @@ async function guardarServiciosExtra(servicios) {
   }
   await eliminarFilas("servicios", { clave: "like.extra-%" });
 
-  const filasExtras = servicios.map((servicio, indice) => ({
-    id: 1000 + indice,
-    clave: valorTexto(servicio.id),
-    categoria_id: categoriaIdRemota(valorTexto(servicio.categoria)),
-    proveedor_id: proveedorIdRemota(valorTexto(servicio.proveedor) || "Proveedor local"),
-    nombre: valorTexto(servicio.nombre),
-    descripcion: valorTexto(servicio.descripcion),
-    precio: Number(servicio.precio) || 0,
-    imagen: valorTexto(servicio.imagen) || "assets/img/detalles.svg",
-  }));
+  const filasExtras = [];
+  for (const [indice, servicio] of servicios.entries()) {
+    filasExtras.push({
+      id: 1000 + indice,
+      clave: valorTexto(servicio.id),
+      categoria_id: categoriaIdRemota(valorTexto(servicio.categoria)),
+      proveedor_id: await proveedorIdRemota(valorTexto(servicio.proveedor) || "Proveedor local"),
+      nombre: valorTexto(servicio.nombre),
+      descripcion: valorTexto(servicio.descripcion),
+      precio: Number(servicio.precio) || 0,
+      imagen: valorTexto(servicio.imagen) || "assets/img/detalles.svg",
+    });
+  }
   if (filasExtras.length) await insertarFilas("servicios", filasExtras);
 
   datos.servicios = [

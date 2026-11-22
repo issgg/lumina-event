@@ -1476,6 +1476,11 @@ tbody tr:last-child td {
   font-size: 1rem;
 }
 
+.anuncio-negocio {
+  color: var(--color-oro);
+  font-weight: 700;
+}
+
 .anuncio-tarjeta p {
   margin: 0;
   color: var(--color-texto-suave);

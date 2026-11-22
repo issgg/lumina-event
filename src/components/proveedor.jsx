@@ -204,6 +204,7 @@ export default function Proveedor({ sesion, setAviso, formularioAbierto = false 
                 />
                 <div>
                   <span className="etiqueta">{nombreCategoria(anuncio.categoria)}</span>
+                  {anuncio.negocio && <small className="anuncio-negocio">{anuncio.negocio}</small>}
                   <h3>{anuncio.nombre}</h3>
                   <p>{anuncio.descripcion || "Sin descripción."}</p>
                   <div className="anuncio-pie">
