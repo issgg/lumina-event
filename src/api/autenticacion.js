@@ -1,3 +1,4 @@
+import { rolValido } from "./configuracion.js";
 import { solicitarConTiempo } from "./red.js";
 
 const URL_BASE = String(import.meta.env.VITE_SUPABASE_URL ?? "").replace(/\/+$/, "");
@@ -10,13 +11,14 @@ function ahora() {
   return Math.floor(Date.now() / 1000);
 }
 
-function normalizarSesion(datos) {
+function normalizarSesion(datos, rolElegido) {
   if (!datos?.access_token) throw new Error("No se pudo iniciar sesión");
   const expira = Number(datos.expires_at ?? ahora() + Number(datos.expires_in ?? 3600));
   return {
     access_token: datos.access_token,
     refresh_token: datos.refresh_token ?? "",
     expires_at: expira,
+    rol: rolValido(rolElegido ?? datos.rol ?? datos.user?.user_metadata?.rol),
     user: datos.user ?? null,
   };
 }
@@ -31,8 +33,8 @@ function leerSesion() {
   }
 }
 
-function guardarSesion(sesion) {
-  const normalizada = normalizarSesion(sesion);
+function guardarSesion(sesion, rolElegido) {
+  const normalizada = normalizarSesion(sesion, rolElegido);
   if (typeof window !== "undefined") {
     window.localStorage.setItem(CLAVE_LOCAL, JSON.stringify(normalizada));
   }
@@ -41,6 +43,23 @@ function guardarSesion(sesion) {
 
 export function limpiarSesion() {
   if (typeof window !== "undefined") window.localStorage.removeItem(CLAVE_LOCAL);
+}
+
+export async function actualizarRol(rol, sesionActual) {
+  const guardada = sesionActual ?? leerSesion();
+  if (!guardada) return null;
+
+  const nuevo = rolValido(rol);
+  const datos = await solicitarAuth("/user", {
+    metodo: "PATCH",
+    cuerpo: { user_metadata: { rol: nuevo } },
+    token: guardada.access_token,
+  });
+
+  return guardarSesion(
+    { ...guardada, user: datos ?? guardada.user, rol: nuevo },
+    nuevo,
+  );
 }
 
 async function solicitarAuth(ruta, { metodo = "GET", cuerpo, token } = {}) {
@@ -97,32 +116,47 @@ export async function obtenerSesion() {
       metodo: "POST",
       cuerpo: { refresh_token: guardada.refresh_token },
     });
-    return guardarSesion({ ...datos, user: datos?.user ?? guardada.user });
+    return guardarSesion({ ...datos, user: datos?.user ?? guardada.user }, guardada.rol);
   } catch {
     limpiarSesion();
     return null;
   }
 }
 
-export async function iniciarSesionCorreo(correo, clave) {
+export async function iniciarSesionCorreo(correo, clave, rolElegido) {
   const datos = await solicitarAuth("/token?grant_type=password", {
     metodo: "POST",
     cuerpo: { email: correo.trim(), password: clave },
   });
-  return guardarSesion(datos);
+  const sesion = guardarSesion(datos, rolElegido);
+
+  try {
+    if (datos?.user?.user_metadata?.rol !== sesion.rol) {
+      return await actualizarRol(sesion.rol, sesion);
+    }
+  } catch {
+    return sesion;
+  }
+  return sesion;
 }
 
-export async function registrarseCorreo(correo, clave) {
+export async function registrarseCorreo(correo, clave, rolElegido) {
+  const rol = rolValido(rolElegido);
   const datos = await solicitarAuth("/signup", {
     metodo: "POST",
-    cuerpo: { email: correo.trim(), password: clave },
+    cuerpo: { email: correo.trim(), password: clave, data: { rol } },
   });
-  if (datos?.access_token) return { sesion: guardarSesion(datos), pendiente: false };
+  if (datos?.access_token) return { sesion: guardarSesion(datos, rol), pendiente: false };
   return { sesion: null, pendiente: true };
 }
 
-export function iniciarConGoogle() {
+export function iniciarConGoogle(rolElegido) {
   if (!authConfigurado) throw new Error("Falta configurar Supabase");
+  try {
+    window.sessionStorage.setItem("lumina-rol-elegido", rolValido(rolElegido));
+  } catch {
+    return;
+  }
   const destino = `${window.location.origin}${window.location.pathname}`;
   const url = new URL(`${URL_BASE}/auth/v1/authorize`);
   url.searchParams.set("provider", "google");
@@ -159,7 +193,14 @@ export function capturarSesionRedireccion() {
       limpiarSesion();
     }
   } else {
-    guardarSesion(Object.fromEntries(parametros.entries()));
+    let rolElegido;
+    try {
+      rolElegido = window.sessionStorage.getItem("lumina-rol-elegido") ?? undefined;
+      window.sessionStorage.removeItem("lumina-rol-elegido");
+    } catch {
+      rolElegido = undefined;
+    }
+    guardarSesion(Object.fromEntries(parametros.entries()), rolElegido);
   }
 
   window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);

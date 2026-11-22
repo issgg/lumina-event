@@ -1,3 +1,25 @@
+export const ROLES = [
+  {
+    id: "organizador",
+    texto: "Armar mi evento",
+    descripcion: "Elijo salón, servicios y armo mi paquete.",
+  },
+  {
+    id: "proveedor",
+    texto: "Anunciar servicios",
+    descripcion: "DJ, comida, decoración u otros servicios.",
+  },
+];
+
+export const RUTA_POR_ROL = {
+  organizador: "/",
+  proveedor: "/proveedor",
+};
+
+export function rolValido(rol) {
+  return ROLES.some((item) => item.id === rol) ? rol : "organizador";
+}
+
 export const NAVEGACION = [
   { to: "/", texto: "Inicio" },
   { to: "/armador", texto: "Datos" },
@@ -5,6 +27,11 @@ export const NAVEGACION = [
   { to: "/catalogo", texto: "Servicios" },
   { to: "/resumen", texto: "Mi paquete" },
   { to: "/pago", texto: "Pago" },
+];
+
+export const NAVEGACION_PROVEEDOR = [
+  { to: "/proveedor", texto: "Mi puesto" },
+  { to: "/proveedor/anunciar", texto: "Anunciar" },
 ];
 
 export const CATEGORIAS = [

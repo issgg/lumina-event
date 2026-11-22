@@ -5,6 +5,7 @@ import {
   iniciarSesionCorreo,
   registrarseCorreo,
 } from "../api/autenticacion.js";
+import { ROLES } from "../api/configuracion.js";
 
 function errorGuardado() {
   try {
@@ -24,6 +25,7 @@ function olvidarError() {
 
 export default function Acceso({ onSesion }) {
   const [modo, setModo] = useState("entrar");
+  const [rol, setRol] = useState("organizador");
   const [correo, setCorreo] = useState("");
   const [clave, setClave] = useState("");
   const [error, setError] = useState(errorGuardado);
@@ -32,6 +34,13 @@ export default function Acceso({ onSesion }) {
 
   function cambiarModo(nuevo) {
     setModo(nuevo);
+    setError("");
+    setMensaje("");
+    olvidarError();
+  }
+
+  function cambiarRol(nuevo) {
+    setRol(nuevo);
     setError("");
     setMensaje("");
     olvidarError();
@@ -51,9 +60,9 @@ export default function Acceso({ onSesion }) {
     setOcupado(true);
     try {
       if (modo === "entrar") {
-        onSesion(await iniciarSesionCorreo(correo, clave));
+        onSesion(await iniciarSesionCorreo(correo, clave, rol));
       } else {
-        const resultado = await registrarseCorreo(correo, clave);
+        const resultado = await registrarseCorreo(correo, clave, rol);
         if (resultado.sesion) {
           onSesion(resultado.sesion);
         } else {
@@ -73,11 +82,13 @@ export default function Acceso({ onSesion }) {
     setMensaje("");
     olvidarError();
     try {
-      iniciarConGoogle();
+      iniciarConGoogle(rol);
     } catch (fallo) {
       setError(fallo.message || "No se pudo abrir Google.");
     }
   }
+
+  const esProveedor = rol === "proveedor";
 
   return (
     <main className="acceso">
@@ -88,27 +99,53 @@ export default function Acceso({ onSesion }) {
             <span>Lumina Event</span>
           </div>
           <p className="acceso-kicker">Tu acceso</p>
-          <h2>Cada celebración empieza con una buena entrada.</h2>
+          <h2>
+            {esProveedor
+              ? "Tu servicio, frente a más celebraciones."
+              : "Cada celebración empieza con una buena entrada."}
+          </h2>
           <p>
-            Un espacio para armar tu evento con calma: servicios, presupuesto y cronograma en un solo lugar.
+            {esProveedor
+              ? "Anuncia lo que haces, elige una categoría y deja que los organizadores te encuentren."
+              : "Un espacio para armar tu evento con calma: servicios, presupuesto y cronograma en un solo lugar."}
           </p>
           <div className="acceso-puntos">
-            <span>
-              <b>01</b> Explora opciones
-            </span>
-            <span>
-              <b>02</b> Ajusta el presupuesto
-            </span>
-            <span>
-              <b>03</b> Revisa el cronograma
-            </span>
+            {esProveedor ? (
+              <>
+                <span>
+                  <b>01</b> Elige tu categoría
+                </span>
+                <span>
+                  <b>02</b> Cuenta qué ofreces
+                </span>
+                <span>
+                  <b>03</b> Publícalo en el catálogo
+                </span>
+              </>
+            ) : (
+              <>
+                <span>
+                  <b>01</b> Explora opciones
+                </span>
+                <span>
+                  <b>02</b> Ajusta el presupuesto
+                </span>
+                <span>
+                  <b>03</b> Revisa el cronograma
+                </span>
+              </>
+            )}
           </div>
         </aside>
 
         <section className="acceso-tarjeta">
           <p className="etiqueta">Bienvenido</p>
           <h1>{modo === "entrar" ? "Entra a tu cuenta" : "Crea tu cuenta"}</h1>
-          <p className="subtitulo">Guarda tus eventos y continua donde lo dejaste.</p>
+          <p className="subtitulo">
+            {esProveedor
+              ? "Publica tus servicios y sigue donde lo dejaste."
+              : "Guarda tus eventos y continua donde lo dejaste."}
+          </p>
 
           <div className="pestanas" aria-label="Tipo de acceso">
             <button
@@ -125,6 +162,21 @@ export default function Acceso({ onSesion }) {
             >
               Registrarme
             </button>
+          </div>
+
+          <div className="roles-acceso" aria-label="Tipo de cuenta">
+            {ROLES.map((opcion) => (
+              <button
+                key={opcion.id}
+                type="button"
+                className={rol === opcion.id ? "activo" : ""}
+                aria-pressed={rol === opcion.id}
+                onClick={() => cambiarRol(opcion.id)}
+              >
+                <strong>{opcion.texto}</strong>
+                <span>{opcion.descripcion}</span>
+              </button>
+            ))}
           </div>
 
           <button
