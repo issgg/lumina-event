@@ -16,6 +16,11 @@ export const RUTA_POR_ROL = {
   proveedor: "/proveedor",
 };
 
+export const RUTA_ACCION_POR_ROL = {
+  organizador: "/",
+  proveedor: "/proveedor/anunciar",
+};
+
 export function rolValido(rol) {
   return ROLES.some((item) => item.id === rol) ? rol : "organizador";
 }

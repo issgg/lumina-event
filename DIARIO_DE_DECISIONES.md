@@ -26,6 +26,7 @@ Aquí explico por qué tomé cada decisión. Está escrito en lenguaje sencillo 
 | 22/11 | Guardar el rol en la sesión | Para no perder el contexto al recargar o renovar el token | El rol elegido al entrar se conserva y también se puede cambiar desde el encabezado |
 | 22/11 | Anuncios como servicios `extra-` | No quería pedir una tabla nueva ni volver a correr el SQL | Los anuncios aparecen en el catálogo y se pueden quitar |
 | 22/11 | El proveedor no publica salones | Los salones tienen dirección, capacidad y modal propio | El proveedor elige solo categorías de servicios |
+| 22/11 | Cambio de rol sin esperar a Supabase | El botón de anunciar parecía no responder si la llamada tardaba | El menú y la ruta cambian al instante; la sincronización va en segundo plano |
 
 ## Qué respondería si me preguntan por una decisión
 

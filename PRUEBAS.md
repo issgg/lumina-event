@@ -34,6 +34,7 @@ Los casos de abajo están revisados en código y en la lógica. Se pueden volver
 | 14 | Proveedor sin anuncios | Entrar como proveedor con una cuenta nueva | Aparece “Todavía no publicaste nada” y el botón **Anunciar servicio** | OK |
 | 15 | Anuncio inválido | Dejar nombre vacío o precio negativo y publicar | Aparece el mensaje claro y no se publica | OK |
 | 16 | Cambio de rol sin salir | Probar **Anunciar servicio** y **Armar mi evento** en el encabezado | El menú cambia, la sesión se mantiene y ninguna ruta ajena se abre | OK |
+| 17 | Botón Anunciar servicio lento | Activar modo proveedor con Supabase lento o sin red | El formulario abre al instante; si no se pudo sincronizar aparece un aviso, pero no se bloquea | OK |
 
 ## Pruebas automáticas incluidas
 

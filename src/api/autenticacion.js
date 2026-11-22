@@ -45,6 +45,27 @@ export function limpiarSesion() {
   if (typeof window !== "undefined") window.localStorage.removeItem(CLAVE_LOCAL);
 }
 
+export function guardarRolLocal(rol, sesionActual) {
+  const guardada = sesionActual ?? leerSesion();
+  if (!guardada) return null;
+
+  const nuevo = rolValido(rol);
+  const user = guardada.user ?? null;
+  return guardarSesion(
+    {
+      ...guardada,
+      user: user
+        ? {
+            ...user,
+            user_metadata: { ...(user.user_metadata ?? {}), rol: nuevo },
+          }
+        : user,
+      rol: nuevo,
+    },
+    nuevo,
+  );
+}
+
 export async function actualizarRol(rol, sesionActual) {
   const guardada = sesionActual ?? leerSesion();
   if (!guardada) return null;
@@ -56,10 +77,7 @@ export async function actualizarRol(rol, sesionActual) {
     token: guardada.access_token,
   });
 
-  return guardarSesion(
-    { ...guardada, user: datos ?? guardada.user, rol: nuevo },
-    nuevo,
-  );
+  return guardarRolLocal(nuevo, { ...guardada, user: datos ?? guardada.user });
 }
 
 async function solicitarAuth(ruta, { metodo = "GET", cuerpo, token } = {}) {

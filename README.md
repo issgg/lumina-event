@@ -18,7 +18,7 @@ Una sola plataforma reúne salón, comida, mobiliario, música, decoración, fot
 
 El flujo es sencillo: datos del evento, salón, categorías de servicios, resumen y pago simulado. En cada categoría se puede **regresar**, **omitir** o **continuar**.
 
-También hay dos tipos de cuenta. El **organizador** arma su paquete con el flujo anterior. El **proveedor** anuncia lo que ofrece, por ejemplo DJ, comida o decoración. El tipo se elige al entrar y se puede cambiar desde el encabezado sin cerrar sesión; cada uno ve solo su menú.
+También hay dos tipos de cuenta. El **organizador** arma su paquete con el flujo anterior. El **proveedor** anuncia lo que ofrece, por ejemplo DJ, comida o decoración. El tipo se elige al entrar y se puede cambiar desde el encabezado sin cerrar sesión; cada uno ve solo su menú. El botón **Anunciar servicio** abre directo el formulario del proveedor.
 
 ## Paleta
 

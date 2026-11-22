@@ -118,7 +118,7 @@ El frontend solo usa la llave pública. El `service_role` no aparece en el códi
 - Recarga a mitad del proceso: se retoma el borrador desde Supabase.
 - Servidor lento: se corta la espera y se muestra mensaje para reintentar.
 - Listas vacías: muestran mensajes en vez de pantallas en blanco.
-- Cambio de rol: se cambia desde el encabezado sin cerrar sesión y el menú se ajusta.
+- Cambio de rol: se cambia desde el encabezado sin cerrar sesión, el menú se ajusta y **Anunciar servicio** abre el formulario aunque Supabase tarde.
 - Anuncio sin nombre o con precio negativo: muestra mensaje y no se publica.
 - Proveedor sin anuncios: muestra un texto invitando a publicar el primero.
 

@@ -34,4 +34,5 @@ export const MENSAJES = {
   anuncioSinPublicar: "Guardado aquí, pero no se pudo publicar en el catálogo.",
   modoProveedor: "Ahora estás anunciando tus servicios.",
   modoOrganizador: "Ahora estás armando tu evento.",
+  rolSinSincronizar: "Modo cambiado. No se pudo sincronizar con Supabase.",
 };

@@ -2,8 +2,13 @@ import { useEffect, useState } from "react";
 import { Navigate, Route, Routes, useNavigate } from "react-router";
 
 import { inicializarBase, guardarEvento, leerEvento } from "./api/baseDatos.js";
-import { actualizarRol, cerrarSesion, obtenerSesion } from "./api/autenticacion.js";
-import { RUTA_POR_ROL } from "./api/configuracion.js";
+import {
+  actualizarRol,
+  cerrarSesion,
+  guardarRolLocal,
+  obtenerSesion,
+} from "./api/autenticacion.js";
+import { RUTA_ACCION_POR_ROL, RUTA_POR_ROL } from "./api/configuracion.js";
 import { eventoVacio } from "./logica/evento.js";
 import { MENSAJES } from "./logica/mensajes.js";
 import Acceso from "./components/acceso.jsx";
@@ -89,18 +94,19 @@ export default function App() {
     setAviso("");
   }
 
-  async function cambiarRol(nuevo) {
-    try {
-      const actualizada = await actualizarRol(nuevo, sesion);
-      if (!actualizada) return;
-      setSesion(actualizada);
-      setAviso(
-        actualizada.rol === "proveedor" ? MENSAJES.modoProveedor : MENSAJES.modoOrganizador,
-      );
-      navegar(RUTA_POR_ROL[actualizada.rol] ?? "/");
-    } catch {
-      setAviso(MENSAJES.datosInvalidos);
-    }
+  function cambiarRol(nuevo) {
+    const actualizada = guardarRolLocal(nuevo, sesion);
+    if (!actualizada) return;
+
+    setSesion(actualizada);
+    setAviso(
+      actualizada.rol === "proveedor" ? MENSAJES.modoProveedor : MENSAJES.modoOrganizador,
+    );
+    navegar(RUTA_ACCION_POR_ROL[actualizada.rol] ?? RUTA_POR_ROL[actualizada.rol] ?? "/");
+
+    actualizarRol(actualizada.rol, actualizada).catch(() => {
+      setAviso(MENSAJES.rolSinSincronizar);
+    });
   }
 
   if (verificandoSesion) {

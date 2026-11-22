@@ -8,7 +8,7 @@ import { generarCronograma, aMinutos, formatearHora } from "../src/logica/cronog
 import { seleccionarSalon, evaluarCobertura, estadoPresupuesto } from "../src/logica/paquete.js";
 import { validarPago, formatearNumeroTarjeta } from "../src/logica/pago.js";
 import { MENSAJES } from "../src/logica/mensajes.js";
-import { CATEGORIAS_PROVEEDOR, NAVEGACION_PROVEEDOR, RUTA_POR_ROL, rolValido } from "../src/api/configuracion.js";
+import { CATEGORIAS_PROVEEDOR, NAVEGACION_PROVEEDOR, RUTA_ACCION_POR_ROL, RUTA_POR_ROL, rolValido } from "../src/api/configuracion.js";
 
 const servicio = { id: "dj", nombre: "DJ", categoria: "musica", precio: 8000 };
 
@@ -142,6 +142,7 @@ test("el proveedor tiene su propio menú y no ve salones", () => {
   assert.equal(rolValido("proveedor"), "proveedor");
   assert.equal(rolValido("otro"), "organizador");
   assert.equal(RUTA_POR_ROL.proveedor, "/proveedor");
+  assert.equal(RUTA_ACCION_POR_ROL.proveedor, "/proveedor/anunciar");
   assert.deepEqual(NAVEGACION_PROVEEDOR.map((item) => item.to), ["/proveedor", "/proveedor/anunciar"]);
   assert.equal(CATEGORIAS_PROVEEDOR.some((categoria) => categoria.id === "salones"), false);
 });

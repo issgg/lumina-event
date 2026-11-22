@@ -30,7 +30,7 @@ Abrir `/#/acceso`.
 Entrar con la opción **Anunciar servicios** y abrir `/#/proveedor`.
 
 - Mostrar que el menú solo tiene **Mi puesto** y **Anunciar**.
-- Clic en **Anunciar servicio**, llenar DJ o comida, precio y descripción.
+- Clic en **Anunciar servicio**, llenar DJ o comida, precio y descripción. Desde el organizador, el botón del encabezado abre directo este formulario.
 - Publicar y mostrar que el anuncio queda en **Mis anuncios**.
 - Clic en **Armar mi evento** en el encabezado para volver al otro menú sin salir.
 

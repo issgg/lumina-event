@@ -18,6 +18,7 @@ Aquí anoto cuándo usé la IA, qué pedí y qué revisé yo después.
 | 22/11 | Entrega y casos límite | Revisar si cumplía la rúbrica | Señaló bitácora faltante, docs viejos y riesgos de red | Agregué esta bitácora, actualicé docs y corregí los casos límite |
 | 22/11 | Tipo proveedor | Agregar otro usuario que anuncie DJ, comida y otros servicios | Propuso rol en el acceso, sesión con rol y menú distinto | Revisé que el proveedor no vea el armador y que el rol no se pierda al recargar |
 | 22/11 | Anuncios | Crear una pantalla sencilla para publicar ofertas | Propuso guardar los anuncios como servicios `extra-` del catálogo | Verifiqué que no se borren los servicios del administrador y que el precio inválido no pase |
+| 22/11 | Botón de anunciar | El botón del encabezado parecía no responder | Propuso cambiar el rol en local y navegar antes de sincronizar con Supabase | Revisé que abra el formulario directo y que una falla de red solo muestre aviso |
 
 ## Cosas que la IA propuso y yo rechacé
 
