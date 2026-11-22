@@ -1521,6 +1521,100 @@ tbody tr:last-child td {
   color: var(--color-oro);
 }
 
+.revision-filtros {
+  flex-wrap: wrap;
+  margin-bottom: 1.2rem;
+}
+
+.revision-filtros .boton {
+  padding: 0.5rem 0.85rem;
+  font-size: 0.78rem;
+}
+
+.revision-filtros .boton.activo {
+  border-color: var(--color-oro);
+  color: var(--color-oro);
+}
+
+.revision-etiquetas {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.estado-anuncio {
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--color-borde);
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.estado-anuncio.estado-pendiente {
+  border-color: var(--color-oro);
+  color: var(--color-oro);
+}
+
+.estado-anuncio.estado-aprobado {
+  border-color: var(--color-bosque);
+  color: var(--color-arcilla-oscuro);
+}
+
+.estado-anuncio.estado-rechazado {
+  border-color: var(--color-peligro-borde);
+  color: var(--color-error);
+}
+
+.revision-correo {
+  color: var(--color-texto-suave);
+  font-size: 0.7rem;
+  overflow-wrap: anywhere;
+}
+
+.revision-motivo {
+  padding: 0.55rem 0.7rem;
+  border-left: 3px solid var(--color-error);
+  border-radius: 6px;
+  background: var(--color-peligro-fondo);
+  color: var(--color-error);
+  font-size: 0.75rem;
+}
+
+.revision-motivo-campo {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--color-texto-suave);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.revision-motivo-campo textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  background: var(--color-papel);
+  color: var(--color-tinta);
+  font: inherit;
+  font-size: 0.78rem;
+  resize: vertical;
+}
+
+.revision-acciones {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--color-borde);
+}
+
+.revision-acciones .boton {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.76rem;
+}
+
 @keyframes aparecer {
   from {
     opacity: 0;

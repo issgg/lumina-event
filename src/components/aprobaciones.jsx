@@ -1,13 +1,217 @@
-export default function Aprobaciones() {
+import { useEffect, useState } from "react";
+
+import {
+  fotoDe,
+  imagenDe,
+  listarAnuncios,
+  revisarAnuncio,
+  suscribirseAnuncios,
+} from "../api/anuncios.js";
+import { CATEGORIAS } from "../api/configuracion.js";
+import { formatearMoneda } from "../logica/formato.js";
+import { MENSAJES } from "../logica/mensajes.js";
+
+const FILTROS = [
+  { id: "pendiente", texto: "Pendientes" },
+  { id: "aprobado", texto: "Aprobados" },
+  { id: "rechazado", texto: "Rechazados" },
+  { id: "todos", texto: "Todos" },
+];
+
+const TEXTO_ESTADO = {
+  pendiente: "Pendiente",
+  aprobado: "Aprobado",
+  rechazado: "Rechazado",
+};
+
+function nombreCategoria(id) {
+  return CATEGORIAS.find((categoria) => categoria.id === id)?.nombre ?? id;
+}
+
+function fechaTexto(valor) {
+  if (!valor) return "Fecha por definir";
+  const fecha = new Date(valor);
+  if (Number.isNaN(fecha.getTime())) return valor;
+  return fecha.toLocaleDateString("es-MX", { day: "numeric", month: "short" });
+}
+
+export default function Aprobaciones({ setAviso }) {
+  const [anuncios, setAnuncios] = useState([]);
+  const [filtro, setFiltro] = useState("pendiente");
+  const [motivos, setMotivos] = useState({});
+  const [ocupado, setOcupado] = useState("");
+
+  useEffect(() => {
+    let activo = true;
+    listarAnuncios()
+      .then((lista) => {
+        if (activo) setAnuncios(lista);
+      })
+      .catch(() => {
+        if (activo) setAnuncios([]);
+      });
+    return () => {
+      activo = false;
+    };
+  }, [filtro]);
+
+  useEffect(
+    () =>
+      suscribirseAnuncios(() => {
+        listarAnuncios()
+          .then(setAnuncios)
+          .catch(() => setAnuncios([]));
+      }),
+    [],
+  );
+
+  const visibles = filtro === "todos" ? anuncios : anuncios.filter((anuncio) => anuncio.estado === filtro);
+  const pendientes = anuncios.filter((anuncio) => anuncio.estado === "pendiente").length;
+
+  function cambiarMotivo(id, valor) {
+    setMotivos((actual) => ({ ...actual, [id]: valor }));
+  }
+
+  async function revisar(anuncio, estado) {
+    const motivo = String(motivos[anuncio.id] ?? "").trim();
+    if (estado === "rechazado" && !motivo) {
+      setAviso(MENSAJES.adminMotivo);
+      return;
+    }
+
+    setOcupado(anuncio.id);
+    try {
+      await revisarAnuncio(anuncio.id, estado, motivo);
+      setMotivos((actual) => ({ ...actual, [anuncio.id]: "" }));
+      setAnuncios(await listarAnuncios());
+      if (estado === "aprobado") setAviso(MENSAJES.anuncioAprobado);
+      else if (estado === "rechazado") setAviso(MENSAJES.anuncioRechazado);
+      else setAviso(MENSAJES.anuncioPendiente);
+    } catch {
+      setAviso(MENSAJES.falloGuardado);
+    } finally {
+      setOcupado("");
+    }
+  }
+
   return (
     <section className="pagina">
       <header className="titulo-pagina">
         <div>
           <p className="etiqueta">Panel de revisión</p>
           <h1>Aprobación de anuncios</h1>
-          <p>Aquí se revisarán los servicios enviados por los proveedores.</p>
+          <p>Revisa lo que envían los proveedores. Solo lo aprobado aparece en el catálogo.</p>
+        </div>
+        <div className="titulo-acciones">
+          <p className="contador">{pendientes} por revisar</p>
         </div>
       </header>
+
+      <div className="barra-filtros revision-filtros">
+        {FILTROS.map((opcion) => (
+          <button
+            key={opcion.id}
+            type="button"
+            className={`boton boton-secundario${filtro === opcion.id ? " activo" : ""}`}
+            aria-pressed={filtro === opcion.id}
+            onClick={() => setFiltro(opcion.id)}
+          >
+            {opcion.texto}
+          </button>
+        ))}
+      </div>
+
+      <div className="panel">
+        <div className="anuncios-cabecera">
+          <h2>Solicitudes</h2>
+          <span>{visibles.length} anuncios</span>
+        </div>
+
+        {visibles.length === 0 ? (
+          <p className="vacio-texto">No hay anuncios en esta lista por ahora.</p>
+        ) : (
+          <div className="lista-anuncios">
+            {visibles.map((anuncio) => (
+              <article
+                className={`anuncio-tarjeta revision-tarjeta estado-${anuncio.estado}`}
+                key={anuncio.id}
+              >
+                <img
+                  src={fotoDe(anuncio.categoria)}
+                  alt=""
+                  onError={(evento) => {
+                    evento.currentTarget.src = imagenDe(anuncio.categoria);
+                  }}
+                />
+                <div>
+                  <div className="revision-etiquetas">
+                    <span className="etiqueta">{nombreCategoria(anuncio.categoria)}</span>
+                    <span className={`estado-anuncio estado-${anuncio.estado}`}>
+                      {TEXTO_ESTADO[anuncio.estado]}
+                    </span>
+                  </div>
+                  {anuncio.negocio && <small className="anuncio-negocio">{anuncio.negocio}</small>}
+                  <h3>{anuncio.nombre}</h3>
+                  <p>{anuncio.descripcion || "Sin descripción."}</p>
+                  <small className="revision-correo">
+                    {anuncio.correo || "Sin correo"} · {fechaTexto(anuncio.creadoEn)}
+                  </small>
+                  {anuncio.estado === "rechazado" && anuncio.motivo && (
+                    <p className="revision-motivo">Motivo: {anuncio.motivo}</p>
+                  )}
+                  {anuncio.estado !== "aprobado" && (
+                    <label className="revision-motivo-campo">
+                      Motivo por si se rechaza
+                      <textarea
+                        rows="2"
+                        maxLength={200}
+                        value={motivos[anuncio.id] ?? ""}
+                        placeholder="Explica qué debe corregir."
+                        onChange={(evento) => cambiarMotivo(anuncio.id, evento.target.value)}
+                      />
+                    </label>
+                  )}
+                  <div className="anuncio-pie">
+                    <strong>{formatearMoneda(anuncio.precio)}</strong>
+                  </div>
+                  <div className="revision-acciones">
+                    {anuncio.estado !== "aprobado" && (
+                      <button
+                        type="button"
+                        className="boton"
+                        disabled={Boolean(ocupado)}
+                        onClick={() => revisar(anuncio, "aprobado")}
+                      >
+                        Aprobar
+                      </button>
+                    )}
+                    {anuncio.estado !== "rechazado" && (
+                      <button
+                        type="button"
+                        className="boton boton-secundario"
+                        disabled={Boolean(ocupado)}
+                        onClick={() => revisar(anuncio, "rechazado")}
+                      >
+                        Rechazar
+                      </button>
+                    )}
+                    {anuncio.estado !== "pendiente" && (
+                      <button
+                        type="button"
+                        className="boton-texto"
+                        disabled={Boolean(ocupado)}
+                        onClick={() => revisar(anuncio, "pendiente")}
+                      >
+                        Volver a pendiente
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </div>
     </section>
   );
 }
