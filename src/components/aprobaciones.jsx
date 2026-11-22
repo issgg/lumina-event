@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import {
   fotoDe,
   imagenDe,
-  listarAnuncios,
-  revisarAnuncio,
+  listarAnunciosAdmin,
+  revisarAnuncioAdmin,
   suscribirseAnuncios,
 } from "../api/anuncios.js";
 import { CATEGORIAS } from "../api/configuracion.js";
@@ -36,7 +36,7 @@ function fechaTexto(valor) {
   return fecha.toLocaleDateString("es-MX", { day: "numeric", month: "short" });
 }
 
-export default function Aprobaciones({ setAviso }) {
+export default function Aprobaciones({ token, setAviso }) {
   const [anuncios, setAnuncios] = useState([]);
   const [filtro, setFiltro] = useState("pendiente");
   const [motivos, setMotivos] = useState({});
@@ -45,7 +45,7 @@ export default function Aprobaciones({ setAviso }) {
 
   useEffect(() => {
     let activo = true;
-    listarAnuncios()
+    listarAnunciosAdmin(token)
       .then((lista) => {
         if (activo) {
           setAnuncios(lista);
@@ -61,12 +61,12 @@ export default function Aprobaciones({ setAviso }) {
     return () => {
       activo = false;
     };
-  }, [filtro]);
+  }, [filtro, token]);
 
   useEffect(
     () =>
       suscribirseAnuncios(() => {
-        listarAnuncios()
+        listarAnunciosAdmin(token)
           .then((lista) => {
             setAnuncios(lista);
             setSinTabla(false);
@@ -76,7 +76,7 @@ export default function Aprobaciones({ setAviso }) {
             setSinTabla(true);
           });
       }),
-    [],
+    [token],
   );
 
   const visibles = filtro === "todos" ? anuncios : anuncios.filter((anuncio) => anuncio.estado === filtro);
@@ -95,9 +95,9 @@ export default function Aprobaciones({ setAviso }) {
 
     setOcupado(anuncio.id);
     try {
-      await revisarAnuncio(anuncio.id, estado, motivo);
+      await revisarAnuncioAdmin(token, anuncio.id, estado, motivo);
       setMotivos((actual) => ({ ...actual, [anuncio.id]: "" }));
-      setAnuncios(await listarAnuncios());
+      setAnuncios(await listarAnunciosAdmin(token));
       if (estado === "aprobado") setAviso(MENSAJES.anuncioAprobado);
       else if (estado === "rechazado") setAviso(MENSAJES.anuncioRechazado);
       else setAviso(MENSAJES.anuncioPendiente);
@@ -123,7 +123,7 @@ export default function Aprobaciones({ setAviso }) {
 
       {sinTabla && (
         <p className="aviso aviso-error revision-aviso">
-          Falta la tabla de anuncios en Supabase. Ejecuta `public/db/migracion_anuncios.sql` y recarga.
+          No se pudieron cargar los anuncios. Revisa que la función lumina-admin esté desplegada y que exista la tabla anuncios.
         </p>
       )}
 

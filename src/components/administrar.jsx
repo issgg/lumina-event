@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 
-import { guardarExtrasManuales, leerExtrasManuales } from "../api/anuncios.js";
+import {
+  borrarExtraManual,
+  guardarExtrasManuales,
+  leerExtrasManuales,
+} from "../api/anuncios.js";
 import { CATEGORIAS } from "../api/configuracion.js";
 import { formatearMoneda } from "../logica/formato.js";
 import { MENSAJES } from "../logica/mensajes.js";
@@ -13,13 +17,23 @@ const FORMULARIO_VACIO = {
   precio: "",
 };
 
-export default function Administrar({ setAviso }) {
+export default function Administrar({ token, setAviso }) {
   const [extras, setExtras] = useState([]);
   const [formulario, setFormulario] = useState(FORMULARIO_VACIO);
 
   useEffect(() => {
-    setExtras(leerExtrasManuales());
-  }, []);
+    let activo = true;
+    leerExtrasManuales(token)
+      .then((lista) => {
+        if (activo) setExtras(lista);
+      })
+      .catch(() => {
+        if (activo) setExtras([]);
+      });
+    return () => {
+      activo = false;
+    };
+  }, [token]);
 
   function cambiar(campo, valor) {
     setFormulario((actual) => ({ ...actual, [campo]: valor }));
@@ -41,19 +55,20 @@ export default function Administrar({ setAviso }) {
     }
 
     try {
-      await guardarExtrasManuales([
-        ...extras,
-        {
-          id: `extra-${Date.now()}`,
-          nombre,
-          categoria: formulario.categoria,
-          proveedor: formulario.proveedor.trim() || "Proveedor local",
-          descripcion: formulario.descripcion.trim(),
-          precio,
-          imagen: "assets/img/detalles.svg",
-        },
-      ]);
-      setExtras(leerExtrasManuales());
+      setExtras(
+        await guardarExtrasManuales(token, [
+          ...extras,
+          {
+            id: `extra-${Date.now()}`,
+            nombre,
+            categoria: formulario.categoria,
+            proveedor: formulario.proveedor.trim() || "Proveedor local",
+            descripcion: formulario.descripcion.trim(),
+            precio,
+            imagen: "assets/img/detalles.svg",
+          },
+        ]),
+      );
       setFormulario(FORMULARIO_VACIO);
       setAviso(MENSAJES.adminAgregado);
     } catch {
@@ -63,8 +78,7 @@ export default function Administrar({ setAviso }) {
 
   async function eliminar(id) {
     try {
-      await guardarExtrasManuales(extras.filter((servicio) => servicio.id !== id));
-      setExtras(leerExtrasManuales());
+      setExtras(await borrarExtraManual(token, id));
       setAviso(MENSAJES.adminEliminado);
     } catch {
       setAviso(MENSAJES.falloGuardado);

@@ -18,7 +18,7 @@ Una sola plataforma reúne salón, comida, mobiliario, música, decoración, fot
 
 El flujo es sencillo: datos del evento, salón, categorías de servicios, resumen y pago simulado. En cada categoría se puede **regresar**, **omitir** o **continuar**.
 
-También hay tres tipos de cuenta. El **organizador** arma su paquete con el flujo anterior. El **proveedor** anuncia lo que ofrece, por ejemplo DJ, comida o decoración. El **administrador** revisa esos anuncios y aprueba o rechaza cada uno. Organizador y proveedor se eligen al entrar y se pueden cambiar desde el encabezado sin cerrar sesión; el administrador entra con credenciales fijas de demostración y tiene menú propio. El botón **Anunciar servicio** abre directo el formulario del proveedor.
+También hay tres tipos de cuenta. El **organizador** arma su paquete con el flujo anterior. El **proveedor** anuncia lo que ofrece, por ejemplo DJ, comida o decoración. El **administrador** revisa esos anuncios y aprueba o rechaza cada uno. Organizador y proveedor se eligen al entrar y se pueden cambiar desde el encabezado sin cerrar sesión; el administrador valida sus credenciales en el backend y tiene menú propio. El botón **Anunciar servicio** abre directo el formulario del proveedor.
 
 ## Paleta
 
@@ -68,11 +68,25 @@ npm test
 
 El `anon key` es público y debe ir en el frontend; el `service_role` **nunca** se pone aquí. Las políticas RLS del SQL permiten el acceso de demostración; para producción habría que reducirlas.
 
+## Backend
+
+La app usa una Edge Function de Supabase llamada `lumina-admin` en `supabase/functions/lumina-admin/index.ts`. El frontend no guarda credenciales de administrador: el formulario solo envía lo que escribe la persona y la función valida `ADMIN_CORREO` y `ADMIN_CLAVE` desde secretos de Supabase. La función usa `SUPABASE_URL`, `SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY`, que Supabase entrega al entorno de la función; el `service_role` sigue sin aparecer en el navegador.
+
+Para desplegarla:
+
+1. Instalar Supabase CLI e iniciar sesión con `supabase login`.
+2. Desde la raíz del repo, ejecutar `supabase link --project-ref dakdafqbgliyuqnqaduf`.
+3. Definir los secretos con `supabase secrets set ADMIN_CORREO=... ADMIN_CLAVE=...`, usando el correo y la contraseña privados del administrador.
+4. Ejecutar `supabase functions deploy lumina-admin`.
+5. Confirmar en **Edge Functions → Logs** que la función responde.
+
+`supabase/config.toml` deja `verify_jwt = false` porque la función valida por ella misma: token firmado para administrador y token de Supabase Auth para proveedor.
+
 ## Inicio de sesión
 
-La pantalla de acceso permite entrar o registrarse con correo y contraseña usando Supabase Auth. Antes de entrar se elige el tipo de cuenta: **Armar mi evento** o **Anunciar servicios**. La sesión se guarda en `localStorage`, conserva ese rol y se renueva sola cuando todavía hay un `refresh_token`. El administrador no aparece en el registro ni tiene un botón visible: entra escribiendo sus credenciales privadas en el formulario normal.
+La pantalla de acceso permite entrar o registrarse con correo y contraseña usando Supabase Auth. Antes de entrar se elige el tipo de cuenta: **Armar mi evento** o **Anunciar servicios**. La sesión se guarda en `localStorage`, conserva ese rol y se renueva sola cuando todavía hay un `refresh_token`. El administrador no aparece en el registro ni tiene un botón visible: entra escribiendo sus credenciales privadas en el formulario normal y la Edge Function las valida.
 
-Los anuncios del proveedor se guardan en la tabla `anuncios` de Supabase con estado `pendiente`, `aprobado` o `rechazado`. El administrador ve los pendientes en `/#/admin`; si rechaza, escribe un motivo y el proveedor puede corregir y reenviar. Solo los aprobados se copian al catálogo como servicios `extra-`; por eso aparecen en el Inicio y en las categorías. El proveedor no publica salones porque esos tienen dirección y capacidad aparte.
+Los anuncios del proveedor se guardan en la tabla `anuncios` de Supabase con estado `pendiente`, `aprobado` o `rechazado`. El proveedor llama a la función con su token de Supabase; el administrador llama con su token firmado. El administrador ve los pendientes en `/#/admin`; si rechaza, escribe un motivo y el proveedor puede corregir y reenviar. Solo los aprobados se copian al catálogo como servicios `extra-`; por eso aparecen en el Inicio y en las categorías. Esa copia la hace la función, no el navegador. El proveedor no publica salones porque esos tienen dirección y capacidad aparte.
 
 Para habilitar Google:
 
@@ -166,7 +180,7 @@ luminaDB.tablas()
 
 El workflow `.github/workflows/pages.yml` compila y publica `dist/` en GitHub Pages en cada push a `main`. También se puede lanzar desde **Actions → Desplegar pagina → Run workflow**.
 
-El build usa `.env.production` con la URL y la `publishable key` de Supabase. Esa key es pública y viaja en el bundle del navegador; nunca se pone `service_role`.
+El build usa `.env.production` con la URL y la `publishable key` de Supabase. Esa key es pública y viaja en el bundle del navegador; nunca se pone `service_role`. El backend se despliega aparte con `supabase functions deploy lumina-admin` siguiendo la sección **Backend**.
 
 Para activarlo:
 

@@ -1,11 +1,16 @@
-import { guardarServiciosExtra, leerServiciosExtra } from "./baseDatos.js";
-import { anuncioPublicable, estadoAnuncioValido } from "../logica/validacion.js";
 import {
-  actualizarFilas,
-  eliminarFilas,
-  insertarFilas,
-  leerTabla,
-} from "./supabase.js";
+  borrarAnuncioBackend,
+  borrarExtraBackend,
+  corregirAnuncioBackend,
+  guardarAnuncioBackend,
+  guardarExtrasBackend,
+  listarAnunciosBackend,
+  listarAnunciosProveedor,
+  listarExtrasBackend,
+  listarRecomendadosBackend,
+  revisarAnuncioBackend,
+} from "./backendAdmin.js";
+import { estadoAnuncioValido } from "../logica/validacion.js";
 
 const EVENTO = "lumina-anuncios";
 
@@ -35,7 +40,7 @@ function texto(valor) {
 
 function desdeFila(fila) {
   return {
-    id: texto(fila.clave),
+    id: texto(fila.id ?? fila.clave),
     correo: texto(fila.correo),
     negocio: texto(fila.negocio),
     categoria: texto(fila.categoria),
@@ -45,14 +50,15 @@ function desdeFila(fila) {
     imagen: texto(fila.imagen) || imagenDe(fila.categoria),
     estado: estadoAnuncioValido(fila.estado) ? fila.estado : "pendiente",
     motivo: texto(fila.motivo),
-    creadoEn: texto(fila.creado_en),
-    revisadoEn: texto(fila.revisado_en),
+    creadoEn: texto(fila.creadoEn ?? fila.creado_en),
+    revisadoEn: texto(fila.revisadoEn ?? fila.revisado_en),
   };
 }
 
-function nuevoClave() {
-  const azar = Math.random().toString(36).slice(2, 7);
-  return `anuncio-${Date.now()}-${azar}`;
+function ordenar(lista) {
+  return lista
+    .map(desdeFila)
+    .sort((primero, segundo) => segundo.creadoEn.localeCompare(primero.creadoEn));
 }
 
 export function imagenDe(categoria) {
@@ -63,111 +69,80 @@ export function fotoDe(categoria) {
   return `assets/fotos/${IMAGENES[categoria] ?? "detalles"}-1.jpg`;
 }
 
-function comoServicio(anuncio) {
-  const id = texto(anuncio.id);
+export function servicioDeAnuncio(anuncio) {
+  const normalizado = desdeFila(anuncio);
+  const id = normalizado.id;
   return {
     id: id.startsWith("extra-") ? id : `extra-${id}`,
-    categoria: anuncio.categoria,
-    nombre: anuncio.nombre,
-    descripcion: anuncio.descripcion,
-    precio: Number(anuncio.precio) || 0,
-    proveedor: anuncio.negocio || "Proveedor local",
-    imagen: imagenDe(anuncio.categoria),
+    categoria: normalizado.categoria,
+    nombre: normalizado.nombre,
+    descripcion: normalizado.descripcion,
+    precio: normalizado.precio,
+    proveedor: normalizado.negocio || "Proveedor local",
+    imagen: imagenDe(normalizado.categoria),
   };
 }
 
-export async function listarAnuncios(filtros = {}) {
-  const filas = await leerTabla("anuncios", filtros);
-  return filas
-    .map(desdeFila)
-    .sort((primero, segundo) => segundo.creadoEn.localeCompare(primero.creadoEn));
+export async function leerAnuncios(tokenUsuario) {
+  return ordenar(await listarAnunciosProveedor(tokenUsuario));
 }
 
-export function leerAnuncios(correo) {
-  return listarAnuncios(correo ? { correo: `eq.${correo}` } : {});
+export async function listarAnunciosAdmin(tokenAdmin) {
+  return ordenar(await listarAnunciosBackend(tokenAdmin));
 }
 
-export function leerAnunciosPendientes() {
-  return listarAnuncios({ estado: "eq.pendiente" });
+export async function leerAnunciosAprobados() {
+  return ordenar(await listarRecomendadosBackend());
 }
 
-export function leerAnunciosAprobados() {
-  return listarAnuncios({ estado: "eq.aprobado" });
+export function leerExtrasManuales(tokenAdmin) {
+  return listarExtrasBackend(tokenAdmin);
 }
 
-export function leerExtrasManuales() {
-  return leerServiciosExtra().filter((servicio) => !servicio.id.startsWith("extra-anuncio-"));
+export function guardarExtrasManuales(tokenAdmin, servicios) {
+  const resultado = guardarExtrasBackend(tokenAdmin, servicios);
+  resultado.then(notificar).catch(() => {});
+  return resultado;
 }
 
-export async function sincronizarCatalogo() {
-  const aprobados = (await leerAnunciosAprobados()).filter(anuncioPublicable);
-  const manuales = leerExtrasManuales();
-  await guardarServiciosExtra([...manuales, ...aprobados.map(comoServicio)]);
-  notificar();
+export function borrarExtraManual(tokenAdmin, clave) {
+  const resultado = borrarExtraBackend(tokenAdmin, clave);
+  resultado.then(notificar).catch(() => {});
+  return resultado;
 }
 
-export async function publicarAnunciosGuardados() {
-  return sincronizarCatalogo();
-}
-
-export async function guardarExtrasManuales(servicios) {
-  const aprobados = (await leerAnunciosAprobados()).filter(anuncioPublicable);
-  await guardarServiciosExtra([...servicios, ...aprobados.map(comoServicio)]);
-  notificar();
-}
-
-export async function guardarAnuncio(correo, datos) {
+export async function guardarAnuncio(tokenUsuario, datos) {
   const fila = {
-    clave: nuevoClave(),
-    correo: texto(correo),
     negocio: texto(datos.negocio ?? "").trim(),
     categoria: texto(datos.categoria),
     nombre: texto(datos.nombre ?? "").trim(),
     descripcion: texto(datos.descripcion ?? "").trim(),
     precio: Number(datos.precio) || 0,
-    imagen: imagenDe(datos.categoria),
-    estado: "pendiente",
-    motivo: null,
   };
-  await insertarFilas("anuncios", [fila]);
+  const creado = await guardarAnuncioBackend(tokenUsuario, fila);
   notificar();
-  return desdeFila(fila);
+  return desdeFila(creado);
 }
 
-export async function corregirAnuncio(clave, datos) {
-  await actualizarFilas(
-    "anuncios",
-    { clave: `eq.${clave}` },
-    {
-      negocio: texto(datos.negocio ?? "").trim(),
-      categoria: texto(datos.categoria),
-      nombre: texto(datos.nombre ?? "").trim(),
-      descripcion: texto(datos.descripcion ?? "").trim(),
-      precio: Number(datos.precio) || 0,
-      imagen: imagenDe(datos.categoria),
-      estado: "pendiente",
-      motivo: null,
-      revisado_en: null,
-    },
-  );
-  await sincronizarCatalogo();
+export async function corregirAnuncio(tokenUsuario, clave, datos) {
+  const fila = {
+    negocio: texto(datos.negocio ?? "").trim(),
+    categoria: texto(datos.categoria),
+    nombre: texto(datos.nombre ?? "").trim(),
+    descripcion: texto(datos.descripcion ?? "").trim(),
+    precio: Number(datos.precio) || 0,
+  };
+  await corregirAnuncioBackend(tokenUsuario, clave, fila);
+  notificar();
 }
 
-export async function revisarAnuncio(clave, estado, motivo = "") {
+export async function revisarAnuncioAdmin(tokenAdmin, clave, estado, motivo = "") {
   if (!estadoAnuncioValido(estado)) throw new Error("Estado de anuncio no válido");
-  await actualizarFilas(
-    "anuncios",
-    { clave: `eq.${clave}` },
-    {
-      estado,
-      motivo: estado === "rechazado" ? texto(motivo).trim().slice(0, 200) : null,
-      revisado_en: new Date().toISOString(),
-    },
-  );
-  await sincronizarCatalogo();
+  await revisarAnuncioBackend(tokenAdmin, clave, estado, motivo);
+  notificar();
 }
 
-export async function borrarAnuncio(correo, clave) {
-  await eliminarFilas("anuncios", { clave: `eq.${clave}`, correo: `eq.${correo}` });
-  await sincronizarCatalogo();
+export async function borrarAnuncio(tokenUsuario, clave) {
+  await borrarAnuncioBackend(tokenUsuario, clave);
+  notificar();
 }

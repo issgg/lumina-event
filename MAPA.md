@@ -92,14 +92,16 @@ En cada categoría:
 | `src/api/supabase.js` | Lee, inserta, actualiza y borra filas con REST |
 | `src/api/baseDatos.js` | Siembra tablas, arma el cache `luminaDB` y calcula el cronograma |
 | `src/api/autenticacion.js` | Sesión con correo, Google, renovación de token y rol guardado |
-| `src/api/anuncios.js` | Guarda anuncios en Supabase, cambia estados y sincroniza solo los aprobados como servicios `extra-` |
+| `src/api/anuncios.js` | Envía anuncios, revisiones y extras a la Edge Function; expone los aprobados al catálogo |
+| `src/api/backendAdmin.js` | Cliente de la Edge Function `lumina-admin` |
 | `src/api/catalogo.js` | Trae catálogo y categorías desde Supabase |
 | `src/api/configuracion.js` | Roles, navegación por rol, categorías, tipos de evento y reglas del cronograma |
 | `src/api/red.js` | Corta la espera si una llamada tarda demasiado |
+| `supabase/functions/lumina-admin/index.ts` | Backend: valida admin, guarda anuncios, revisa solicitudes y sincroniza el catálogo |
 
 Tablas: `usuarios`, `proveedores`, `categorias`, `salones`, `servicios`, `anuncios`, `eventos`, `detalle_evento`, `cronograma`.
 
-El frontend solo usa la llave pública. El `service_role` no aparece en el código.
+El frontend solo usa la llave pública. El `service_role` vive solo en el entorno de la Edge Function y no aparece en el bundle. Las credenciales del administrador tampoco: se guardan como secretos `ADMIN_CORREO` y `ADMIN_CLAVE` de Supabase.
 
 ## LÓGICA
 

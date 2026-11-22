@@ -1,0 +1,4 @@
+project_id = "dakdafqbgliyuqnqaduf"
+
+[functions.lumina-admin]
+verify_jwt = false

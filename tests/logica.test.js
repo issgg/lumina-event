@@ -14,7 +14,7 @@ import { generarCronograma, aMinutos, formatearHora } from "../src/logica/cronog
 import { seleccionarSalon, evaluarCobertura, estadoPresupuesto } from "../src/logica/paquete.js";
 import { validarPago, formatearNumeroTarjeta } from "../src/logica/pago.js";
 import { MENSAJES } from "../src/logica/mensajes.js";
-import { ADMIN, CATEGORIAS_PROVEEDOR, NAVEGACION_ADMIN, NAVEGACION_PROVEEDOR, ROLES_REGISTRO, RUTA_ACCION_POR_ROL, RUTA_POR_ROL, rolValido } from "../src/api/configuracion.js";
+import { CATEGORIAS_PROVEEDOR, NAVEGACION_ADMIN, NAVEGACION_PROVEEDOR, ROLES_REGISTRO, RUTA_ACCION_POR_ROL, RUTA_POR_ROL, rolValido } from "../src/api/configuracion.js";
 
 const servicio = { id: "dj", nombre: "DJ", categoria: "musica", precio: 8000 };
 
@@ -158,8 +158,6 @@ test("el administrador no se ofrece en el registro y tiene menú propio", () => 
   assert.equal(ROLES_REGISTRO.some((rol) => rol.id === "admin"), false);
   assert.equal(RUTA_POR_ROL.admin, "/admin");
   assert.deepEqual(NAVEGACION_ADMIN.map((item) => item.to), ["/admin", "/administrar"]);
-  assert.ok(String(ADMIN.correo).length > 0);
-  assert.ok(String(ADMIN.clave).length >= 6);
 });
 
 test("solo los estados conocidos son válidos para un anuncio", () => {

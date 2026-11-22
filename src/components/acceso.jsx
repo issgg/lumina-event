@@ -6,7 +6,7 @@ import {
   iniciarSesionCorreo,
   registrarseCorreo,
 } from "../api/autenticacion.js";
-import { ADMIN, ROLES_REGISTRO } from "../api/configuracion.js";
+import { ROLES_REGISTRO } from "../api/configuracion.js";
 
 function errorGuardado() {
   try {
@@ -58,26 +58,18 @@ export default function Acceso({ onSesion }) {
       return;
     }
 
-    if (
-      modo === "entrar" &&
-      correo.trim().toLowerCase() === ADMIN.correo &&
-      clave === ADMIN.clave
-    ) {
-      setOcupado(true);
-      try {
-        onSesion(iniciarSesionAdmin(ADMIN.correo, ADMIN.clave));
-      } catch (fallo) {
-        setError(fallo.message || "No se pudo completar el acceso.");
-      } finally {
-        setOcupado(false);
-      }
-      return;
-    }
-
     setOcupado(true);
     try {
       if (modo === "entrar") {
-        onSesion(await iniciarSesionCorreo(correo, clave, rol));
+        try {
+          onSesion(await iniciarSesionCorreo(correo, clave, rol));
+        } catch (falloNormal) {
+          try {
+            onSesion(await iniciarSesionAdmin(correo, clave));
+          } catch {
+            throw falloNormal;
+          }
+        }
       } else {
         const resultado = await registrarseCorreo(correo, clave, rol);
         if (resultado.sesion) {

@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 
-import { sincronizarCatalogo, suscribirseAnuncios } from "../api/anuncios.js";
+import {
+  leerAnunciosAprobados,
+  servicioDeAnuncio,
+  suscribirseAnuncios,
+} from "../api/anuncios.js";
 import { cargarServicios } from "../api/catalogo.js";
 import { CATEGORIAS } from "../api/configuracion.js";
 import { agregarServicio } from "../logica/carrito.js";
@@ -30,11 +34,18 @@ export default function Catalogo({ evento, onActualizar, setAviso }) {
   useEffect(() => {
     let activo = true;
     const cargar = () => {
-      if (activo) {
-        setServicios(cargarServicios().filter((servicio) => servicio.categoria !== "salones"));
-      }
+      const base = cargarServicios().filter(
+        (servicio) =>
+          servicio.categoria !== "salones" && !String(servicio.id).startsWith("extra-anuncio-"),
+      );
+      if (activo) setServicios(base);
+      leerAnunciosAprobados()
+        .then((lista) => {
+          if (activo) setServicios([...base, ...lista.map(servicioDeAnuncio)]);
+        })
+        .catch(() => {});
     };
-    sincronizarCatalogo().catch(() => {}).finally(cargar);
+    cargar();
     const cancelar = suscribirseAnuncios(cargar);
     return () => {
       activo = false;

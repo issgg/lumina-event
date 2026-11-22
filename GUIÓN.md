@@ -39,7 +39,7 @@ Entrar con la opción **Anunciar servicios** y abrir `/#/proveedor`.
 
 ## 4b. Administrador (35 segundos)
 
-Volver a `/#/acceso` y entrar con las credenciales privadas del administrador en el formulario normal. No mostrar ni leer credenciales en pantalla.
+Volver a `/#/acceso` y entrar con las credenciales privadas del administrador en el formulario normal. La Edge Function valida los datos; no mostrar ni leer credenciales en pantalla.
 
 - Mostrar que el menú solo tiene **Revisar anuncios** y **Catálogo manual**.
 - En **Pendientes**, aprobar un anuncio; luego cambiar a **Aprobados** y mostrar que ya está en el catálogo.
@@ -96,9 +96,9 @@ Abrir `DIARIO_DE_DECISIONES.md` y `PRUEBAS.md`.
 
 ## Qué decir si preguntan
 
-- **¿Dónde viven los datos?** En Supabase; se ven en Table Editor y en la consola con `luminaDB`.
-- **¿Cómo funciona el proveedor?** Publica servicios con precio y categoría; quedan pendientes. Cuando el administrador los aprueba, se copian al catálogo como servicios `extra-` y el organizador los puede ver.
-- **¿Cómo entra el administrador?** Desde el recuadro de revisión en la pantalla de acceso, con las credenciales fijas de la demo.
+- **¿Dónde viven los datos?** En Supabase; se ven en Table Editor y en la consola con `luminaDB`. Las acciones privadas pasan por la Edge Function `lumina-admin`.
+- **¿Cómo funciona el proveedor?** Publica servicios con precio y categoría; quedan pendientes. Cuando el administrador los aprueba, la Edge Function los copia al catálogo como servicios `extra-` y el organizador los puede ver.
+- **¿Cómo entra el administrador?** Escribe sus credenciales en el formulario normal; la validación ocurre en la Edge Function y no hay datos visibles en pantalla.
 - **¿Se pierde el evento al cambiar de rol?** No. El cambio solo cambia el menú y la ruta; la sesión y el borrador siguen ahí.
 - **¿Qué es lo más complicado?** El cálculo del cronograma, porque respeta horarios y tiempos de cada servicio.
 - **¿Qué cambiaste después de probar?** Quité la barra de progreso porque hacía la app más complicada.
@@ -114,4 +114,4 @@ Abrir `DIARIO_DE_DECISIONES.md` y `PRUEBAS.md`.
 - Mostrar que el modo oscuro viene por defecto y que el botón del encabezado permite volver al claro.
 - Probar el cambio entre **Anunciar servicio** y **Armar mi evento** sin cerrar sesión.
 - Confirmar que en Supabase se corrió `public/db/migracion_anuncios.sql` si el proyecto ya existía.
-- Tener a mano las credenciales privadas del administrador; no están visibles en la app ni en el guion.
+- Confirmar que la Edge Function `lumina-admin` está desplegada y que los secretos `ADMIN_CORREO` y `ADMIN_CLAVE` están definidos en Supabase.

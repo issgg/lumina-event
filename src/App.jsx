@@ -162,8 +162,8 @@ export default function App() {
         {esAdmin ? (
           <>
             <Route index element={<Navigate to="/admin" replace />} />
-            <Route path="admin" element={<Aprobaciones setAviso={setAviso} />} />
-            <Route path="administrar" element={<Administrar setAviso={setAviso} />} />
+            <Route path="admin" element={<Aprobaciones token={sesion.access_token} setAviso={setAviso} />} />
+            <Route path="administrar" element={<Administrar token={sesion.access_token} setAviso={setAviso} />} />
             <Route path="*" element={<Navigate to="/admin" replace />} />
           </>
         ) : esProveedor ? (

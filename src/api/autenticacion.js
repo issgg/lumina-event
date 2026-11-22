@@ -1,27 +1,23 @@
-import { ADMIN, rolValido } from "./configuracion.js";
+import { entrarAdminBackend, PREFIJO_TOKEN_ADMIN } from "./backendAdmin.js";
+import { rolValido } from "./configuracion.js";
 import { solicitarConTiempo } from "./red.js";
 
 const URL_BASE = String(import.meta.env.VITE_SUPABASE_URL ?? "").replace(/\/+$/, "");
 const CLAVE = String(import.meta.env.VITE_SUPABASE_ANON_KEY ?? "").trim();
 const CLAVE_LOCAL = "lumina-sesion";
-const TOKEN_ADMIN = "admin-local";
 
 export const authConfigurado = Boolean(URL_BASE && CLAVE);
 
-export function iniciarSesionAdmin(correo, clave) {
-  const texto = String(correo ?? "").trim().toLowerCase();
-  if (texto !== ADMIN.correo || clave !== ADMIN.clave) {
-    throw new Error("Datos de administrador incorrectos.");
-  }
-
+export async function iniciarSesionAdmin(correo, clave) {
+  const datos = await entrarAdminBackend(correo, clave);
   return guardarSesion(
     {
-      access_token: TOKEN_ADMIN,
+      access_token: datos.token,
       refresh_token: "",
-      expires_at: ahora() + 60 * 60 * 24 * 365,
+      expires_at: datos.expires_at,
       rol: "admin",
       user: {
-        email: ADMIN.correo,
+        email: datos.correo,
         user_metadata: { rol: "admin" },
       },
     },
@@ -93,7 +89,7 @@ export async function actualizarRol(rol, sesionActual) {
   if (!guardada) return null;
 
   const nuevo = rolValido(rol);
-  if (guardada.access_token === TOKEN_ADMIN) return guardarRolLocal(nuevo, guardada);
+  if (guardada.access_token.startsWith(PREFIJO_TOKEN_ADMIN)) return guardarRolLocal(nuevo, guardada);
 
   const datos = await solicitarAuth("/user", {
     metodo: "PATCH",
@@ -209,7 +205,7 @@ export function iniciarConGoogle(rolElegido) {
 export async function cerrarSesion() {
   const guardada = leerSesion();
   limpiarSesion();
-  if (guardada?.access_token && guardada.access_token !== TOKEN_ADMIN) {
+  if (guardada?.access_token && !guardada.access_token.startsWith(PREFIJO_TOKEN_ADMIN)) {
     try {
       await solicitarAuth("/logout", { metodo: "POST", token: guardada.access_token });
     } catch {

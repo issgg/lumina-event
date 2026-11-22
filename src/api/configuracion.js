@@ -1,8 +1,3 @@
-export const ADMIN = {
-  correo: "admin@lumina.local",
-  clave: "LuminaAdmin2026!",
-};
-
 export const ROLES = [
   {
     id: "organizador",

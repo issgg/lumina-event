@@ -27,7 +27,8 @@ Aquí explico por qué tomé cada decisión. Está escrito en lenguaje sencillo 
 | 22/11 | Anuncios como servicios `extra-` | Primero reutilicé el catálogo para no correr SQL otra vez | Después cambié: los envíos van a `anuncios` y solo los aprobados se copian como `extra-` |
 | 22/11 | El proveedor no publica salones | Los salones tienen dirección, capacidad y modal propio | El proveedor elige solo categorías de servicios |
 | 22/11 | Cambio de rol sin esperar a Supabase | El botón de anunciar parecía no responder si la llamada tardaba | El menú y la ruta cambian al instante; la sincronización va en segundo plano |
-| 22/11 | Tercer rol de administrador | El usuario pidió revisar lo que publican los proveedores | El administrador tiene menú propio, no aparece en el registro y usa credenciales fijas de demo |
+| 22/11 | Tercer rol de administrador | El usuario pidió revisar lo que publican los proveedores | El administrador tiene menú propio, no aparece en el registro y valida credenciales en una Edge Function |
+| 22/11 | Backend para secretos | El usuario pidió no dejar todo en el frontend | Las credenciales admin y el `service_role` viven en Supabase; el navegador solo usa tokens |
 | 22/11 | Tabla `anuncios` con estados | Necesitábamos saber qué anuncio está pendiente, aprobado o rechazado | Supabase guarda el estado y el motivo; hay una migración SQL para proyectos ya creados |
 | 22/11 | Solo anuncios aprobados en el catálogo | No queremos mostrar ofertas sin revisar | El Inicio y el catálogo leen lo aprobado; el proveedor ve el estado y puede corregir rechazos |
 | 22/11 | Motivo obligatorio al rechazar | El proveedor debe saber qué corregir | El panel pide un motivo corto y el anuncio vuelve a `pendiente` al guardarse |

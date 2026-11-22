@@ -8,7 +8,6 @@ import {
   guardarAnuncio,
   imagenDe,
   leerAnuncios,
-  sincronizarCatalogo,
   suscribirseAnuncios,
 } from "../api/anuncios.js";
 import { CATEGORIAS, CATEGORIAS_PROVEEDOR } from "../api/configuracion.js";
@@ -35,7 +34,7 @@ function nombreCategoria(id) {
 
 export default function Proveedor({ sesion, setAviso, formularioAbierto = false }) {
   const navegar = useNavigate();
-  const correo = sesion?.user?.email ?? "sin-correo";
+  const token = sesion?.access_token ?? "";
   const [anuncios, setAnuncios] = useState([]);
   const [formulario, setFormulario] = useState(FORMULARIO_VACIO);
   const [editando, setEditando] = useState("");
@@ -44,33 +43,26 @@ export default function Proveedor({ sesion, setAviso, formularioAbierto = false 
 
   useEffect(() => {
     let activo = true;
-    async function cargar() {
-      try {
-        const lista = await leerAnuncios(correo);
+    leerAnuncios(token)
+      .then((lista) => {
         if (activo) setAnuncios(lista);
-      } catch {
+      })
+      .catch(() => {
         if (activo) setAnuncios([]);
-      }
-      try {
-        await sincronizarCatalogo();
-      } catch {
-        return;
-      }
-    }
-    cargar();
+      });
     return () => {
       activo = false;
     };
-  }, [correo]);
+  }, [token]);
 
   useEffect(
     () =>
       suscribirseAnuncios(() => {
-        leerAnuncios(correo)
+        leerAnuncios(token)
           .then(setAnuncios)
           .catch(() => setAnuncios([]));
       }),
-    [correo],
+    [token],
   );
 
   function cambiar(campo, valor) {
@@ -125,9 +117,9 @@ export default function Proveedor({ sesion, setAviso, formularioAbierto = false 
     setOcupado(true);
     try {
       const datos = { ...formulario, nombre, descripcion, precio };
-      if (editando) await corregirAnuncio(editando, datos);
-      else await guardarAnuncio(correo, datos);
-      setAnuncios(await leerAnuncios(correo));
+      if (editando) await corregirAnuncio(token, editando, datos);
+      else await guardarAnuncio(token, datos);
+      setAnuncios(await leerAnuncios(token));
       setFormulario(FORMULARIO_VACIO);
       setEditando("");
       setAviso(editando ? MENSAJES.anuncioCorregido : MENSAJES.anuncioAgregado);
@@ -142,8 +134,8 @@ export default function Proveedor({ sesion, setAviso, formularioAbierto = false 
   async function eliminar(id) {
     setOcupado(true);
     try {
-      await borrarAnuncio(correo, id);
-      setAnuncios(await leerAnuncios(correo));
+      await borrarAnuncio(token, id);
+      setAnuncios(await leerAnuncios(token));
       setAviso(MENSAJES.anuncioEliminado);
     } catch {
       setAviso(MENSAJES.anuncioSinPublicar);

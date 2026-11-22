@@ -31,7 +31,8 @@ Aquí anoto cuándo usé la IA, qué pedí y qué revisé yo después.
 - **Cobro real:** no lo acepté. El pago es solo una simulación y no guarda datos bancarios.
 - **SQLite en el navegador:** la dejé atrás porque el proyecto debía usar Supabase.
 - **Google OAuth sin secret:** lo dejé pendiente. Sin `Client Secret` la app muestra un mensaje claro y no se rompe.
-- **Administrador en el registro:** no lo acepté. El registro deja solo organizador y proveedor; el administrador entra con credenciales fijas de demo.
+- **Administrador en el registro:** no lo acepté. El registro deja solo organizador y proveedor; el administrador valida sus credenciales en una Edge Function.
+- **Todo en el frontend:** no lo acepté. El usuario pidió backend, así que los secretos y las escrituras privadas pasaron a `lumina-admin`.
 - **Publicar anuncios sin revisión:** no lo acepté. Ahora pasan por `pendiente`, y solo los aprobados llegan al catálogo.
 
 ## Cómo revisé el trabajo de la IA
