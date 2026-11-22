@@ -848,6 +848,14 @@ tbody tr:last-child td {
   font-weight: 700;
 }
 
+.recomendados {
+  margin-top: 2rem;
+}
+
+.recomendados .anuncio-tarjeta {
+  background: var(--color-papel-claro);
+}
+
 .paneles-formulario {
   grid-template-columns: minmax(0, 1.4fr) minmax(240px, 0.6fr);
 }

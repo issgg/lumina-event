@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 
 import {
   borrarAnuncio,
+  corregirAnuncio,
   fotoDe,
   guardarAnuncio,
   imagenDe,
@@ -22,6 +23,12 @@ const FORMULARIO_VACIO = {
   precio: "",
 };
 
+const TEXTO_ESTADO = {
+  pendiente: "En revisión",
+  aprobado: "Aprobado",
+  rechazado: "Rechazado",
+};
+
 function nombreCategoria(id) {
   return CATEGORIAS.find((categoria) => categoria.id === id)?.nombre ?? id;
 }
@@ -31,6 +38,7 @@ export default function Proveedor({ sesion, setAviso, formularioAbierto = false 
   const correo = sesion?.user?.email ?? "sin-correo";
   const [anuncios, setAnuncios] = useState([]);
   const [formulario, setFormulario] = useState(FORMULARIO_VACIO);
+  const [editando, setEditando] = useState("");
   const [error, setError] = useState("");
   const [ocupado, setOcupado] = useState(false);
 
@@ -69,6 +77,26 @@ export default function Proveedor({ sesion, setAviso, formularioAbierto = false 
     setFormulario((actual) => ({ ...actual, [campo]: valor }));
   }
 
+  function abrirEdicion(anuncio) {
+    setError("");
+    setEditando(anuncio.id);
+    setFormulario({
+      negocio: anuncio.negocio,
+      categoria: anuncio.categoria,
+      nombre: anuncio.nombre,
+      descripcion: anuncio.descripcion,
+      precio: String(anuncio.precio),
+    });
+    navegar("/proveedor/anunciar");
+  }
+
+  function cancelar() {
+    setError("");
+    setEditando("");
+    setFormulario(FORMULARIO_VACIO);
+    navegar("/proveedor");
+  }
+
   async function agregar(evento) {
     evento.preventDefault();
     setError("");
@@ -96,10 +124,13 @@ export default function Proveedor({ sesion, setAviso, formularioAbierto = false 
 
     setOcupado(true);
     try {
-      await guardarAnuncio(correo, { ...formulario, nombre, descripcion, precio });
+      const datos = { ...formulario, nombre, descripcion, precio };
+      if (editando) await corregirAnuncio(editando, datos);
+      else await guardarAnuncio(correo, datos);
       setAnuncios(await leerAnuncios(correo));
       setFormulario(FORMULARIO_VACIO);
-      setAviso(MENSAJES.anuncioAgregado);
+      setEditando("");
+      setAviso(editando ? MENSAJES.anuncioCorregido : MENSAJES.anuncioAgregado);
       navegar("/proveedor");
     } catch {
       setAviso(MENSAJES.anuncioSinPublicar);
@@ -132,7 +163,16 @@ export default function Proveedor({ sesion, setAviso, formularioAbierto = false 
           </p>
         </div>
         {!formularioAbierto && (
-          <button type="button" className="boton" onClick={() => navegar("/proveedor/anunciar")}>
+          <button
+            type="button"
+            className="boton"
+            onClick={() => {
+              setEditando("");
+              setFormulario(FORMULARIO_VACIO);
+              setError("");
+              navegar("/proveedor/anunciar");
+            }}
+          >
             Anunciar servicio
           </button>
         )}
@@ -140,7 +180,7 @@ export default function Proveedor({ sesion, setAviso, formularioAbierto = false 
 
       {formularioAbierto && (
         <form className="panel formulario-anuncio" onSubmit={agregar} noValidate>
-          <h2>Nuevo anuncio</h2>
+          <h2>{editando ? "Corregir anuncio" : "Nuevo anuncio"}</h2>
           <div className="formulario">
             <label>
               Nombre de tu negocio
@@ -197,12 +237,12 @@ export default function Proveedor({ sesion, setAviso, formularioAbierto = false 
           {error && <p className="error-acceso">{error}</p>}
           <div className="acciones-formulario">
             <button type="submit" className="boton" disabled={ocupado}>
-              {ocupado ? "Publicando…" : "Publicar anuncio"}
+              {ocupado ? "Enviando…" : editando ? "Guardar corrección" : "Enviar a revisión"}
             </button>
             <button
               type="button"
               className="boton boton-secundario"
-              onClick={() => navegar("/proveedor")}
+              onClick={cancelar}
               disabled={ocupado}
             >
               Cancelar
@@ -214,14 +254,17 @@ export default function Proveedor({ sesion, setAviso, formularioAbierto = false 
       <div className="panel">
         <div className="anuncios-cabecera">
           <h2>Mis anuncios</h2>
-          <span>{anuncios.length} publicados</span>
+          <span>{anuncios.length} enviados</span>
         </div>
         {anuncios.length === 0 ? (
           <p className="vacio-texto">Todavía no publicaste nada. Empieza con un servicio sencillo.</p>
         ) : (
           <div className="lista-anuncios">
             {anuncios.map((anuncio) => (
-              <article className="anuncio-tarjeta" key={anuncio.id}>
+              <article
+                className={`anuncio-tarjeta estado-${anuncio.estado}`}
+                key={anuncio.id}
+              >
                 <img
                   src={fotoDe(anuncio.categoria)}
                   alt=""
@@ -230,12 +273,30 @@ export default function Proveedor({ sesion, setAviso, formularioAbierto = false 
                   }}
                 />
                 <div>
-                  <span className="etiqueta">{nombreCategoria(anuncio.categoria)}</span>
+                  <div className="revision-etiquetas">
+                    <span className="etiqueta">{nombreCategoria(anuncio.categoria)}</span>
+                    <span className={`estado-anuncio estado-${anuncio.estado}`}>
+                      {TEXTO_ESTADO[anuncio.estado] ?? "En revisión"}
+                    </span>
+                  </div>
                   {anuncio.negocio && <small className="anuncio-negocio">{anuncio.negocio}</small>}
                   <h3>{anuncio.nombre}</h3>
                   <p>{anuncio.descripcion || "Sin descripción."}</p>
+                  {anuncio.estado === "rechazado" && anuncio.motivo && (
+                    <p className="revision-motivo">Motivo: {anuncio.motivo}</p>
+                  )}
                   <div className="anuncio-pie">
                     <strong>{formatearMoneda(anuncio.precio)}</strong>
+                    {anuncio.estado === "rechazado" && (
+                      <button
+                        type="button"
+                        className="boton-texto"
+                        onClick={() => abrirEdicion(anuncio)}
+                        disabled={ocupado}
+                      >
+                        Corregir
+                      </button>
+                    )}
                     <button
                       type="button"
                       className="boton-texto"

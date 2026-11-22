@@ -1,11 +1,43 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
+import {
+  fotoDe,
+  imagenDe,
+  leerAnunciosAprobados,
+  suscribirseAnuncios,
+} from "../api/anuncios.js";
+import { CATEGORIAS } from "../api/configuracion.js";
 import { calcularTotal } from "../logica/carrito.js";
 import { formatearMoneda } from "../logica/formato.js";
+
+function nombreCategoria(id) {
+  return CATEGORIAS.find((categoria) => categoria.id === id)?.nombre ?? id;
+}
 
 export default function Inicio({ evento = { detalles: [] } }) {
   const servicios = evento.detalles.length;
   const total = calcularTotal(evento.detalles);
+  const [recomendados, setRecomendados] = useState([]);
+
+  useEffect(() => {
+    let activo = true;
+    const cargar = () => {
+      leerAnunciosAprobados()
+        .then((lista) => {
+          if (activo) setRecomendados(lista.slice(0, 3));
+        })
+        .catch(() => {
+          if (activo) setRecomendados([]);
+        });
+    };
+    cargar();
+    const cancelar = suscribirseAnuncios(cargar);
+    return () => {
+      activo = false;
+      cancelar();
+    };
+  }, []);
 
   return (
     <section className="pagina inicio-pagina">
@@ -66,6 +98,42 @@ export default function Inicio({ evento = { detalles: [] } }) {
           <p>Arma y revisa tu paquete</p>
         </div>
       </div>
+
+      {recomendados.length > 0 && (
+        <section className="recomendados">
+          <div className="anuncios-cabecera">
+            <div>
+              <p className="etiqueta">Recomendados para ti</p>
+              <h2>Ideas aprobadas por nuestro equipo</h2>
+            </div>
+            <Link className="boton-texto" to="/catalogo">
+              Ver catálogo
+            </Link>
+          </div>
+          <div className="lista-anuncios">
+            {recomendados.map((anuncio) => (
+              <article className="anuncio-tarjeta" key={anuncio.id}>
+                <img
+                  src={fotoDe(anuncio.categoria)}
+                  alt=""
+                  onError={(evento) => {
+                    evento.currentTarget.src = imagenDe(anuncio.categoria);
+                  }}
+                />
+                <div>
+                  <span className="etiqueta">{nombreCategoria(anuncio.categoria)}</span>
+                  {anuncio.negocio && <small className="anuncio-negocio">{anuncio.negocio}</small>}
+                  <h3>{anuncio.nombre}</h3>
+                  <p>{anuncio.descripcion || "Sin descripción."}</p>
+                  <div className="anuncio-pie">
+                    <strong>{formatearMoneda(anuncio.precio)}</strong>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
     </section>
   );
 }
