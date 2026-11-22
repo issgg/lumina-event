@@ -21,6 +21,7 @@ import Resumen from "./components/resumen.jsx";
 import Pago from "./components/pago.jsx";
 import Administrar from "./components/administrar.jsx";
 import Proveedor from "./components/proveedor.jsx";
+import Aprobaciones from "./components/aprobaciones.jsx";
 
 import "./App.css";
 
@@ -95,6 +96,7 @@ export default function App() {
   }
 
   function cambiarRol(nuevo) {
+    if (!sesion || sesion.rol === "admin") return;
     const actualizada = guardarRolLocal(nuevo, sesion);
     if (!actualizada) return;
 
@@ -141,6 +143,7 @@ export default function App() {
     );
   }
 
+  const esAdmin = sesion?.rol === "admin";
   const esProveedor = sesion?.rol === "proveedor";
 
   return (
@@ -156,7 +159,14 @@ export default function App() {
           />
         }
       >
-        {esProveedor ? (
+        {esAdmin ? (
+          <>
+            <Route index element={<Navigate to="/admin" replace />} />
+            <Route path="admin" element={<Aprobaciones setAviso={setAviso} />} />
+            <Route path="administrar" element={<Administrar setAviso={setAviso} />} />
+            <Route path="*" element={<Navigate to="/admin" replace />} />
+          </>
+        ) : esProveedor ? (
           <>
             <Route index element={<Navigate to="/proveedor" replace />} />
             <Route path="proveedor" element={<Proveedor sesion={sesion} setAviso={setAviso} />} />
@@ -189,7 +199,7 @@ export default function App() {
               path="pago"
               element={<Pago evento={evento} onActualizar={actualizarEvento} />}
             />
-            <Route path="administrar" element={<Administrar setAviso={setAviso} />} />
+            <Route path="administrar" element={<Navigate to="/" replace />} />
             <Route path="proveedor" element={<Navigate to="/" replace />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </>

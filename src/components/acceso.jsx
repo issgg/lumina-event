@@ -2,10 +2,11 @@ import { useState } from "react";
 import {
   authConfigurado,
   iniciarConGoogle,
+  iniciarSesionAdmin,
   iniciarSesionCorreo,
   registrarseCorreo,
 } from "../api/autenticacion.js";
-import { ROLES } from "../api/configuracion.js";
+import { ADMIN, ROLES_REGISTRO } from "../api/configuracion.js";
 
 function errorGuardado() {
   try {
@@ -88,6 +89,17 @@ export default function Acceso({ onSesion }) {
     }
   }
 
+  function entrarAdmin() {
+    setError("");
+    setMensaje("");
+    olvidarError();
+    try {
+      onSesion(iniciarSesionAdmin(ADMIN.correo, ADMIN.clave));
+    } catch (fallo) {
+      setError(fallo.message || "No se pudo abrir el panel de revisión.");
+    }
+  }
+
   const esProveedor = rol === "proveedor";
 
   return (
@@ -165,7 +177,7 @@ export default function Acceso({ onSesion }) {
           </div>
 
           <div className="roles-acceso" aria-label="Tipo de cuenta">
-            {ROLES.map((opcion) => (
+            {ROLES_REGISTRO.map((opcion) => (
               <button
                 key={opcion.id}
                 type="button"
@@ -227,6 +239,18 @@ export default function Acceso({ onSesion }) {
               {ocupado ? "Un momento…" : modo === "entrar" ? "Entrar" : "Crear cuenta"}
             </button>
           </form>
+
+          <div className="acceso-admin">
+            <p className="etiqueta">Acceso de revisión</p>
+            <p>
+              Correo: <code>{ADMIN.correo}</code>
+              <br />
+              Contraseña: <code>{ADMIN.clave}</code>
+            </p>
+            <button type="button" className="boton boton-secundario" onClick={entrarAdmin}>
+              Entrar como administrador
+            </button>
+          </div>
         </section>
       </div>
     </main>

@@ -1,13 +1,25 @@
 import { useState } from "react";
 import { Link, NavLink, Outlet } from "react-router";
-import { NAVEGACION, NAVEGACION_PROVEEDOR } from "../api/configuracion.js";
+import {
+  NAVEGACION,
+  NAVEGACION_ADMIN,
+  NAVEGACION_PROVEEDOR,
+  RUTA_POR_ROL,
+} from "../api/configuracion.js";
 
 export default function Layout({ aviso, sesion, onCerrarSesion, onCambiarRol }) {
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [tema, setTema] = useState(() => document.documentElement.dataset.tema || "oscuro");
   const correo = sesion?.user?.email ?? sesion?.user?.user_metadata?.email ?? "Invitado";
-  const esProveedor = sesion?.rol === "proveedor";
-  const enlaces = esProveedor ? NAVEGACION_PROVEEDOR : NAVEGACION;
+  const rol = sesion?.rol;
+  const esAdmin = rol === "admin";
+  const esProveedor = rol === "proveedor";
+  const enlaces = esAdmin
+    ? NAVEGACION_ADMIN
+    : esProveedor
+      ? NAVEGACION_PROVEEDOR
+      : NAVEGACION;
+  const rolSiguiente = esProveedor ? "organizador" : "proveedor";
   const cerrarMenu = () => setMenuAbierto(false);
 
   function alternarTema() {
@@ -24,7 +36,7 @@ export default function Layout({ aviso, sesion, onCerrarSesion, onCambiarRol }) 
   return (
     <div className="aplicacion">
       <header className="encabezado">
-        <NavLink to={esProveedor ? "/proveedor" : "/"} className="marca" onClick={cerrarMenu}>
+        <NavLink to={RUTA_POR_ROL[rol] ?? "/"} className="marca" onClick={cerrarMenu}>
           <span className="marca-icono">L</span>
           <span>Lumina Event</span>
         </NavLink>
@@ -60,14 +72,14 @@ export default function Layout({ aviso, sesion, onCerrarSesion, onCambiarRol }) 
               </NavLink>
             ))}
           </nav>
-          <span className="rol-etiqueta">{esProveedor ? "Proveedor" : "Organizador"}</span>
-          <button
-            type="button"
-            className="boton-rol"
-            onClick={() => onCambiarRol(esProveedor ? "organizador" : "proveedor")}
-          >
-            {esProveedor ? "Armar mi evento" : "Anunciar servicio"}
-          </button>
+          <span className="rol-etiqueta">
+            {esAdmin ? "Administrador" : esProveedor ? "Proveedor" : "Organizador"}
+          </span>
+          {!esAdmin && (
+            <button type="button" className="boton-rol" onClick={() => onCambiarRol(rolSiguiente)}>
+              {esProveedor ? "Armar mi evento" : "Anunciar servicio"}
+            </button>
+          )}
           <button
             type="button"
             className="boton-tema"
@@ -96,9 +108,17 @@ export default function Layout({ aviso, sesion, onCerrarSesion, onCambiarRol }) 
 
       <footer className="pie">
         <p>Lumina Event</p>
-        <Link className="pie-enlace" to={esProveedor ? "/proveedor/anunciar" : "/administrar"}>
-          {esProveedor ? "Anunciar" : "Administrar"}
-        </Link>
+        {esAdmin ? (
+          <Link className="pie-enlace" to="/administrar">
+            Catálogo manual
+          </Link>
+        ) : esProveedor ? (
+          <Link className="pie-enlace" to="/proveedor/anunciar">
+            Anunciar
+          </Link>
+        ) : (
+          <span>Eventos con calma</span>
+        )}
       </footer>
     </div>
   );

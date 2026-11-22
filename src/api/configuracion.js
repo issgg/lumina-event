@@ -1,3 +1,8 @@
+export const ADMIN = {
+  correo: "admin@lumina.local",
+  clave: "LuminaAdmin2026!",
+};
+
 export const ROLES = [
   {
     id: "organizador",
@@ -9,16 +14,25 @@ export const ROLES = [
     texto: "Anunciar servicios",
     descripcion: "DJ, comida, decoración u otros servicios.",
   },
+  {
+    id: "admin",
+    texto: "Revisar anuncios",
+    descripcion: "Apruebo o rechazo lo que publican los proveedores.",
+  },
 ];
+
+export const ROLES_REGISTRO = ROLES.filter((rol) => rol.id !== "admin");
 
 export const RUTA_POR_ROL = {
   organizador: "/",
   proveedor: "/proveedor",
+  admin: "/admin",
 };
 
 export const RUTA_ACCION_POR_ROL = {
   organizador: "/",
   proveedor: "/proveedor/anunciar",
+  admin: "/admin",
 };
 
 export function rolValido(rol) {
@@ -37,6 +51,11 @@ export const NAVEGACION = [
 export const NAVEGACION_PROVEEDOR = [
   { to: "/proveedor", texto: "Mi puesto" },
   { to: "/proveedor/anunciar", texto: "Anunciar" },
+];
+
+export const NAVEGACION_ADMIN = [
+  { to: "/admin", texto: "Revisar anuncios" },
+  { to: "/administrar", texto: "Catálogo manual" },
 ];
 
 export const CATEGORIAS = [

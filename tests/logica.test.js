@@ -8,7 +8,7 @@ import { generarCronograma, aMinutos, formatearHora } from "../src/logica/cronog
 import { seleccionarSalon, evaluarCobertura, estadoPresupuesto } from "../src/logica/paquete.js";
 import { validarPago, formatearNumeroTarjeta } from "../src/logica/pago.js";
 import { MENSAJES } from "../src/logica/mensajes.js";
-import { CATEGORIAS_PROVEEDOR, NAVEGACION_PROVEEDOR, RUTA_ACCION_POR_ROL, RUTA_POR_ROL, rolValido } from "../src/api/configuracion.js";
+import { CATEGORIAS_PROVEEDOR, NAVEGACION_ADMIN, NAVEGACION_PROVEEDOR, ROLES_REGISTRO, RUTA_ACCION_POR_ROL, RUTA_POR_ROL, rolValido } from "../src/api/configuracion.js";
 
 const servicio = { id: "dj", nombre: "DJ", categoria: "musica", precio: 8000 };
 
@@ -145,4 +145,11 @@ test("el proveedor tiene su propio menú y no ve salones", () => {
   assert.equal(RUTA_ACCION_POR_ROL.proveedor, "/proveedor/anunciar");
   assert.deepEqual(NAVEGACION_PROVEEDOR.map((item) => item.to), ["/proveedor", "/proveedor/anunciar"]);
   assert.equal(CATEGORIAS_PROVEEDOR.some((categoria) => categoria.id === "salones"), false);
+});
+
+test("el administrador no se ofrece en el registro y tiene menú propio", () => {
+  assert.equal(rolValido("admin"), "admin");
+  assert.equal(ROLES_REGISTRO.some((rol) => rol.id === "admin"), false);
+  assert.equal(RUTA_POR_ROL.admin, "/admin");
+  assert.deepEqual(NAVEGACION_ADMIN.map((item) => item.to), ["/admin", "/administrar"]);
 });

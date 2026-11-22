@@ -1,11 +1,33 @@
-import { rolValido } from "./configuracion.js";
+import { ADMIN, rolValido } from "./configuracion.js";
 import { solicitarConTiempo } from "./red.js";
 
 const URL_BASE = String(import.meta.env.VITE_SUPABASE_URL ?? "").replace(/\/+$/, "");
 const CLAVE = String(import.meta.env.VITE_SUPABASE_ANON_KEY ?? "").trim();
 const CLAVE_LOCAL = "lumina-sesion";
+const TOKEN_ADMIN = "admin-local";
 
 export const authConfigurado = Boolean(URL_BASE && CLAVE);
+
+export function iniciarSesionAdmin(correo, clave) {
+  const texto = String(correo ?? "").trim().toLowerCase();
+  if (texto !== ADMIN.correo || clave !== ADMIN.clave) {
+    throw new Error("Datos de administrador incorrectos.");
+  }
+
+  return guardarSesion(
+    {
+      access_token: TOKEN_ADMIN,
+      refresh_token: "",
+      expires_at: ahora() + 60 * 60 * 24 * 365,
+      rol: "admin",
+      user: {
+        email: ADMIN.correo,
+        user_metadata: { rol: "admin" },
+      },
+    },
+    "admin",
+  );
+}
 
 function ahora() {
   return Math.floor(Date.now() / 1000);
@@ -71,6 +93,8 @@ export async function actualizarRol(rol, sesionActual) {
   if (!guardada) return null;
 
   const nuevo = rolValido(rol);
+  if (guardada.access_token === TOKEN_ADMIN) return guardarRolLocal(nuevo, guardada);
+
   const datos = await solicitarAuth("/user", {
     metodo: "PATCH",
     cuerpo: { user_metadata: { rol: nuevo } },
@@ -185,7 +209,7 @@ export function iniciarConGoogle(rolElegido) {
 export async function cerrarSesion() {
   const guardada = leerSesion();
   limpiarSesion();
-  if (guardada?.access_token) {
+  if (guardada?.access_token && guardada.access_token !== TOKEN_ADMIN) {
     try {
       await solicitarAuth("/logout", { metodo: "POST", token: guardada.access_token });
     } catch {
