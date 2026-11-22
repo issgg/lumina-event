@@ -16,6 +16,8 @@ Aquí anoto cuándo usé la IA, qué pedí y qué revisé yo después.
 | 21/11 | Paleta | Hacer el diseño más elegante, sobre todo los colores | Propuso marfil, verde profundo, terracota apagado y latón | Revisé contraste y apliqué variables en `index.css` y `App.css` |
 | 21/11 | Modo oscuro | Que el modo oscuro se vea mejor que todo en claro | Propuso fondo verde oscuro, texto marfil, botones latón y un botón para cambiar de tema | Revisé contraste, guardé la preferencia y dejé el oscuro por defecto |
 | 22/11 | Entrega y casos límite | Revisar si cumplía la rúbrica | Señaló bitácora faltante, docs viejos y riesgos de red | Agregué esta bitácora, actualicé docs y corregí los casos límite |
+| 22/11 | Tipo proveedor | Agregar otro usuario que anuncie DJ, comida y otros servicios | Propuso rol en el acceso, sesión con rol y menú distinto | Revisé que el proveedor no vea el armador y que el rol no se pierda al recargar |
+| 22/11 | Anuncios | Crear una pantalla sencilla para publicar ofertas | Propuso guardar los anuncios como servicios `extra-` del catálogo | Verifiqué que no se borren los servicios del administrador y que el precio inválido no pase |
 
 ## Cosas que la IA propuso y yo rechacé
 
@@ -24,6 +26,7 @@ Aquí anoto cuándo usé la IA, qué pedí y qué revisé yo después.
 - **Cobro real:** no lo acepté. El pago es solo una simulación y no guarda datos bancarios.
 - **SQLite en el navegador:** la dejé atrás porque el proyecto debía usar Supabase.
 - **Google OAuth sin secret:** lo dejé pendiente. Sin `Client Secret` la app muestra un mensaje claro y no se rompe.
+- **Tabla nueva para anuncios:** no la agregué. Los anuncios reutilizan los servicios `extra-` y así no hace falta volver a correr el SQL.
 
 ## Cómo revisé el trabajo de la IA
 

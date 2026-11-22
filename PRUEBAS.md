@@ -2,7 +2,7 @@
 
 Última revisión: **22/11/2026**.
 
-Pruebas automáticas: **12/12 aprobadas** con:
+Pruebas automáticas: **13/13 aprobadas** con:
 
 ```bash
 npm test
@@ -31,10 +31,13 @@ Los casos de abajo están revisados en código y en la lógica. Se pueden volver
 | 11 | Precio vacío en administrar | En `/#/administrar`, dejar precio vacío y agregar | Aparece “Escribe un precio mayor o igual a cero.” y no se agrega | OK |
 | 12 | Salón ya elegido | Elegir salón y mirar el botón en tarjeta y modal | El botón dice “Salón elegido” y queda deshabilitado | OK |
 | 13 | Cambio de tema | Abrir la app y probar el botón **Ver claro / Ver oscuro** | El tema cambia y se recuerda al recargar | OK |
+| 14 | Proveedor sin anuncios | Entrar como proveedor con una cuenta nueva | Aparece “Todavía no publicaste nada” y el botón **Anunciar servicio** | OK |
+| 15 | Anuncio inválido | Dejar nombre vacío o precio negativo y publicar | Aparece el mensaje claro y no se publica | OK |
+| 16 | Cambio de rol sin salir | Probar **Anunciar servicio** y **Armar mi evento** en el encabezado | El menú cambia, la sesión se mantiene y ninguna ruta ajena se abre | OK |
 
 ## Pruebas automáticas incluidas
 
-En `tests/logica.test.js` hay 12 pruebas:
+En `tests/logica.test.js` hay 13 pruebas:
 
 1. No agrega el mismo servicio dos veces.
 2. `cambiarCantidad` no baja de 1.
@@ -48,6 +51,7 @@ En `tests/logica.test.js` hay 12 pruebas:
 10. `validarBusqueda` rechaza texto demasiado largo.
 11. Luhn acepta la tarjeta de ejemplo.
 12. Luhn rechaza una tarjeta inválida.
+13. El proveedor tiene su propio menú y no ve salones.
 
 ## Tarjeta de ejemplo para el pago
 

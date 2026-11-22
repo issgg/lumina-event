@@ -22,10 +22,16 @@ Aquí explico por qué tomé cada decisión. Está escrito en lenguaje sencillo 
 | 22/11 | Agregar tiempo de espera a las llamadas | Si el servidor no responde, la app no debe quedarse cargando | Muestra un mensaje claro y permite reintentar |
 | 22/11 | Evitar doble guardado | Un doble clic no debe duplicar datos | Los botones se bloquean y hay guardas extra |
 | 22/11 | Dejar la bitácora al día | La rúbrica la pide dentro del repositorio | Queda lista para la pregunta de criterio |
+| 22/11 | Dos tipos de cuenta | El usuario pidió otro tipo enfocado en anunciar lo que ofrece | Organizador y proveedor tienen menús distintos, sin mezclar tareas |
+| 22/11 | Guardar el rol en la sesión | Para no perder el contexto al recargar o renovar el token | El rol elegido al entrar se conserva y también se puede cambiar desde el encabezado |
+| 22/11 | Anuncios como servicios `extra-` | No quería pedir una tabla nueva ni volver a correr el SQL | Los anuncios aparecen en el catálogo y se pueden quitar |
+| 22/11 | El proveedor no publica salones | Los salones tienen dirección, capacidad y modal propio | El proveedor elige solo categorías de servicios |
 
 ## Qué respondería si me preguntan por una decisión
 
 - **¿Por qué Supabase y no SQLite?** Porque el proyecto necesita guardar datos en la nube y funcionar desde el deploy.
 - **¿Qué rechacé de la IA?** La barra de progreso y la idea de juntar todo en pocas pantallas.
 - **¿Dónde se equivocó la IA?** Dejó `const total = total;` en el resumen. Lo detecté al revisar el archivo y lo corregí.
+- **¿Por qué el proveedor no ve el armador?** Porque su trabajo es anunciar servicios, no elegir salón ni armar paquetes.
+- **¿Cómo aparecen los anuncios en el catálogo?** Se guardan como servicios `extra-`, el mismo mecanismo que ya usaba el administrador.
 - **¿Qué haría diferente?** Pediría el secret de Google antes y pondría tiempo de espera en las llamadas desde el inicio.

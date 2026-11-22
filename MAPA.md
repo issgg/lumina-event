@@ -16,6 +16,8 @@ Lumina Event es una app estática hecha con React y Vite. El navegador habla con
 
 La idea es ayudar a una persona a organizar un evento en pocos pasos: elegir salón, pasar por categorías de servicios, ver el resumen y recibir un comprobante de pago simulado.
 
+También ayuda a otra persona a ofrecer servicios. Según el tipo de cuenta, la app muestra un menú distinto: el organizador arma el paquete y el proveedor publica anuncios de DJ, comida, decoración u otras categorías.
+
 ## Estructura de carpetas
 
 | Parte | Archivos | Para qué sirve |
@@ -36,8 +38,8 @@ La idea es ayudar a una persona a organizar un evento en pocos pasos: elegir sal
 
 | Archivo | Qué hace |
 |---|---|
-| `src/components/acceso.jsx` | Inicia sesión o registra a la persona |
-| `src/components/layout.jsx` | Muestra encabezado, menú, pie y botón para cambiar de tema |
+| `src/components/acceso.jsx` | Elige tipo de cuenta, inicia sesión o registra a la persona |
+| `src/components/layout.jsx` | Muestra encabezado, menú según el rol, pie y botón para cambiar de tema |
 | `src/components/inicio.jsx` | Pantalla de bienvenida y accesos rápidos |
 | `src/components/armador.jsx` | Formulario de datos del evento y guardado del borrador |
 | `src/components/salon.jsx` | Muestra salones, permite ver el detalle grande y elegir uno |
@@ -46,6 +48,7 @@ La idea es ayudar a una persona a organizar un evento en pocos pasos: elegir sal
 | `src/components/resumen.jsx` | Resume salón, servicios y costo aproximado |
 | `src/components/pago.jsx` | Valida tarjeta de ejemplo y muestra comprobante |
 | `src/components/administrar.jsx` | Agrega y elimina servicios del catálogo |
+| `src/components/proveedor.jsx` | Publica, muestra y quita anuncios del proveedor |
 
 ## FLUJO DE UNA PANTALLA A OTRA
 
@@ -59,6 +62,12 @@ La idea es ayudar a una persona a organizar un evento en pocos pasos: elegir sal
     →  /#/catalogo?categoria=detalles
     →  /#/catalogo?categoria=seguridad
     →  /#/resumen  →  /#/pago
+```
+
+Flujo del proveedor:
+
+```text
+/#/acceso  →  /#/proveedor  →  /#/proveedor/anunciar  →  /#/proveedor
 ```
 
 En cada categoría:
@@ -75,9 +84,10 @@ En cada categoría:
 |---|---|
 | `src/api/supabase.js` | Lee, inserta, actualiza y borra filas con REST |
 | `src/api/baseDatos.js` | Siembra tablas, arma el cache `luminaDB` y calcula el cronograma |
-| `src/api/autenticacion.js` | Sesión con correo, Google y renovación de token |
+| `src/api/autenticacion.js` | Sesión con correo, Google, renovación de token y rol guardado |
+| `src/api/anuncios.js` | Guarda anuncios del proveedor y los publica como servicios `extra-` |
 | `src/api/catalogo.js` | Trae catálogo y categorías desde Supabase |
-| `src/api/configuracion.js` | Navegación, categorías, tipos de evento y reglas del cronograma |
+| `src/api/configuracion.js` | Roles, navegación por rol, categorías, tipos de evento y reglas del cronograma |
 | `src/api/red.js` | Corta la espera si una llamada tarda demasiado |
 
 Tablas: `perfiles`, `salones`, `categorias`, `servicios`, `eventos`, `detalle_evento`, `cronograma`, `pagos`.
@@ -108,6 +118,9 @@ El frontend solo usa la llave pública. El `service_role` no aparece en el códi
 - Recarga a mitad del proceso: se retoma el borrador desde Supabase.
 - Servidor lento: se corta la espera y se muestra mensaje para reintentar.
 - Listas vacías: muestran mensajes en vez de pantallas en blanco.
+- Cambio de rol: se cambia desde el encabezado sin cerrar sesión y el menú se ajusta.
+- Anuncio sin nombre o con precio negativo: muestra mensaje y no se publica.
+- Proveedor sin anuncios: muestra un texto invitando a publicar el primero.
 
 Detalle y pasos para probarlos: `PRUEBAS.md`.
 
@@ -119,5 +132,7 @@ Detalle y pasos para probarlos: `PRUEBAS.md`.
 - Pago simulado: no se cobra nada ni se guardan datos de tarjeta.
 - Sin barra de progreso: el flujo quedó más simple.
 - Categorías por pasos: se puede regresar u omitir sin perder el avance.
+- Dos tipos de cuenta: el menú cambia según el rol para no mezclar armar paquetes con anunciar servicios.
+- Anuncios como servicios `extra-`: reutilizan el catálogo y no piden una tabla nueva.
 
 Las razones completas están en `DIARIO_DE_DECISIONES.md`. El registro de trabajo con IA está en `BITACORA_IA.md`.

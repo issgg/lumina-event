@@ -1,6 +1,6 @@
 # Guion de presentación
 
-Duración sugerida: **3 minutos**. Usar lenguaje sencillo y mostrar la app en vivo desde:
+Duración sugerida: **4 minutos**. Usar lenguaje sencillo y mostrar la app en vivo desde:
 
 https://issgg.github.io/lumina-event/
 
@@ -23,9 +23,20 @@ Mostrar en `README.md` los enlaces de entrega y la estructura de carpetas.
 
 Abrir `/#/acceso`.
 
-> "Primero se inicia sesión con correo. La sesión se guarda y se renueva sola. El acceso con Google queda pendiente porque falta el secreto en Supabase, pero el botón avisa en vez de romperse."
+> "Primero se elige el tipo de cuenta. El organizador arma su evento y el proveedor anuncia servicios. La sesión se guarda, recuerda ese rol y se renueva sola. El acceso con Google queda pendiente porque falta el secreto en Supabase, pero el botón avisa en vez de romperse."
 
-## 4. Datos del evento (30 segundos)
+## 4. Proveedor (35 segundos)
+
+Entrar con la opción **Anunciar servicios** y abrir `/#/proveedor`.
+
+- Mostrar que el menú solo tiene **Mi puesto** y **Anunciar**.
+- Clic en **Anunciar servicio**, llenar DJ o comida, precio y descripción.
+- Publicar y mostrar que el anuncio queda en **Mis anuncios**.
+- Clic en **Armar mi evento** en el encabezado para volver al otro menú sin salir.
+
+> "Este es el otro tipo de usuario. No arma paquetes: publica lo que ofrece. El anuncio entra al catálogo como un servicio más y se puede quitar cuando ya no aplica."
+
+## 5. Datos del evento (30 segundos)
 
 Ir a `/#/armador`.
 
@@ -35,7 +46,7 @@ Ir a `/#/armador`.
 
 > "Esta pantalla valida los datos antes de continuar. Si algo falta o está mal, aparece un mensaje claro."
 
-## 5. Salón (30 segundos)
+## 6. Salón (30 segundos)
 
 Ir a `/#/salon`.
 
@@ -45,7 +56,7 @@ Ir a `/#/salon`.
 
 > "Antes de elegir se puede ver la tarjeta en grande. El salón elegido queda deshabilitado para no guardarlo dos veces."
 
-## 6. Servicios por categoría (40 segundos)
+## 7. Servicios por categoría (40 segundos)
 
 Ir a `/#/catalogo?categoria=comida`.
 
@@ -57,7 +68,7 @@ Ir a `/#/catalogo?categoria=comida`.
 
 > "El catálogo va por pasos: comida, mobiliario, música, decoración, fotografía, detalles y seguridad. En cada paso se puede regresar u omitir. El avance se guarda, así que al recargar se retoma."
 
-## 7. Resumen y pago simulado (25 segundos)
+## 8. Resumen y pago simulado (25 segundos)
 
 Ir a `/#/resumen` y después a `/#/pago`.
 
@@ -65,7 +76,7 @@ Ir a `/#/resumen` y después a `/#/pago`.
 
 Tarjeta de ejemplo: `4242 4242 4242 4242`, cualquier fecha futura y CVC de 3 dígitos.
 
-## 8. Cierre (20 segundos)
+## 9. Cierre (20 segundos)
 
 > "Para terminar, la bitácora cuenta qué pidí a la IA y qué rechacé, y el diario explica por qué tomé cada decisión. También hay una tabla de casos límite con los resultados."
 
@@ -74,6 +85,8 @@ Abrir `DIARIO_DE_DECISIONES.md` y `PRUEBAS.md`.
 ## Qué decir si preguntan
 
 - **¿Dónde viven los datos?** En Supabase; se ven en Table Editor y en la consola con `luminaDB`.
+- **¿Cómo funciona el proveedor?** Publica servicios con precio y categoría; entran al catálogo como servicios `extra-` y el organizador los puede ver.
+- **¿Se pierde el evento al cambiar de rol?** No. El cambio solo cambia el menú y la ruta; la sesión y el borrador siguen ahí.
 - **¿Qué es lo más complicado?** El cálculo del cronograma, porque respeta horarios y tiempos de cada servicio.
 - **¿Qué cambiaste después de probar?** Quité la barra de progreso porque hacía la app más complicada.
 - **¿Qué propuso la IA y rechazaste?** Juntar todo en pocas pantallas y el cobro real.
@@ -86,3 +99,4 @@ Abrir `DIARIO_DE_DECISIONES.md` y `PRUEBAS.md`.
 - Repasar los enlaces del repo y del deploy.
 - Probar una vez el flujo completo con la tarjeta de ejemplo.
 - Mostrar que el modo oscuro viene por defecto y que el botón del encabezado permite volver al claro.
+- Probar el cambio entre **Anunciar servicio** y **Armar mi evento** sin cerrar sesión.

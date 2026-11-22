@@ -18,6 +18,8 @@ Una sola plataforma reúne salón, comida, mobiliario, música, decoración, fot
 
 El flujo es sencillo: datos del evento, salón, categorías de servicios, resumen y pago simulado. En cada categoría se puede **regresar**, **omitir** o **continuar**.
 
+También hay dos tipos de cuenta. El **organizador** arma su paquete con el flujo anterior. El **proveedor** anuncia lo que ofrece, por ejemplo DJ, comida o decoración. El tipo se elige al entrar y se puede cambiar desde el encabezado sin cerrar sesión; cada uno ve solo su menú.
+
 ## Paleta
 
 La paleta busca un look elegante y tranquilo:
@@ -67,7 +69,9 @@ El `anon key` es público y debe ir en el frontend; el `service_role` **nunca** 
 
 ## Inicio de sesión
 
-La pantalla de acceso permite entrar o registrarse con correo y contraseña usando Supabase Auth. La sesión se guarda en `localStorage` y se renueva sola cuando todavía hay un `refresh_token`.
+La pantalla de acceso permite entrar o registrarse con correo y contraseña usando Supabase Auth. Antes de entrar se elige el tipo de cuenta: **Armar mi evento** o **Anunciar servicios**. La sesión se guarda en `localStorage`, conserva ese rol y se renueva sola cuando todavía hay un `refresh_token`.
+
+Los anuncios del proveedor se guardan en el navegador y se publican en el catálogo como servicios `extra-` dentro de la tabla `servicios` de Supabase. Así el organizador los ve sin que haya una tabla nueva. El proveedor no publica salones porque esos tienen dirección y capacidad aparte.
 
 Para habilitar Google:
 
@@ -102,6 +106,7 @@ LuminaEvent/
 │  ├─ App.css
 │  ├─ index.css
 │  ├─ api/
+│  │  ├─ anuncios.js
 │  │  ├─ autenticacion.js
 │  │  ├─ baseDatos.js
 │  │  ├─ catalogo.js
@@ -118,7 +123,8 @@ LuminaEvent/
 │  │  ├─ tarjetaServicio.jsx
 │  │  ├─ resumen.jsx
 │  │  ├─ pago.jsx
-│  │  └─ administrar.jsx
+│  │  ├─ administrar.jsx
+│  │  └─ proveedor.jsx
 │  └─ logica/
 │     ├─ carrito.js
 │     ├─ paquete.js
