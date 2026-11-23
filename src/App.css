@@ -3491,3 +3491,127 @@ h3 {
 .flujo-acciones-fijas .boton-texto {
   background: rgba(255, 255, 255, 0.06);
 }
+
+@media (max-width: 760px) {
+  .catalogo-pagina {
+    padding-bottom: calc(6.25rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .flujo-etapas {
+    display: flex;
+    gap: 0.4rem;
+    overflow-x: auto;
+    padding-bottom: 0.35rem;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+
+  .flujo-etapas::-webkit-scrollbar {
+    display: none;
+  }
+
+  .flujo-etapas li {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    white-space: nowrap;
+  }
+
+  .flujo-acciones-fijas {
+    position: fixed;
+    left: 0.6rem;
+    right: 0.6rem;
+    bottom: calc(0.6rem + env(safe-area-inset-bottom, 0px));
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 0.65rem;
+    border-radius: 18px;
+  }
+
+  .flujo-acciones-info {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .flujo-acciones-info .etiqueta {
+    font-size: 0.62rem;
+  }
+
+  .flujo-acciones-info strong {
+    display: block;
+    overflow: hidden;
+    font-size: 0.95rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .flujo-acciones-info .contador {
+    display: none;
+  }
+
+  .flujo-acciones-fijas .acciones-principales {
+    width: auto;
+    flex-wrap: nowrap;
+    gap: 0.35rem;
+  }
+
+  .flujo-acciones-fijas .boton-continuar {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0.7rem 0.85rem;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+
+  .flujo-acciones-fijas .boton-volver,
+  .flujo-acciones-fijas .boton-omitir {
+    flex: 0 0 44px;
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 0;
+  }
+
+  .flujo-acciones-fijas .boton-volver::before {
+    content: "←";
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+
+  .flujo-acciones-fijas .boton-omitir::before {
+    content: "↷";
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+
+  .modal-tarjeta {
+    max-height: calc(100vh - 1rem);
+    max-height: calc(100dvh - 1rem);
+  }
+
+  .modal-imagen {
+    height: clamp(150px, 26dvh, 210px);
+  }
+
+  .modal-miniatura {
+    flex-basis: 52px;
+    width: 52px;
+    height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .catalogo-pagina {
+    padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .flujo-acciones-fijas .flujo-acciones-info {
+    display: none;
+  }
+
+  .flujo-acciones-fijas .acciones-principales {
+    flex: 1 1 auto;
+  }
+}

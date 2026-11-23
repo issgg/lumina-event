@@ -97,7 +97,7 @@ export default function Catalogo({ evento, onActualizar, setAviso }) {
   }
 
   return (
-    <Pagina ref={paginaRef}>
+    <Pagina className="catalogo-pagina" ref={paginaRef}>
       <header className="titulo-pagina" data-reveal>
         <div>
           <p className="etiqueta">Servicios · {categoria.nombre}</p>
@@ -197,13 +197,23 @@ export default function Catalogo({ evento, onActualizar, setAviso }) {
           </span>
         </div>
         <div className="acciones-principales">
-          <button type="button" className="boton boton-secundario" onClick={retroceder}>
+          <button
+            type="button"
+            className="boton boton-secundario boton-volver"
+            aria-label={anterior ? "Volver a la etapa anterior" : "Volver al salón"}
+            onClick={retroceder}
+          >
             ← {anterior ? "Atrás" : "Salón"}
           </button>
-          <button type="button" className="boton-texto" onClick={avanzar}>
+          <button
+            type="button"
+            className="boton-texto boton-omitir"
+            aria-label={esUltima ? "Omitir y ver resumen" : "Omitir esta categoría"}
+            onClick={avanzar}
+          >
             {esUltima ? "Omitir y ver resumen" : "Omitir"}
           </button>
-          <button type="button" className="boton" onClick={avanzar}>
+          <button type="button" className="boton boton-continuar" onClick={avanzar}>
             Continuar {esUltima ? "al resumen" : `a ${siguiente.nombre}`} <span aria-hidden="true">→</span>
           </button>
         </div>
