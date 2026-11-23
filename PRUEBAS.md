@@ -45,7 +45,7 @@ Los casos de abajo están revisados en código y en la lógica. Se pueden volver
 | 25 | Registro sin confirmación | Crear una cuenta con un correo de prueba en `/#/acceso` | Entra directo, sin pantalla de “revisa tu correo” ni correo enviado | OK |
 | 26 | Registro por rol | Crear organizador y proveedor con teléfono y campos propios | Organizador pide datos de persona; proveedor pide negocio, categoría y descripción; ambos guardan los datos | OK |
 | 27 | Cuentas separadas | Armar un evento con una cuenta, cerrar sesión y entrar con otra | La cuenta nueva empieza vacía; al volver a la primera aparece solo su evento | OK |
-| 28 | Confirmación de contraseña | Abrir **Registrarme** y mirar el orden de los campos | La confirmación aparece justo después de la contraseña y solo en registro | OK |
+| 28 | Orden del registro | Abrir **Registrarme** y mirar los campos | Aparecen nombre, teléfono, correo, contraseña y confirmación, en ese orden | OK |
 | 29 | Función anterior activa | Crear organizador antes de desplegar la función actualizada | Se crea igual, sin selector de tipo de evento; el tipo se elige después en el armador | OK |
 
 ## Pruebas automáticas incluidas

@@ -224,6 +224,33 @@ export default function Acceso({ onSesion }) {
           </div>
 
           <form className="formulario-acceso" onSubmit={enviar}>
+            {modo === "registrar" && (
+              <>
+                <label>
+                  Nombre completo
+                  <input
+                    type="text"
+                    autoComplete="name"
+                    value={registro.nombre}
+                    onChange={(evento) => cambiarRegistro("nombre", evento.target.value)}
+                    placeholder="Tu nombre y apellido"
+                    maxLength={60}
+                    required
+                  />
+                </label>
+                <label>
+                  Teléfono
+                  <input
+                    type="tel"
+                    autoComplete="tel"
+                    value={registro.telefono}
+                    onChange={(evento) => cambiarRegistro("telefono", evento.target.value)}
+                    placeholder="55 1234 5678"
+                    required
+                  />
+                </label>
+              </>
+            )}
             <label>
               Correo
               <input
@@ -248,42 +275,16 @@ export default function Acceso({ onSesion }) {
               />
             </label>
             {modo === "registrar" && (
-              <label>
-                Repite tu contraseña
-                <input
-                  type="password"
-                  autoComplete="new-password"
-                  value={registro.repetirClave}
-                  onChange={(evento) => cambiarRegistro("repetirClave", evento.target.value)}
-                  placeholder="Otra vez tu contraseña"
-                  minLength={6}
-                  required
-                />
-              </label>
-            )}
-
-            {modo === "registrar" && (
               <>
                 <label>
-                  Nombre completo
+                  Repite tu contraseña
                   <input
-                    type="text"
-                    autoComplete="name"
-                    value={registro.nombre}
-                    onChange={(evento) => cambiarRegistro("nombre", evento.target.value)}
-                    placeholder="Tu nombre y apellido"
-                    maxLength={60}
-                    required
-                  />
-                </label>
-                <label>
-                  Teléfono
-                  <input
-                    type="tel"
-                    autoComplete="tel"
-                    value={registro.telefono}
-                    onChange={(evento) => cambiarRegistro("telefono", evento.target.value)}
-                    placeholder="55 1234 5678"
+                    type="password"
+                    autoComplete="new-password"
+                    value={registro.repetirClave}
+                    onChange={(evento) => cambiarRegistro("repetirClave", evento.target.value)}
+                    placeholder="Otra vez tu contraseña"
+                    minLength={6}
                     required
                   />
                 </label>
