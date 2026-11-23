@@ -247,6 +247,20 @@ export default function Acceso({ onSesion }) {
                 required
               />
             </label>
+            {modo === "registrar" && (
+              <label>
+                Repite tu contraseña
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  value={registro.repetirClave}
+                  onChange={(evento) => cambiarRegistro("repetirClave", evento.target.value)}
+                  placeholder="Otra vez tu contraseña"
+                  minLength={6}
+                  required
+                />
+              </label>
+            )}
 
             {modo === "registrar" && (
               <>
@@ -313,18 +327,6 @@ export default function Acceso({ onSesion }) {
                     </label>
                   </>
                 )}
-                <label>
-                  Repite tu contraseña
-                  <input
-                    type="password"
-                    autoComplete="new-password"
-                    value={registro.repetirClave}
-                    onChange={(evento) => cambiarRegistro("repetirClave", evento.target.value)}
-                    placeholder="Otra vez tu contraseña"
-                    minLength={6}
-                    required
-                  />
-                </label>
               </>
             )}
 
