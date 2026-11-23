@@ -109,9 +109,14 @@ export default function Layout({ aviso, sesion, onCerrarSesion, onCambiarRol }) 
       <footer className="pie">
         <p>Lumina Event</p>
         {esAdmin ? (
-          <Link className="pie-enlace" to="/administrar">
-            Catálogo manual
-          </Link>
+          <>
+            <Link className="pie-enlace" to="/compras">
+              Revisar compras
+            </Link>
+            <Link className="pie-enlace" to="/administrar">
+              Catálogo manual
+            </Link>
+          </>
         ) : esProveedor ? (
           <Link className="pie-enlace" to="/proveedor/anunciar">
             Anunciar

@@ -22,6 +22,7 @@ import Pago from "./components/pago.jsx";
 import Administrar from "./components/administrar.jsx";
 import Proveedor from "./components/proveedor.jsx";
 import Aprobaciones from "./components/aprobaciones.jsx";
+import Compras from "./components/compras.jsx";
 
 import "./App.css";
 
@@ -163,6 +164,7 @@ export default function App() {
           <>
             <Route index element={<Navigate to="/admin" replace />} />
             <Route path="admin" element={<Aprobaciones token={sesion.access_token} setAviso={setAviso} />} />
+            <Route path="compras" element={<Compras token={sesion.access_token} setAviso={setAviso} />} />
             <Route path="administrar" element={<Administrar token={sesion.access_token} setAviso={setAviso} />} />
             <Route path="*" element={<Navigate to="/admin" replace />} />
           </>
