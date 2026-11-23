@@ -20,6 +20,28 @@ type Anuncio = {
   revisadoEn: string;
 };
 
+type Compra = {
+  id: string;
+  correo: string;
+  total: number;
+  estado: string;
+  motivo: string;
+  metodo: string;
+  ultimos4: string;
+  creadoEn: string;
+  revisadoEn: string;
+  instancia: Record<string, unknown>;
+};
+
+type DetalleCompra = {
+  id: string;
+  nombre: string;
+  categoria: string;
+  cantidad: number;
+  precioUnitario: number;
+  subtotal: number;
+};
+
 const PREFIJO_TOKEN = "lumina-admin-";
 const CATEGORIAS = [
   "salones",
@@ -235,6 +257,105 @@ function datosAnuncio(cuerpo: Record<string, unknown>) {
     descripcion,
     precio: numero(cuerpo.precio),
     imagen: imagenDe(cuerpo.categoria),
+  };
+}
+
+function desdeFilaCompra(fila: Record<string, unknown>): Compra {
+  const estado = texto(fila.estado);
+  const instancia = fila.instancia && typeof fila.instancia === "object"
+    ? (fila.instancia as Record<string, unknown>)
+    : {};
+  return {
+    id: texto(fila.clave),
+    correo: texto(fila.correo),
+    total: numero(fila.total),
+    estado: estadoValido(estado) ? estado : "pendiente",
+    motivo: texto(fila.motivo),
+    metodo: texto(fila.metodo) || "tarjeta",
+    ultimos4: texto(fila.ultimos4),
+    creadoEn: texto(fila.creado_en),
+    revisadoEn: texto(fila.revisado_en),
+    instancia,
+  };
+}
+
+function ordenarCompras(filas: Record<string, unknown>[]) {
+  return filas
+    .map(desdeFilaCompra)
+    .sort((primero, segundo) => segundo.creadoEn.localeCompare(primero.creadoEn));
+}
+
+function datosCompra(cuerpo: Record<string, unknown>) {
+  const brutos = Array.isArray(cuerpo.detalles) ? cuerpo.detalles : [];
+  if (!brutos.length) throw new Error("Agrega servicios antes de confirmar la compra.");
+
+  const detalles: DetalleCompra[] = [];
+  let total = 0;
+  for (const bruto of brutos.slice(0, 60)) {
+    const item = bruto && typeof bruto === "object" ? (bruto as Record<string, unknown>) : {};
+    const nombre = texto(item.nombre).slice(0, 80);
+    const cantidad = Math.floor(numero(item.cantidad));
+    const precioUnitario = numero(item.precioUnitario);
+    if (!nombre || cantidad < 1 || precioUnitario <= 0) {
+      throw new Error("Revisa los servicios de tu paquete.");
+    }
+    const subtotal = Math.round(precioUnitario * cantidad * 100) / 100;
+    total += subtotal;
+    detalles.push({
+      id: texto(item.id).slice(0, 40),
+      nombre,
+      categoria: texto(item.categoria).slice(0, 20),
+      cantidad,
+      precioUnitario,
+      subtotal,
+    });
+  }
+  total = Math.round(total * 100) / 100;
+
+  const totalEnviado = Number(cuerpo.total);
+  if (Number.isFinite(totalEnviado) && Math.abs(totalEnviado - total) > 0.01) {
+    throw new Error("El total no coincide con tu paquete.");
+  }
+
+  const eventoBruto = cuerpo.evento && typeof cuerpo.evento === "object"
+    ? (cuerpo.evento as Record<string, unknown>)
+    : {};
+  const salonBruto = cuerpo.salon && typeof cuerpo.salon === "object"
+    ? (cuerpo.salon as Record<string, unknown>)
+    : null;
+  const cronogramaBruto = Array.isArray(cuerpo.cronograma) ? cuerpo.cronograma : [];
+  const cronograma = cronogramaBruto.slice(0, 40)
+    .map((bruto) => {
+      const item = bruto && typeof bruto === "object" ? (bruto as Record<string, unknown>) : {};
+      return {
+        hora: texto(item.hora).slice(0, 10),
+        actividad: texto(item.actividad).slice(0, 80),
+        descripcion: texto(item.descripcion).slice(0, 200),
+      };
+    })
+    .filter((item) => item.hora && item.actividad);
+
+  return {
+    total,
+    ultimos4: texto(cuerpo.ultimos4).replace(/\D/g, "").slice(-4),
+    instancia: {
+      evento: {
+        nombre: texto(eventoBruto.nombre).slice(0, 80),
+        tipoEvento: texto(eventoBruto.tipoEvento).slice(0, 40),
+        fecha: texto(eventoBruto.fecha).slice(0, 20),
+        invitados: Math.floor(numero(eventoBruto.invitados)),
+        horaInicio: texto(eventoBruto.horaInicio).slice(0, 5),
+      },
+      salon: salonBruto
+        ? {
+            id: texto(salonBruto.id).slice(0, 40),
+            nombre: texto(salonBruto.nombre).slice(0, 80),
+            direccion: texto(salonBruto.direccion).slice(0, 160),
+          }
+        : null,
+      detalles,
+      cronograma,
+    },
   };
 }
 
@@ -579,6 +700,42 @@ async function manejar(req: Request) {
     }
   }
 
+  if (ruta === "/public/compras" && metodo === "POST") {
+    const usuario = await usuarioDe(req);
+    if (!usuario) return json({ error: "Inicia sesión para confirmar la compra" }, 401);
+    try {
+      const datos = datosCompra(cuerpo);
+      const clave = `LM-${new Date().getFullYear()}-${crypto.randomUUID().slice(0, 6).toUpperCase()}`;
+      const [fila] = await rest("compras", {
+        metodo: "POST",
+        cuerpo: [
+          {
+            clave,
+            correo: usuario.correo,
+            total: datos.total,
+            estado: "pendiente",
+            motivo: null,
+            metodo: "tarjeta",
+            ultimos4: datos.ultimos4,
+            instancia: datos.instancia,
+          },
+        ],
+        prefer: "return=representation",
+      });
+      return json(desdeFilaCompra(fila));
+    } catch (error) {
+      const mensaje = error instanceof Error ? error.message : "No se pudo registrar la compra.";
+      return json({ error: mensaje }, 400);
+    }
+  }
+
+  if (ruta === "/mis/compras" && metodo === "GET") {
+    const usuario = await usuarioDe(req);
+    if (!usuario) return json({ error: "Inicia sesión para ver tus compras" }, 401);
+    const filas = await rest("compras", { filtros: { correo: `eq.${usuario.correo}` } });
+    return json(ordenarCompras(filas));
+  }
+
   if (ruta.startsWith("/admin/") && !(await adminDe(req))) {
     return json({ error: "Sesión de administrador no válida" }, 401);
   }
@@ -605,6 +762,35 @@ async function manejar(req: Request) {
       },
     });
     await sincronizar();
+    return json({ ok: true });
+  }
+
+  if (ruta === "/admin/compras" && metodo === "GET") {
+    return json(ordenarCompras(await rest("compras")));
+  }
+
+  if (ruta === "/admin/compras/revisar" && metodo === "POST") {
+    const clave = texto(cuerpo.clave);
+    const estado = texto(cuerpo.estado);
+    const motivo = texto(cuerpo.motivo).slice(0, 200);
+    if (!clave || !estadoValido(estado)) return json({ error: "Revisión no válida" }, 400);
+    if (estado === "rechazado" && !motivo) return json({ error: "Falta el motivo del rechazo" }, 400);
+
+    const actuales = await rest("compras", { filtros: { clave: `eq.${clave}` } });
+    if (!actuales.length) return json({ error: "Compra no encontrada" }, 404);
+    if (texto(actuales[0].estado) === "aprobado" && estado !== "aprobado") {
+      return json({ error: "Una compra aprobada ya no puede cambiar" }, 400);
+    }
+
+    await rest("compras", {
+      metodo: "PATCH",
+      filtros: { clave: `eq.${clave}` },
+      cuerpo: {
+        estado,
+        motivo: estado === "rechazado" ? motivo : null,
+        revisado_en: estado === "pendiente" ? null : new Date().toISOString(),
+      },
+    });
     return json({ ok: true });
   }
 

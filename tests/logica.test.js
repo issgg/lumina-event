@@ -4,7 +4,9 @@ import assert from "node:assert/strict";
 import { agregarServicio, quitarServicio, cambiarCantidad, calcularTotal, agruparPorCategoria } from "../src/logica/carrito.js";
 import {
   anuncioPublicable,
+  compraConfirmada,
   estadoAnuncioValido,
+  estadoCompraValido,
   motivoRechazoValido,
   validarDatosEvento,
   validarBusqueda,
@@ -15,7 +17,7 @@ import { generarCronograma, aMinutos, formatearHora } from "../src/logica/cronog
 import { seleccionarSalon, evaluarCobertura, estadoPresupuesto } from "../src/logica/paquete.js";
 import { validarPago, formatearNumeroTarjeta } from "../src/logica/pago.js";
 import { MENSAJES } from "../src/logica/mensajes.js";
-import { CATEGORIAS_PROVEEDOR, NAVEGACION_ADMIN, NAVEGACION_PROVEEDOR, ROLES_REGISTRO, RUTA_ACCION_POR_ROL, RUTA_POR_ROL, rolValido } from "../src/api/configuracion.js";
+import { CATEGORIAS_PROVEEDOR, NAVEGACION_ADMIN, NAVEGACION_PROVEEDOR, ROLES_REGISTRO, RUTA_ACCION_POR_ROL, RUTA_POR_ROL, TEXTO_ESTADO_COMPRA, rolValido } from "../src/api/configuracion.js";
 
 const servicio = { id: "dj", nombre: "DJ", categoria: "musica", precio: 8000 };
 
@@ -121,7 +123,7 @@ test("el presupuesto indica si sobra o se excede", () => {
   assert.deepEqual(estadoPresupuesto("", 71000), { estado: "sin-definir", diferencia: 0 });
 });
 
-test("la validación del pago simulado acepta una tarjeta de prueba y rechaza datos inválidos", () => {
+test("la validación del pago acepta una tarjeta de prueba y rechaza datos inválidos", () => {
   const hoy = new Date(2026, 10, 21);
   const valido = {
     titular: "Ana Pérez",
@@ -158,7 +160,7 @@ test("el administrador no se ofrece en el registro y tiene menú propio", () => 
   assert.equal(rolValido("admin"), "admin");
   assert.equal(ROLES_REGISTRO.some((rol) => rol.id === "admin"), false);
   assert.equal(RUTA_POR_ROL.admin, "/admin");
-  assert.deepEqual(NAVEGACION_ADMIN.map((item) => item.to), ["/admin", "/administrar"]);
+  assert.deepEqual(NAVEGACION_ADMIN.map((item) => item.to), ["/admin", "/compras", "/administrar"]);
 });
 
 test("solo los estados conocidos son válidos para un anuncio", () => {
@@ -181,6 +183,19 @@ test("rechazar un anuncio pide un motivo corto y no vacío", () => {
   assert.equal(motivoRechazoValido("   "), false);
   assert.equal(motivoRechazoValido(""), false);
   assert.equal(motivoRechazoValido("x".repeat(201)), false);
+});
+
+test("una compra solo queda confirmada cuando el admin la aprueba", () => {
+  assert.equal(estadoCompraValido("pendiente"), true);
+  assert.equal(estadoCompraValido("aprobado"), true);
+  assert.equal(estadoCompraValido("rechazado"), true);
+  assert.equal(estadoCompraValido("otro"), false);
+  assert.equal(compraConfirmada({ estado: "pendiente" }), false);
+  assert.equal(compraConfirmada({ estado: "rechazado" }), false);
+  assert.equal(compraConfirmada({ estado: "aprobado" }), true);
+  assert.equal(compraConfirmada(null), false);
+  assert.equal(TEXTO_ESTADO_COMPRA.pendiente, "Pendiente de aprobación");
+  assert.equal(TEXTO_ESTADO_COMPRA.aprobado, "Confirmada");
 });
 
 test("registro de organizador pide datos reales y contraseña coincidente", () => {

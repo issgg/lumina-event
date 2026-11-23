@@ -21,7 +21,7 @@ const TABLAS = [
   "cronograma",
 ];
 
-const TABLAS_OPCIONALES = ["anuncios"];
+const TABLAS_OPCIONALES = ["anuncios", "compras"];
 
 let datos = tablasVacias();
 let promesa = null;

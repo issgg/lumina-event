@@ -37,6 +37,14 @@ export function estadoAnuncioValido(estado) {
   return ["pendiente", "aprobado", "rechazado"].includes(estado);
 }
 
+export function estadoCompraValido(estado) {
+  return ["pendiente", "aprobado", "rechazado"].includes(estado);
+}
+
+export function compraConfirmada(compra) {
+  return Boolean(compra) && compra.estado === "aprobado";
+}
+
 export function anuncioPublicable(anuncio) {
   return Boolean(anuncio) && anuncio.estado === "aprobado";
 }

@@ -62,6 +62,24 @@ create table if not exists anuncios (
   revisado_en timestamptz
 );
 
+create table if not exists compras (
+  id bigint generated always as identity primary key,
+  clave varchar(80) not null unique,
+  correo varchar(120) not null,
+  total decimal(10,2) not null check (total >= 0),
+  moneda varchar(3) not null default 'MXN',
+  estado varchar(12) not null default 'pendiente' check (estado in ('pendiente', 'aprobado', 'rechazado')),
+  motivo varchar(200),
+  metodo varchar(20) not null default 'tarjeta',
+  ultimos4 varchar(4),
+  instancia jsonb not null default '{}'::jsonb,
+  creado_en timestamptz not null default now(),
+  revisado_en timestamptz
+);
+
+create index if not exists compras_correo_creado_idx on compras (correo, creado_en desc);
+create index if not exists compras_estado_idx on compras (estado);
+
 create table if not exists eventos (
   id integer primary key,
   usuario_id integer not null references usuarios(id),
@@ -98,6 +116,7 @@ alter table categorias enable row level security;
 alter table salones enable row level security;
 alter table servicios enable row level security;
 alter table anuncios enable row level security;
+alter table compras enable row level security;
 alter table eventos enable row level security;
 alter table detalle_evento enable row level security;
 alter table cronograma enable row level security;

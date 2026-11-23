@@ -50,8 +50,15 @@ export const NAVEGACION_PROVEEDOR = [
 
 export const NAVEGACION_ADMIN = [
   { to: "/admin", texto: "Revisar anuncios" },
+  { to: "/compras", texto: "Revisar compras" },
   { to: "/administrar", texto: "Catálogo manual" },
 ];
+
+export const TEXTO_ESTADO_COMPRA = {
+  pendiente: "Pendiente de aprobación",
+  aprobado: "Confirmada",
+  rechazado: "Rechazada",
+};
 
 export const CATEGORIAS = [
   { id: "salones", nombre: "Salones", descripcion: "Espacios con dirección, capacidad y horarios" },

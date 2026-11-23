@@ -42,6 +42,26 @@ export function registrarBackend(datos) {
   return solicitar("/registro", { metodo: "POST", cuerpo: datos });
 }
 
+export function crearCompraBackend(tokenUsuario, datos) {
+  return solicitar("/public/compras", { metodo: "POST", tokenUsuario, cuerpo: datos });
+}
+
+export function listarMisComprasBackend(tokenUsuario) {
+  return solicitar("/mis/compras", { tokenUsuario });
+}
+
+export function listarComprasAdminBackend(tokenAdmin) {
+  return solicitar("/admin/compras", { tokenAdmin });
+}
+
+export function revisarCompraBackend(tokenAdmin, clave, estado, motivo) {
+  return solicitar("/admin/compras/revisar", {
+    metodo: "POST",
+    tokenAdmin,
+    cuerpo: { clave, estado, motivo },
+  });
+}
+
 export function listarAnunciosBackend(tokenAdmin) {
   return solicitar("/admin/anuncios", { tokenAdmin });
 }
