@@ -13,7 +13,7 @@
   --color-noche: #0b1210;
   --color-borde: #2c3d38;
   --color-borde-fuerte: #4a5f57;
-  --color-texto-suave: #aab4ad;
+  --color-texto-suave: #b9c7c1;
   --color-error: #e08b7c;
   --color-blanco: #f7f3ec;
   --color-primario: #c9a45c;
@@ -166,7 +166,9 @@ textarea:focus-visible {
 
 .boton:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+  background: var(--color-arena-claro);
+  border-color: var(--color-borde);
+  color: var(--color-texto-suave);
 }
 
 .boton-secundario {
@@ -206,6 +208,12 @@ textarea:focus-visible {
 
 .boton-texto:hover {
   color: var(--color-error);
+}
+
+.boton-texto:disabled {
+  color: var(--color-texto-suave);
+  text-decoration: none;
+  cursor: not-allowed;
 }
 
 .aviso {
