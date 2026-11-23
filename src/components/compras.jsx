@@ -77,7 +77,7 @@ export default function Compras({ token, setAviso }) {
   async function revisar(compra, estado) {
     const motivo = String(motivos[compra.id] ?? "").trim();
     if (estado === "rechazado" && !motivoRechazoValido(motivo)) {
-      setAviso(MENSAJES.adminMotivo);
+      setAviso(MENSAJES.compraMotivo);
       return;
     }
 
@@ -90,7 +90,7 @@ export default function Compras({ token, setAviso }) {
       else if (estado === "rechazado") setAviso(MENSAJES.compraRechazada);
       else setAviso(MENSAJES.compraPendiente);
     } catch {
-      setAviso(MENSAJES.falloGuardado);
+      setAviso(MENSAJES.compraRevisionFallida);
     } finally {
       setOcupado("");
     }

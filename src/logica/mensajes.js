@@ -42,6 +42,8 @@ export const MENSAJES = {
   compraRechazada: "Compra rechazada. Revisa el motivo indicado.",
   compraPendiente: "Compra devuelta a revisión.",
   compraSinGuardar: "No se pudo registrar la compra. Intenta de nuevo.",
+  compraMotivo: "Escribe un motivo para rechazar la compra.",
+  compraRevisionFallida: "No se pudo revisar la compra. Intenta de nuevo.",
   modoProveedor: "Ahora estás anunciando tus servicios.",
   modoOrganizador: "Ahora estás armando tu evento.",
   rolSinSincronizar: "Modo cambiado. No se pudo sincronizar con Supabase.",
