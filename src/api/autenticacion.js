@@ -180,7 +180,20 @@ export async function iniciarSesionCorreo(correo, clave, rolElegido) {
 
 export async function registrarseCorreo(datosRegistro, rolElegido) {
   const rol = rolValido(rolElegido);
-  const datos = await registrarBackend({ ...datosRegistro, rol });
+  let datos;
+
+  try {
+    datos = await registrarBackend({ ...datosRegistro, rol });
+  } catch (fallo) {
+    const mensaje = String(fallo?.message ?? "");
+    if (rol !== "organizador" || !mensaje.includes("tipo de evento")) throw fallo;
+    datos = await registrarBackend({
+      ...datosRegistro,
+      rol,
+      tipoEvento: "Evento empresarial",
+    });
+  }
+
   if (!datos?.access_token) throw new Error("No se pudo crear la sesión. Intenta entrar.");
   return { sesion: guardarSesion(datos, rol), pendiente: false };
 }
