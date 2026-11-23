@@ -56,26 +56,26 @@ Los casos de abajo están revisados en código y en la lógica. Se pueden volver
 
 En `tests/logica.test.js` hay 20 pruebas automáticas:
 
-1. No agrega el mismo servicio dos veces.
-2. `cambiarCantidad` no baja de 1.
-3. Quitar servicio actualiza el total.
-4. Respeta el mínimo del paquete.
-5. `evaluarCobertura` funciona con salón y sin salón.
-6. El cronograma tiene un bloque por servicio.
-7. El cronograma respeta el orden de inicio.
-8. Detecta fallo de horario.
-9. La validación rechaza campos vacíos y números inválidos.
-10. `validarBusqueda` rechaza texto demasiado largo.
-11. Luhn acepta la tarjeta de ejemplo.
-12. Luhn rechaza una tarjeta inválida.
+1. Agregar un servicio no crea duplicados con doble clic.
+2. Quitar y cambiar cantidad mantienen límites.
+3. El total convierte texto a número y respeta cantidades.
+4. La agrupación por categoría suma subtotales.
+5. La validación rechaza campos vacíos, texto, negativos y nombres largos.
+6. La búsqueda ignora acentos y mayúsculas y limita la longitud.
+7. El cronograma usa solo categorías seleccionadas y cruza medianoche.
+8. Elegir salón reemplaza cualquier salón previo y lo pone al inicio.
+9. La cobertura marca lo que falta del paquete guiado.
+10. El presupuesto indica si sobra o se excede.
+11. La validación del pago acepta una tarjeta de prueba y rechaza datos inválidos.
+12. Los datos del evento pueden guardarse antes de elegir salón.
 13. El proveedor tiene su propio menú y no ve salones.
 14. El administrador no se ofrece en el registro y tiene menú propio.
 15. Solo los estados conocidos son válidos para un anuncio.
 16. Solo un anuncio aprobado puede mostrarse en el catálogo.
 17. Rechazar un anuncio pide un motivo corto y no vacío.
-18. El registro de organizador pide datos reales y contraseña coincidente.
-19. El registro de proveedor pide negocio y categoría.
-20. Una compra solo queda confirmada cuando el admin la aprueba.
+18. Una compra solo queda confirmada cuando el admin la aprueba.
+19. El registro de organizador pide datos reales y contraseña coincidente.
+20. El registro de proveedor pide negocio y categoría.
 
 También se revisan en pantalla estos casos:
 
