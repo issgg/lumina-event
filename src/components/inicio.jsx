@@ -77,9 +77,13 @@ export default function Inicio({ evento = { detalles: [] }, sesion }) {
   return (
     <Pagina className="inicio-pagina" ref={paginaRef}>
       <div className="portada">
-        <div className="portada-video" aria-hidden="true">
-          <video autoPlay muted loop playsInline preload="auto" poster="/hero-poster.jpg">
-            <source src="/hero-bg.mp4" type="video/mp4" />
+        <div
+          className="portada-video"
+          aria-hidden="true"
+          style={{ backgroundImage: 'url("hero-poster.jpg")' }}
+        >
+          <video autoPlay muted loop playsInline preload="auto" poster="hero-poster.jpg">
+            <source src="hero-bg.mp4" type="video/mp4" />
           </video>
           <span className="portada-velo portada-velo-lateral" />
           <span className="portada-velo portada-velo-inferior" />
