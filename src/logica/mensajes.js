@@ -49,6 +49,5 @@ export const MENSAJES = {
   registroNegocio: "Escribe el nombre de tu negocio.",
   registroCategoria: "Elige una categoría válida.",
   registroDescripcion: "La descripción debe ser corta, máximo 200 caracteres.",
-  registroTipoEvento: "Elige el tipo de evento que planeas.",
   registroCreado: "Cuenta creada. Ya puedes entrar.",
 };

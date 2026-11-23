@@ -6,7 +6,7 @@ import {
   iniciarSesionCorreo,
   registrarseCorreo,
 } from "../api/autenticacion.js";
-import { CATEGORIAS_PROVEEDOR, ROLES_REGISTRO, TIPOS_EVENTO } from "../api/configuracion.js";
+import { CATEGORIAS_PROVEEDOR, ROLES_REGISTRO } from "../api/configuracion.js";
 import { MENSAJES } from "../logica/mensajes.js";
 import { validarRegistro } from "../logica/validacion.js";
 
@@ -37,7 +37,6 @@ export default function Acceso({ onSesion }) {
     negocio: "",
     categoria: "",
     descripcion: "",
-    tipoEvento: "",
     repetirClave: "",
   });
   const [error, setError] = useState(errorGuardado);
@@ -274,7 +273,7 @@ export default function Acceso({ onSesion }) {
                     required
                   />
                 </label>
-                {esProveedor ? (
+                {esProveedor && (
                   <>
                     <label>
                       Nombre del negocio
@@ -313,22 +312,6 @@ export default function Acceso({ onSesion }) {
                       />
                     </label>
                   </>
-                ) : (
-                  <label>
-                    Tipo de evento que planeas
-                    <select
-                      value={registro.tipoEvento}
-                      onChange={(evento) => cambiarRegistro("tipoEvento", evento.target.value)}
-                      required
-                    >
-                      <option value="">Elige un tipo de evento</option>
-                      {TIPOS_EVENTO.map((tipo) => (
-                        <option key={tipo} value={tipo}>
-                          {tipo}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
                 )}
                 <label>
                   Repite tu contraseña

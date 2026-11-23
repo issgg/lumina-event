@@ -29,7 +29,7 @@ Nueve tablas. Este archivo explica el modelo; `public/db/supabase.sql` contiene 
 
 ## Campos principales
 
-- `usuarios`: nombre, correo, tipo (`usuario` o `admin`), telefono y tipo_evento del registro.
+- `usuarios`: nombre, correo, tipo (`usuario` o `admin`) y telefono del registro.
 - `proveedores`: nombre del negocio, telefono, correo, descripcion y categoria principal.
 - `eventos`: tipo_evento, fecha, invitados, presupuesto, hora_inicio, estado (`borrador`).
 - `salones`: nombre, direccion, capacidad, precio, horarios, imagen.

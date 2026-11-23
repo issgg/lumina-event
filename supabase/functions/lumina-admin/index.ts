@@ -33,14 +33,6 @@ const CATEGORIAS = [
 ];
 const ESTADOS = ["pendiente", "aprobado", "rechazado"];
 const CATEGORIAS_PROVEEDOR = CATEGORIAS.filter((categoria) => categoria !== "salones");
-const TIPOS_EVENTO = [
-  "XV años",
-  "Boda",
-  "Cumpleaños",
-  "Graduación",
-  "Evento empresarial",
-  "Aniversario",
-];
 const IMAGENES: Record<string, string> = {
   musica: "musica",
   comida: "comida",
@@ -265,7 +257,6 @@ function datosRegistro(cuerpo: Record<string, unknown>) {
   const negocio = texto(cuerpo.negocio);
   const categoria = texto(cuerpo.categoria);
   const descripcion = texto(cuerpo.descripcion).slice(0, 200);
-  const tipoEvento = texto(cuerpo.tipoEvento);
 
   if (rol !== "organizador" && rol !== "proveedor") throw new Error("Elige un tipo de cuenta.");
   if (!nombre || nombre.length > 60) throw new Error("Escribe tu nombre, máximo 60 caracteres.");
@@ -277,8 +268,6 @@ function datosRegistro(cuerpo: Record<string, unknown>) {
   if (rol === "proveedor") {
     if (!negocio || negocio.length > 80) throw new Error("Escribe el nombre de tu negocio.");
     if (!CATEGORIAS_PROVEEDOR.includes(categoria)) throw new Error("Elige una categoría válida.");
-  } else {
-    if (!TIPOS_EVENTO.includes(tipoEvento)) throw new Error("Elige el tipo de evento que planeas.");
   }
 
   return {
@@ -290,7 +279,6 @@ function datosRegistro(cuerpo: Record<string, unknown>) {
     negocio,
     categoria,
     descripcion,
-    tipoEvento,
   };
 }
 
@@ -319,7 +307,6 @@ async function crearUsuarioAuth(datos: ReturnType<typeof datosRegistro>) {
         negocio: datos.negocio,
         categoria: datos.categoria,
         descripcion: datos.descripcion,
-        tipo_evento: datos.tipoEvento,
       },
     }),
   });
@@ -384,7 +371,6 @@ async function registrarCuenta(cuerpo: Record<string, unknown>) {
           correo: datos.correo,
           tipo: "usuario",
           telefono: datos.telefono,
-          tipo_evento: datos.rol === "organizador" ? datos.tipoEvento : null,
         },
       ],
       prefer: "return=representation",

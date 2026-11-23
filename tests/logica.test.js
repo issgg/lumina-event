@@ -190,10 +190,8 @@ test("registro de organizador pide datos reales y contraseña coincidente", () =
     telefono: "55 1234 5678",
     clave: "clave123",
     repetirClave: "clave123",
-    tipoEvento: "Boda",
   };
   assert.equal(validarRegistro("organizador", base), "");
-  assert.equal(validarRegistro("organizador", { ...base, tipoEvento: "" }), MENSAJES.registroTipoEvento);
   assert.equal(validarRegistro("organizador", { ...base, telefono: "abc" }), MENSAJES.registroTelefono);
   assert.equal(validarRegistro("organizador", { ...base, repetirClave: "otra123" }), MENSAJES.registroClaveDistinta);
 });
