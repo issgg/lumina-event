@@ -186,20 +186,6 @@ export async function registrarseCorreo(datosRegistro, rolElegido) {
   return { sesion: guardarSesion(datos, rol), pendiente: false };
 }
 
-export function iniciarConGoogle(rolElegido) {
-  if (!authConfigurado) throw new Error("Falta configurar Supabase");
-  try {
-    window.sessionStorage.setItem("lumina-rol-elegido", rolValido(rolElegido));
-  } catch {
-    return;
-  }
-  const destino = `${window.location.origin}${window.location.pathname}`;
-  const url = new URL(`${URL_BASE}/auth/v1/authorize`);
-  url.searchParams.set("provider", "google");
-  url.searchParams.set("redirect_to", destino);
-  window.location.assign(url.toString());
-}
-
 export async function cerrarSesion() {
   const guardada = leerSesion();
   limpiarSesion();
@@ -210,34 +196,4 @@ export async function cerrarSesion() {
       limpiarSesion();
     }
   }
-}
-
-export function capturarSesionRedireccion() {
-  if (typeof window === "undefined") return;
-  const hash = window.location.hash.replace(/^#/, "");
-  if (!hash) return;
-
-  const parametros = new URLSearchParams(hash);
-  const esRetorno = parametros.has("access_token") || parametros.has("error");
-  if (!esRetorno) return;
-
-  const error = parametros.get("error_description") || parametros.get("error");
-  if (error) {
-    try {
-      window.sessionStorage.setItem("lumina-auth-error", error);
-    } catch {
-      limpiarSesion();
-    }
-  } else {
-    let rolElegido;
-    try {
-      rolElegido = window.sessionStorage.getItem("lumina-rol-elegido") ?? undefined;
-      window.sessionStorage.removeItem("lumina-rol-elegido");
-    } catch {
-      rolElegido = undefined;
-    }
-    guardarSesion(Object.fromEntries(parametros.entries()), rolElegido);
-  }
-
-  window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
 }

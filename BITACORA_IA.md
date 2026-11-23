@@ -29,6 +29,13 @@ Aquí anoto cuándo usé la IA, qué pedí y qué revisé yo después.
 | 22/11 | Compra real con aprobación | El usuario pidió que la compra llegara al admin y no quedara confirmada antes de la revisión | Propuse la tabla `compras`, endpoints autenticados y un panel con aprobar/rechazar | Verifiqué que el total se recalcula en el backend y que el cliente ve el estado actualizado |
 | 22/11 | Contraste | El usuario vio textos que no se leían en algunas pantallas | Señaló botones desactivados, etiquetas doradas y paneles verdes | Cambié colores a variables legibles, corregí estados disabled y volví a correr pruebas y build |
 | 22/11 | Diseño y animaciones | El usuario pidió un diseño menos aburrido y un menú de comienzo mejor | Propuso entradas suaves, hover en tarjetas y tres accesos rápidos en el inicio | Añadí animaciones, transiciones y `prefers-reduced-motion`; revisé responsive y build |
+| 22/11 | Rediseño cinematográfico | El usuario pidió negro/oro, video de portada y transiciones entre pantallas | Propuso `framer-motion`, GSAP y Lenis con movimiento reducido | Revisé que el tema claro siga funcionando y que el build sirva el video local |
+| 22/11 | Galería en modales | El usuario pidió fotos grandes y miniaturas en cada servicio | Propuso `galeriaDe(servicio)` por categoría con flechas, contador y teclado | Revisé foco, cierre con Escape, fallback para SVG y sin fotos |
+| 22/11 | Fotos y barra del catálogo | El usuario vio fotos sin mostrar y la barra inferior transparente | Señaló rutas absolutas, altura cero en el modal y `data-reveal` en la barra | Corregí rutas, foto de fondo y opacidad; verifiqué los hashes del deploy |
+| 22/11 | Video de inicio | El usuario dijo que el video no se veía | Detectó `/hero-bg.mp4` como 404 en GitHub Pages | Cambié a rutas relativas, póster de fondo y recodifiqué H.264 compatible |
+| 22/11 | Flujo en teléfono | El usuario pidió revisar que el flujo no se rompiera en móvil | Propuso barra fija compacta con `safe-area-inset-bottom`, stepper horizontal y modal alto | Revisé CSS en 760 px y 480 px, `aria-label` y que las 42 pruebas sigan pasando |
+| 22/11 | Quitar Google | El usuario pidió dejar solo el acceso normal que ya teníamos | Quitó botón, función OAuth, callback de redirección y menciones en docs | Busqué `Google`, `OAuth` y claves de sesión; solo queda Google Fonts en CSS |
+| 22/11 | Docs y CI | El usuario pidió revisar y ajustar todo antes de avisar | Actualizó paleta, estructura, pruebas, guion, mapa, modelo y workflow | Corrí `git diff --check`, 42/42 pruebas y build; no pusheé sin permiso |
 
 ## Cosas que la IA propuso y yo rechacé
 
@@ -36,7 +43,7 @@ Aquí anoto cuándo usé la IA, qué pedí y qué revisé yo después.
 - **Juntar todo en pocas pantallas:** no lo acepté; mantuve las rutas actuales para saber dónde estaba cada parte.
 - **Cobro con pasarela externa:** no lo acepté. La compra se registra en Supabase y pasa por aprobación, pero no se cobra dinero ni se guardan datos bancarios.
 - **SQLite en el navegador:** la dejé atrás porque el proyecto debía usar Supabase.
-- **Google OAuth sin secret:** lo dejé pendiente. Sin `Client Secret` la app muestra un mensaje claro y no se rompe.
+- **Google OAuth:** lo quité. El usuario pidió dejar solo el acceso con correo y contraseña, sin depender de un proveedor externo.
 - **Administrador en el registro:** no lo acepté. El registro deja solo organizador y proveedor; el administrador valida sus credenciales en una Edge Function.
 - **Todo en el frontend:** no lo acepté. El usuario pidió backend, así que los secretos y las escrituras privadas pasaron a `lumina-admin`.
 - **Publicar anuncios sin revisión:** no lo acepté. Ahora pasan por `pendiente`, y solo los aprobados llegan al catálogo.
@@ -45,6 +52,6 @@ Aquí anoto cuándo usé la IA, qué pedí y qué revisé yo después.
 ## Cómo revisé el trabajo de la IA
 
 - Corrí `npm test` y `npm run build`.
-- Miré el diff antes de cada commit.
-- Confirmé que el deploy sirviera los assets nuevos.
+- Miré `git diff --check` y el diff antes de cada commit.
+- Confirmé que el deploy sirviera los assets nuevos y sus hashes.
 - Probé mentalmente los casos límite con la tabla de `PRUEBAS.md`.

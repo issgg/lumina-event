@@ -1633,43 +1633,10 @@ tbody tr:last-child td {
   line-height: 1.4;
 }
 
-.boton-google {
-  width: 100%;
-}
-
-.google-marca {
-  display: grid;
-  place-items: center;
-  width: 1.3rem;
-  height: 1.3rem;
-  border-radius: 50%;
-  background: var(--color-papel-claro);
-  color: var(--color-arcilla);
-  font-size: 0.8rem;
-  font-weight: 900;
-}
-
 .texto-aviso {
   margin: 0.6rem 0 0;
   color: var(--color-error);
   font-size: 0.78rem;
-}
-
-.separador {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin: 1.3rem 0;
-  color: var(--color-texto-suave);
-  font-size: 0.75rem;
-}
-
-.separador::before,
-.separador::after {
-  flex: 1;
-  height: 1px;
-  background: var(--color-borde);
-  content: "";
 }
 
 .formulario-acceso {

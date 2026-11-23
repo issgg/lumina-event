@@ -1,6 +1,6 @@
 # Modelo de datos
 
-Diez tablas. Este archivo explica el modelo; `public/db/supabase.sql` contiene la definición SQL. Para proyectos ya creados están `public/db/migracion_anuncios.sql`, `public/db/migracion_registro.sql` y `public/db/migracion_compras.sql`. `anuncios` y `compras` son opcionales en el arranque: si faltan, el resto de la app sigue funcionando.
+Diez tablas. Este archivo explica el modelo; `public/db/supabase.sql` contiene la definición SQL. Para proyectos ya creados están `public/db/migracion_anuncios.sql`, `public/db/migracion_registro.sql` y `public/db/migracion_compras.sql`. Si un proyecto viejo no tiene `anuncios` o `compras`, las migraciones las agregan; mientras faltan, el resto de la app sigue funcionando.
 
 ## Tablas
 
@@ -12,7 +12,7 @@ Diez tablas. Este archivo explica el modelo; `public/db/supabase.sql` contiene l
 | `salones` | Catálogo de salones | `id` | `proveedor_id → proveedores.id` |
 | `servicios` | Catálogo de servicios | `id` | `categoria_id → categorias.id`, `proveedor_id → proveedores.id` |
 | `anuncios` | Servicios enviados por proveedores y revisados por el administrador | `id` | — |
-| `compras` | Compras confirmadas por el cliente y revisadas por el administrador | `id` | — |
+| `compras` | Compras enviadas por el cliente y revisadas por el administrador | `id` | — |
 | `eventos` | Evento que el usuario está armando | `id` | `usuario_id → usuarios.id`, `salon_id → salones.id` |
 | `detalle_evento` | Servicios agregados al evento | `id` | `evento_id → eventos.id`, `servicio_id → servicios.id` |
 | `cronograma` | Actividades propuestas | `id` | `evento_id → eventos.id` |
@@ -43,7 +43,7 @@ Diez tablas. Este archivo explica el modelo; `public/db/supabase.sql` contiene l
 
 ## Cómo se refleja en la app
 
-`inicializarBase()` usa **Supabase** siempre: `src/api/supabase.js` llama a `/rest/v1/<tabla>`, `public/db/supabase.sql` crea las 9 tablas con RLS y la primera carga siembra el catálogo base desde `public/data/catalogo.json`. Los datos se ven en Table Editor y se consultan en consola con `luminaDB.consultar("servicios")` o `luminaDB.consultar("anuncios")`.
+`inicializarBase()` usa **Supabase** siempre: `src/api/supabase.js` llama a `/rest/v1/<tabla>`, `public/db/supabase.sql` crea las 10 tablas con RLS y la primera carga siembra el catálogo base desde `public/data/catalogo.json`. Los datos se ven en Table Editor y se consultan en consola con `luminaDB.consultar("servicios")` o `luminaDB.consultar("anuncios")`.
 
 Si faltan `VITE_SUPABASE_URL` o `VITE_SUPABASE_ANON_KEY`, la app no inventa una base local: muestra el error de inicio.
 

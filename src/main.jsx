@@ -5,9 +5,6 @@ import { MotionConfig } from "framer-motion";
 import "lenis/dist/lenis.css";
 import "./index.css";
 import App from "./App.jsx";
-import { capturarSesionRedireccion } from "./api/autenticacion.js";
-
-capturarSesionRedireccion();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

@@ -24,14 +24,14 @@ También ayuda a otra persona a ofrecer servicios y a un administrador a revisar
 |---|---|---|
 | Entrada | `src/main.jsx`, `index.html` | Arranca React y monta la app |
 | Rutas y estado | `src/App.jsx` | Define las rutas, mantiene sesión, evento y servicios |
-| Estilos | `src/index.css`, `src/App.css` | Paleta, tarjetas, menú y diseño adaptado |
+| Estilos y movimiento | `src/index.css`, `src/App.css`, `src/movimiento.js`, `src/hooks/useCinematico.js` | Paleta, tarjetas, menú, transiciones y diseño adaptado |
 | API | `src/api/*.js` | Lee y escribe en Supabase, maneja sesión y tiempo de espera |
-| Componentes | `src/components/*.jsx` | Pantallas y piezas visuales |
+| Componentes | `src/components/*.jsx` | Pantallas, modales y piezas visuales |
 | Lógica | `src/logica/*.js` | Cálculos que se pueden probar sin pantalla |
 | Datos | `public/data/catalogo.json` | Datos iniciales para sembrar Supabase |
 | SQL | `public/db/supabase.sql`, `public/db/migracion_*.sql` | Crea tablas, llaves y políticas; las migraciones agregan anuncios, datos de registro y compras |
-| Imágenes | `public/assets/fotos/*.jpg` | Fotos locales de salones y servicios |
-| Pruebas | `tests/*.test.js` | Pruebas de la lógica |
+| Imágenes y video | `public/assets/fotos/*.jpg`, `public/hero-bg.mp4`, `public/hero-poster.jpg` | Fotos locales de salones y servicios, video de portada y póster |
+| Pruebas | `tests/*.test.js` | 42 pruebas de la lógica |
 | Deploy | `.github/workflows/pages.yml` | Publica el build en GitHub Pages |
 
 ## Componentes principales
@@ -44,13 +44,16 @@ También ayuda a otra persona a ofrecer servicios y a un administrador a revisar
 | `src/components/armador.jsx` | Formulario de datos del evento y guardado del borrador |
 | `src/components/salon.jsx` | Muestra salones, permite ver el detalle grande y elegir uno |
 | `src/components/catalogo.jsx` | Muestra una categoría a la vez con regresar, omitir y continuar |
-| `src/components/tarjetaServicio.jsx` | Modal con foto, descripción y precio de cada servicio |
+| `src/components/tarjetaServicio.jsx` | Tarjeta con foto que abre el modal de detalle, descripción y precio |
 | `src/components/resumen.jsx` | Resume salón, servicios y costo aproximado |
 | `src/components/pago.jsx` | Valida tarjeta de ejemplo, envía la compra al backend y muestra su estado |
 | `src/components/administrar.jsx` | Agrega y elimina servicios manuales del catálogo |
 | `src/components/aprobaciones.jsx` | Muestra anuncios pendientes y permite aprobarlos o rechazarlos |
 | `src/components/compras.jsx` | Muestra compras pendientes y permite confirmarlas o rechazarlas |
 | `src/components/proveedor.jsx` | Envía, muestra, corrige y quita anuncios del proveedor |
+| `src/components/modalDetalle.jsx` | Modal reutilizable con portal, foco, teclado y galería de fotos |
+| `src/components/pagina.jsx` | Envoltura de pantalla con animación de entrada y salida |
+| `src/hooks/useCinematico.js` | Movimiento suave con Lenis y GSAP, respetando `prefers-reduced-motion` |
 
 ## FLUJO DE UNA PANTALLA A OTRA
 
@@ -92,7 +95,7 @@ En cada categoría:
 |---|---|
 | `src/api/supabase.js` | Lee, inserta, actualiza y borra filas con REST |
 | `src/api/baseDatos.js` | Siembra tablas, guarda evento, servicios y cronograma por cuenta, y arma el cache `luminaDB` |
-| `src/api/autenticacion.js` | Sesión con correo, Google, renovación de token y rol guardado |
+| `src/api/autenticacion.js` | Sesión con correo, renovación de token y rol guardado |
 | `src/api/anuncios.js` | Envía anuncios, revisiones y extras a la Edge Function; expone los aprobados al catálogo |
 | `src/api/backendAdmin.js` | Cliente de la Edge Function `lumina-admin` |
 | `src/api/catalogo.js` | Trae catálogo y categorías desde Supabase |
@@ -101,7 +104,7 @@ En cada categoría:
 | `supabase/functions/lumina-admin/index.ts` | Backend: crea cuentas confirmadas, valida admin, guarda anuncios, revisa solicitudes y sincroniza el catálogo |
 | `public/db/migracion_registro.sql` | Agrega las columnas nuevas de teléfono, tipo de evento, negocio, categoría y descripción |
 
-Tablas: `usuarios`, `proveedores`, `categorias`, `salones`, `servicios`, `anuncios`, `eventos`, `detalle_evento`, `cronograma`.
+Tablas: `usuarios`, `proveedores`, `categorias`, `salones`, `servicios`, `anuncios`, `eventos`, `detalle_evento`, `cronograma`, `compras`.
 
 El frontend solo usa la llave pública. El `service_role` vive solo en el entorno de la Edge Function y no aparece en el bundle. Las credenciales del administrador tampoco: se guardan como secretos `ADMIN_CORREO` y `ADMIN_CLAVE` de Supabase.
 
@@ -134,16 +137,23 @@ El frontend solo usa la llave pública. El `service_role` vive solo en el entorn
 - Proveedor sin anuncios: muestra un texto invitando a publicar el primero.
 - Anuncio rechazado: aparece con su motivo y el proveedor puede corregirlo y reenviarlo.
 - Anuncio pendiente o rechazado: no aparece en el Inicio ni en el catálogo.
+- Servicio sin foto propia: la galería usa fotos de la categoría y nunca deja un recuadro vacío.
+- Video de portada: si no carga, queda el póster local como fondo.
+- Pantalla de teléfono: la barra de acciones queda fija y compacta sin tapar el contenido.
+- Acceso: solo correo y contraseña; no hay botón de Google.
 
 Detalle y pasos para probarlos: `PRUEBAS.md`.
 
 ## DECISIONES IMPORTANTES
 
 - Supabase en vez de SQLite: el proyecto necesita datos en la nube.
-- REST con `fetch` en vez de una librería nueva: menos dependencias.
+- REST con `fetch` en la capa de Supabase: sin SDK; las librerías nuevas son solo para animación.
 - Rutas con `HashRouter`: funciona en GitHub Pages sin configurar el servidor.
 - Compra con aprobación: se guarda en `compras` como `pendiente`; solo pasa a `aprobado` cuando el admin la revisa. No se cobra dinero ni se guardan datos de tarjeta.
-- Sin barra de progreso: el flujo quedó más simple.
+- Sin barra de progreso pesada: hay un stepper ligero por etapas y se adapta al teléfono.
+- Video hero local con póster: se ve en el deploy sin depender de rutas absolutas.
+- Galería en los modales: foto grande, miniaturas y flechas con teclado.
+- Acceso solo con correo: se quitó Google para no depender de un proveedor externo.
 - Categorías por pasos: se puede regresar u omitir sin perder el avance.
 - Tres tipos de cuenta: el menú cambia según el rol para no mezclar armar paquetes, anunciar servicios y revisar anuncios.
 - Tabla `anuncios`: guarda el estado de cada envío; solo los aprobados se copian como servicios `extra-` al catálogo.

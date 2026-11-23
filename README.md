@@ -22,19 +22,18 @@ También hay tres tipos de cuenta. El **organizador** arma su paquete y confirma
 
 ## Paleta
 
-La paleta busca un look elegante y tranquilo:
+La paleta busca un look elegante y cinematográfico:
 
-- **Marfil:** fondo general, para que leer no canse.
-- **Verde profundo:** botones principales y paneles importantes.
-- **Terracota apagado:** etiquetas y pequeños acentos.
-- **Latón:** bordes de selección y detalles finos.
-- **Arena clara:** superficies suaves y resúmenes.
+- **Negro profundo:** fondo general de la portada y los paneles.
+- **Oro/latón:** botones principales, bordes de selección y detalles finos.
+- **Marfil:** texto principal y titulares.
+- **Verde bosque:** acentos secundarios y superficies del panel.
 
 El modo oscuro viene por defecto. En el encabezado, el botón **Ver claro** permite cambiar y la preferencia queda guardada.
 
 ## Tecnologías
 
-React + Vite, React Router con `HashRouter`, CSS propio, JavaScript ES6 y **Supabase** como base alojada. No se instaló una librería nueva: `src/api/supabase.js` usa el REST de Supabase con `fetch`. La app sigue siendo estática: GitHub Pages publica `dist/` y el navegador habla con Supabase.
+React + Vite, React Router con `HashRouter`, CSS propio, JavaScript ES6, **Framer Motion**, **GSAP**, **Lenis** y **Supabase** como base alojada. `src/api/supabase.js` usa el REST de Supabase con `fetch`. La app sigue siendo estática: GitHub Pages publica `dist/` y el navegador habla con Supabase.
 
 No hay modo local: si faltan las variables de entorno, la app muestra un error claro. `public/data/catalogo.json` solo siembra Supabase la primera vez.
 
@@ -96,15 +95,7 @@ Los anuncios del proveedor se guardan en la tabla `anuncios` de Supabase con est
 
 Las compras se guardan en la tabla `compras` con el mismo modelo de estados. Al confirmar el paquete, el navegador envía un snapshot del evento y el backend recalcula el total desde el desglose; la tarjeta no viaja al servidor. La compra nace `pendiente`, aparece en `/#/compras` para el administrador y solo cuando este la aprueba el cliente ve **Confirmada** en el Inicio y en **Mi paquete**. Si la rechaza, el motivo se muestra al cliente. Una compra aprobada ya no se puede revertir desde el panel.
 
-Para habilitar Google:
-
-1. En Supabase, entrar a **Authentication → Providers → Google** y activarlo.
-2. Agregar las URLs permitidas:
-   - `http://localhost:4173/**`
-   - `https://issgg.github.io/lumina-event/**`
-3. Pegar el `Client ID` y el `Client Secret` de Google OAuth en Supabase.
-
-Si no está el `Client Secret`, el botón de Google muestra un aviso y la app sigue funcionando con correo.
+El acceso es solo con correo y contraseña. No hay botones de acceso externo ni configuración de OAuth; la sesión se guarda, recuerda el rol y se renueva sola.
 
 ## Estructura
 
@@ -128,6 +119,9 @@ LuminaEvent/
 │  ├─ App.jsx
 │  ├─ App.css
 │  ├─ index.css
+│  ├─ movimiento.js
+│  ├─ hooks/
+│  │  └─ useCinematico.js
 │  ├─ api/
 │  │  ├─ anuncios.js
 │  │  ├─ autenticacion.js
@@ -151,7 +145,9 @@ LuminaEvent/
 │  │  ├─ administrar.jsx
 │  │  ├─ aprobaciones.jsx
 │  │  ├─ compras.jsx
-│  │  └─ proveedor.jsx
+│  │  ├─ proveedor.jsx
+│  │  ├─ modalDetalle.jsx
+│  │  └─ pagina.jsx
 │  └─ logica/
 │     ├─ carrito.js
 │     ├─ paquete.js
@@ -169,8 +165,11 @@ LuminaEvent/
 │  ├─ db/migracion_compras.sql
 │  ├─ db/migracion_registro.sql
 │  ├─ db/supabase.sql
+│  ├─ hero-bg.mp4
+│  ├─ hero-poster.jpg
 │  └─ assets/fotos/*.jpg
 └─ tests/
+   └─ logica.test.js
 ```
 
 ## Base de datos en la presentación

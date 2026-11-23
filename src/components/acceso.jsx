@@ -2,7 +2,6 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   authConfigurado,
-  iniciarConGoogle,
   iniciarSesionAdmin,
   iniciarSesionCorreo,
   registrarseCorreo,
@@ -11,22 +10,6 @@ import { CATEGORIAS_PROVEEDOR, ROLES_REGISTRO } from "../api/configuracion.js";
 import { MENSAJES } from "../logica/mensajes.js";
 import { validarRegistro } from "../logica/validacion.js";
 import { resaltado, transicion } from "../movimiento.js";
-
-function errorGuardado() {
-  try {
-    return window.sessionStorage.getItem("lumina-auth-error") ?? "";
-  } catch {
-    return "";
-  }
-}
-
-function olvidarError() {
-  try {
-    window.sessionStorage.removeItem("lumina-auth-error");
-  } catch {
-    return;
-  }
-}
 
 export default function Acceso({ onSesion }) {
   const [modo, setModo] = useState("entrar");
@@ -41,7 +24,7 @@ export default function Acceso({ onSesion }) {
     descripcion: "",
     repetirClave: "",
   });
-  const [error, setError] = useState(errorGuardado);
+  const [error, setError] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [ocupado, setOcupado] = useState(false);
 
@@ -49,14 +32,12 @@ export default function Acceso({ onSesion }) {
     setModo(nuevo);
     setError("");
     setMensaje("");
-    olvidarError();
   }
 
   function cambiarRol(nuevo) {
     setRol(nuevo);
     setError("");
     setMensaje("");
-    olvidarError();
   }
 
   function cambiarRegistro(campo, valor) {
@@ -67,7 +48,6 @@ export default function Acceso({ onSesion }) {
     evento.preventDefault();
     setError("");
     setMensaje("");
-    olvidarError();
 
     if (clave.length < 6) {
       setError(MENSAJES.registroClave);
@@ -104,17 +84,6 @@ export default function Acceso({ onSesion }) {
       setError(fallo.message || "No se pudo completar la acción.");
     } finally {
       setOcupado(false);
-    }
-  }
-
-  function google() {
-    setError("");
-    setMensaje("");
-    olvidarError();
-    try {
-      iniciarConGoogle(rol);
-    } catch (fallo) {
-      setError(fallo.message || "No se pudo abrir Google.");
     }
   }
 
@@ -225,22 +194,6 @@ export default function Acceso({ onSesion }) {
                 <span className="rol-texto">{opcion.descripcion}</span>
               </motion.button>
             ))}
-          </div>
-
-          <button
-            type="button"
-            className="boton boton-secundario boton-google"
-            onClick={google}
-            disabled={!authConfigurado || ocupado}
-          >
-            <span className="google-marca">G</span>
-            Continuar con Google
-          </button>
-
-          {!authConfigurado && <p className="texto-aviso">Falta configurar el acceso.</p>}
-
-          <div className="separador">
-            <span>o con tu correo</span>
           </div>
 
           <form className="formulario-acceso" onSubmit={enviar}>
@@ -364,6 +317,7 @@ export default function Acceso({ onSesion }) {
 
             {error && <p className="error-acceso">{error}</p>}
             {mensaje && <p className="mensaje-acceso">{mensaje}</p>}
+            {!authConfigurado && <p className="texto-aviso">Falta configurar Supabase.</p>}
 
             <button type="submit" className="boton" disabled={!authConfigurado || ocupado}>
               {ocupado ? "Un momento…" : modo === "entrar" ? "Entrar" : "Crear cuenta"}

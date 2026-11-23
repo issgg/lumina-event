@@ -27,6 +27,8 @@ jobs:
           cache: npm
       - name: Instalar dependencias
         run: npm ci
+      - name: Probar logica
+        run: npm test
       - name: Compilar
         run: npm run build
       - name: Subir pagina

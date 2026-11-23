@@ -23,7 +23,7 @@ Mostrar en `README.md` los enlaces de entrega y la estructura de carpetas.
 
 Abrir `/#/acceso`.
 
-> "Primero se elige el tipo de cuenta. El registro ya no espera un correo de confirmación: la Edge Function crea la cuenta confirmada y guarda nombre, teléfono y datos del rol. El tipo de evento se elige después en el armador, no al crear la cuenta; el proveedor agrega negocio, categoría y descripción. La sesión se guarda, recuerda ese rol y se renueva sola. El acceso con Google queda pendiente porque falta el secreto en Supabase, pero el botón avisa en vez de romperse."
+> "Primero se elige el tipo de cuenta. El registro ya no espera un correo de confirmación: la Edge Function crea la cuenta confirmada y guarda nombre, teléfono y datos del rol. El tipo de evento se elige después en el armador, no al crear la cuenta; el proveedor agrega negocio, categoría y descripción. La sesión se guarda, recuerda ese rol y se renueva sola. El acceso es solo con correo y contraseña; no hay botones externos."
 
 ## 4. Proveedor (35 segundos)
 
@@ -102,7 +102,7 @@ Abrir `DIARIO_DE_DECISIONES.md` y `PRUEBAS.md`.
 - **¿Qué pasa con las compras?** Se guardan pendientes en Supabase; el administrador las aprueba en **Revisar compras** y recién ahí el paquete aparece como confirmado para el cliente.
 - **¿Se pierde el evento al cambiar de rol?** No. El cambio solo cambia el menú y la ruta; la sesión y el borrador siguen ahí.
 - **¿Qué es lo más complicado?** El cálculo del cronograma, porque respeta horarios y tiempos de cada servicio.
-- **¿Qué cambiaste después de probar?** Quité la barra de progreso porque hacía la app más complicada.
+- **¿Qué cambiaste después de probar?** Cambié la barra de progreso pesada por un stepper ligero y ajusté la galería y la barra de acciones después de verlas en pantalla.
 - **¿Qué propuso la IA y rechazaste?** Juntar todo en pocas pantallas y el cobro con pasarela externa.
 - **¿Qué pasa si Supabase no responde?** La app deja de esperar, muestra un aviso y permite reintentar.
 
@@ -117,3 +117,8 @@ Abrir `DIARIO_DE_DECISIONES.md` y `PRUEBAS.md`.
 - Confirmar que en Supabase se corrieron `public/db/migracion_anuncios.sql`, `public/db/migracion_registro.sql` y `public/db/migracion_compras.sql` si el proyecto ya existía.
 - Confirmar que la Edge Function `lumina-admin` está desplegada y que los secretos `ADMIN_CORREO` y `ADMIN_CLAVE` están definidos en Supabase.
 - Probar que una compra enviada aparece pendiente en **Revisar compras** y que se vuelve confirmada al aprobarla.
+- Confirmar que el video de la portada se ve y que, si falla, queda el póster local.
+- Abrir el detalle de un servicio y probar las flechas de la galería y el cierre con `Escape`.
+- Probar el flujo en el teléfono: la barra inferior no debe tapar los botones ni el contenido.
+- Confirmar que en `/#/acceso` solo aparece el formulario de correo, sin botón de Google.
+- Repasar que `PRUEBAS.md` diga **42/42** y que GitHub Pages ejecute `npm test` antes de compilar.
