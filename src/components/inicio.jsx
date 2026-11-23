@@ -7,7 +7,8 @@ import {
   leerAnunciosAprobados,
   suscribirseAnuncios,
 } from "../api/anuncios.js";
-import { CATEGORIAS } from "../api/configuracion.js";
+import { listarMisCompras, suscribirseCompras } from "../api/compras.js";
+import { CATEGORIAS, TEXTO_ESTADO_COMPRA } from "../api/configuracion.js";
 import { calcularTotal } from "../logica/carrito.js";
 import { formatearMoneda } from "../logica/formato.js";
 
@@ -15,10 +16,11 @@ function nombreCategoria(id) {
   return CATEGORIAS.find((categoria) => categoria.id === id)?.nombre ?? id;
 }
 
-export default function Inicio({ evento = { detalles: [] } }) {
+export default function Inicio({ evento = { detalles: [] }, sesion }) {
   const servicios = evento.detalles.length;
   const total = calcularTotal(evento.detalles);
   const [recomendados, setRecomendados] = useState([]);
+  const [ultimaCompra, setUltimaCompra] = useState(null);
 
   useEffect(() => {
     let activo = true;
@@ -38,6 +40,26 @@ export default function Inicio({ evento = { detalles: [] } }) {
       cancelar();
     };
   }, []);
+
+  useEffect(() => {
+    if (!sesion?.access_token) return undefined;
+    let activo = true;
+    const cargar = () => {
+      listarMisCompras(sesion.access_token)
+        .then((lista) => {
+          if (activo) setUltimaCompra(lista[0] ?? null);
+        })
+        .catch(() => {
+          if (activo) setUltimaCompra(null);
+        });
+    };
+    cargar();
+    const cancelar = suscribirseCompras(cargar);
+    return () => {
+      activo = false;
+      cancelar();
+    };
+  }, [sesion?.access_token]);
 
   return (
     <section className="pagina inicio-pagina">
@@ -81,6 +103,12 @@ export default function Inicio({ evento = { detalles: [] } }) {
               <dd>{formatearMoneda(total)}</dd>
             </div>
           </dl>
+          {ultimaCompra && (
+            <p className={`portada-compra estado-${ultimaCompra.estado}`}>
+              Última compra · {ultimaCompra.referencia || ultimaCompra.id} ·{" "}
+              <strong>{TEXTO_ESTADO_COMPRA[ultimaCompra.estado] ?? "Pendiente de aprobación"}</strong>
+            </p>
+          )}
           <Link className="boton-texto" to={servicios ? "/resumen" : "/armador"}>
             {servicios ? "Ver mi paquete" : "Comenzar con los datos"}
           </Link>

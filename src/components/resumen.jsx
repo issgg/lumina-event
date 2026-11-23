@@ -3,7 +3,8 @@ import { Link } from "react-router";
 
 import { cargarServicios } from "../api/catalogo.js";
 import { consultarCronograma, limpiarEvento } from "../api/baseDatos.js";
-import { CATEGORIAS } from "../api/configuracion.js";
+import { listarMisCompras, suscribirseCompras } from "../api/compras.js";
+import { CATEGORIAS, TEXTO_ESTADO_COMPRA } from "../api/configuracion.js";
 import { agruparPorCategoria, calcularTotal } from "../logica/carrito.js";
 import { generarCronograma } from "../logica/cronograma.js";
 import { eventoVacio } from "../logica/evento.js";
@@ -13,6 +14,7 @@ import { estadoPresupuesto, evaluarCobertura } from "../logica/paquete.js";
 
 export default function Resumen({ sesion, evento, onActualizar, setAviso }) {
   const [cronograma, setCronograma] = useState([]);
+  const [ultimaCompra, setUltimaCompra] = useState(null);
   const total = calcularTotal(evento.detalles);
   const presupuesto = estadoPresupuesto(evento.presupuesto, total);
   const cobertura = evaluarCobertura(evento.detalles);
@@ -37,6 +39,26 @@ export default function Resumen({ sesion, evento, onActualizar, setAviso }) {
     };
   }, [sesion, evento]);
 
+  useEffect(() => {
+    if (!sesion?.access_token) return undefined;
+    let activo = true;
+    const cargar = () => {
+      listarMisCompras(sesion.access_token)
+        .then((lista) => {
+          if (activo) setUltimaCompra(lista[0] ?? null);
+        })
+        .catch(() => {
+          if (activo) setUltimaCompra(null);
+        });
+    };
+    cargar();
+    const cancelar = suscribirseCompras(cargar);
+    return () => {
+      activo = false;
+      cancelar();
+    };
+  }, [sesion?.access_token]);
+
   async function reiniciar() {
     try {
       await limpiarEvento(sesion);
@@ -51,7 +73,7 @@ export default function Resumen({ sesion, evento, onActualizar, setAviso }) {
       <header className="titulo-pagina">
         <div>
           <p className="etiqueta">Mi paquete</p>
-          <h1>Revisa tu evento antes de pagar.</h1>
+          <h1>Revisa tu evento antes de confirmar.</h1>
           <p>
             {evento.nombre || "Sin nombre"} · {evento.tipoEvento || "Tipo sin definir"} ·{" "}
             {evento.fecha || "Fecha sin definir"}
@@ -59,7 +81,7 @@ export default function Resumen({ sesion, evento, onActualizar, setAviso }) {
         </div>
         <div className="acciones-principales">
           <Link className="boton" to="/pago">
-            Simular compra <span aria-hidden="true">→</span>
+            Confirmar compra <span aria-hidden="true">→</span>
           </Link>
           <Link className="boton-texto" to="/catalogo">
             Ajustar servicios
@@ -72,6 +94,20 @@ export default function Resumen({ sesion, evento, onActualizar, setAviso }) {
           </button>
         </div>
       </header>
+
+      {ultimaCompra && (
+        <div className={`compra-estado estado-${ultimaCompra.estado}`}>
+          <span>Última compra · {ultimaCompra.referencia || ultimaCompra.id}</span>
+          <strong>{TEXTO_ESTADO_COMPRA[ultimaCompra.estado] ?? "Pendiente de aprobación"}</strong>
+          <small>
+            {ultimaCompra.estado === "aprobado"
+              ? "Tu paquete quedó confirmado."
+              : ultimaCompra.estado === "rechazado"
+                ? `Motivo: ${ultimaCompra.motivo || "Sin motivo indicado."}`
+                : "El administrador debe aprobarla para confirmar el paquete."}
+          </small>
+        </div>
+      )}
 
       <div className="resumen-metricas">
         <div className="metrica">

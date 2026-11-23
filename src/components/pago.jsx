@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
 import { cargarServicios } from "../api/catalogo.js";
-import { CATEGORIAS } from "../api/configuracion.js";
+import { crearCompra, listarMisCompras, suscribirseCompras } from "../api/compras.js";
+import { CATEGORIAS, TEXTO_ESTADO_COMPRA } from "../api/configuracion.js";
 import { agruparPorCategoria, calcularTotal } from "../logica/carrito.js";
 import { generarCronograma } from "../logica/cronograma.js";
 import { formatearMoneda } from "../logica/formato.js";
+import { MENSAJES } from "../logica/mensajes.js";
 import { formatearNumeroTarjeta, validarPago } from "../logica/pago.js";
 
 const FORMULARIO_VACIO = { titular: "", numero: "", vencimiento: "", cvv: "" };
@@ -19,7 +21,13 @@ function nombreCategoria(clave) {
   return CATEGORIAS.find((categoria) => categoria.id === clave)?.nombre ?? clave;
 }
 
-export default function Pago({ evento, onActualizar }) {
+function mensajeEstado(estado) {
+  if (estado === "aprobado") return "Compra aprobada. Tu paquete quedó confirmado.";
+  if (estado === "rechazado") return "La compra fue rechazada. Revisa el motivo.";
+  return "Compra enviada. Está esperando la aprobación del administrador.";
+}
+
+export default function Pago({ evento, onActualizar, sesion, setAviso }) {
   const [formulario, setFormulario] = useState(FORMULARIO_VACIO);
   const [errores, setErrores] = useState({});
   const [confirmado, setConfirmado] = useState(null);
@@ -29,14 +37,35 @@ export default function Pago({ evento, onActualizar }) {
   const grupos = agruparPorCategoria(evento.detalles);
   const cronograma = generarCronograma(evento.detalles, evento.horaInicio);
   const salon = cargarServicios().find((servicio) => servicio.id === evento.salonId);
-  const eventoConfirmado = confirmado?.evento ?? evento;
+  const eventoConfirmado = confirmado?.instancia?.evento ?? evento;
+  const detallesConfirmados = confirmado?.instancia?.detalles ?? evento.detalles;
+  const cronogramaConfirmado = confirmado?.instancia?.cronograma ?? cronograma;
+  const salonConfirmado = confirmado?.instancia?.salon ?? salon;
   const totalConfirmado = confirmado?.total ?? total;
+
+  useEffect(() => {
+    if (!confirmado?.id || !sesion?.access_token) return undefined;
+    return suscribirseCompras(() => {
+      listarMisCompras(sesion.access_token)
+        .then((lista) => {
+          const actual = lista.find((compra) => compra.id === confirmado.id);
+          if (actual) {
+            setConfirmado((anterior) =>
+              anterior && anterior.id === actual.id
+                ? { ...anterior, estado: actual.estado, motivo: actual.motivo, revisadoEn: actual.revisadoEn }
+                : anterior,
+            );
+          }
+        })
+        .catch(() => {});
+    });
+  }, [confirmado?.id, sesion?.access_token]);
 
   function cambiar(campo, valor) {
     setFormulario((actual) => ({ ...actual, [campo]: valor }));
   }
 
-  function confirmar(eventoFormulario) {
+  async function confirmar(eventoFormulario) {
     eventoFormulario.preventDefault();
     if (procesando || confirmado) return;
 
@@ -45,24 +74,51 @@ export default function Pago({ evento, onActualizar }) {
     if (!resultado.validos) return;
 
     setProcesando(true);
-    setConfirmado({
-      referencia: `LM-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`,
-      fecha: new Date().toLocaleString("es-MX", { dateStyle: "long", timeStyle: "short" }),
-      total,
-      evento: structuredClone(evento),
-    });
-    setFormulario(FORMULARIO_VACIO);
-    onActualizar(evento, "Compra simulada completada. No se realizó ningún cobro.", false);
-    setProcesando(false);
+    try {
+      const creada = await crearCompra(sesion.access_token, {
+        total,
+        ultimos4: formulario.numero.replace(/\D/g, "").slice(-4),
+        evento: {
+          nombre: evento.nombre,
+          tipoEvento: evento.tipoEvento,
+          fecha: evento.fecha,
+          invitados: evento.invitados,
+          horaInicio: evento.horaInicio,
+        },
+        salon: salon ? { id: salon.id, nombre: salon.nombre, direccion: salon.direccion } : null,
+        detalles: evento.detalles.map((item) => ({
+          id: item.id,
+          nombre: item.nombre,
+          categoria: item.categoria,
+          cantidad: item.cantidad,
+          precioUnitario: item.precioUnitario,
+        })),
+        cronograma: generarCronograma(evento.detalles, evento.horaInicio),
+      });
+
+      const fecha = new Date(creada.creadoEn || Date.now());
+      setConfirmado({
+        ...creada,
+        fecha: Number.isNaN(fecha.getTime())
+          ? new Date().toLocaleString("es-MX", { dateStyle: "long", timeStyle: "short" })
+          : fecha.toLocaleString("es-MX", { dateStyle: "long", timeStyle: "short" }),
+      });
+      setFormulario(FORMULARIO_VACIO);
+      onActualizar(evento, MENSAJES.compraEnviada, false);
+    } catch (error) {
+      setAviso(error?.message || MENSAJES.compraSinGuardar);
+    } finally {
+      setProcesando(false);
+    }
   }
 
   if (evento.detalles.length === 0) {
     return (
       <section className="pagina">
         <div className="vacio vacio-destacado">
-          <p className="etiqueta">Compra simulada</p>
+          <p className="etiqueta">Finalizar compra</p>
           <h1>Tu paquete todavía está vacío.</h1>
-          <p>Agrega un salón y algunos servicios antes de ver cómo quedaría el pago.</p>
+          <p>Agrega un salón y algunos servicios antes de confirmar la compra.</p>
           <Link className="boton" to="/salon">
             Elegir salón
           </Link>
@@ -75,34 +131,39 @@ export default function Pago({ evento, onActualizar }) {
     <section className="pagina pago-pagina">
       <header className="titulo-pagina">
         <div>
-          <p className="etiqueta">Compra simulada</p>
-          <h1>Así quedaría tu compra.</h1>
-          <p>Genera un comprobante de ejemplo. No se cobra nada ni se guardan datos bancarios.</p>
+          <p className="etiqueta">Finalizar compra</p>
+          <h1>Confirma tu paquete.</h1>
+          <p>Enviamos la compra al administrador para su aprobación. No guardamos datos bancarios.</p>
         </div>
       </header>
 
       {confirmado ? (
-        <section className="ticket" role="status" aria-live="polite">
+        <section className={`ticket ticket-compra estado-${confirmado.estado}`} role="status" aria-live="polite">
           <header className="ticket-cabecera">
             <div className="ticket-marca">
               <span className="marca-icono">L</span>
               <div>
                 <strong>Lumina Event</strong>
-                <small>Comprobante de simulación</small>
+                <small>Comprobante de compra</small>
               </div>
             </div>
             <div className="ticket-referencia">
               <small>Referencia</small>
-              <strong>{confirmado.referencia}</strong>
+              <strong>{confirmado.referencia || confirmado.id}</strong>
             </div>
           </header>
 
           <div className="ticket-confirmacion">
             <span className="ticket-check" aria-hidden="true">
-              ✓
+              {confirmado.estado === "aprobado" ? "✓" : confirmado.estado === "rechazado" ? "!" : "…"}
             </span>
             <div>
-              <h2>Listo, tu paquete quedó armado.</h2>
+              <div className="ticket-estado">
+                <h2>{mensajeEstado(confirmado.estado)}</h2>
+                <span className={`estado-compra estado-${confirmado.estado}`}>
+                  {TEXTO_ESTADO_COMPRA[confirmado.estado] ?? "Pendiente de aprobación"}
+                </span>
+              </div>
               <p>
                 {eventoConfirmado.tipoEvento || "Tu evento"} · {eventoConfirmado.fecha || "Fecha por definir"} ·{" "}
                 {eventoConfirmado.invitados || "—"} invitados
@@ -114,18 +175,18 @@ export default function Pago({ evento, onActualizar }) {
           <div className="ticket-cuerpo">
             <div>
               <p className="etiqueta">Ubicación</p>
-              <h3>{salon?.nombre || eventoConfirmado.nombre || "Salón por definir"}</h3>
-              <p>{salon?.direccion || "Sin dirección registrada."}</p>
+              <h3>{salonConfirmado?.nombre || eventoConfirmado.nombre || "Salón por definir"}</h3>
+              <p>{salonConfirmado?.direccion || "Sin dirección registrada."}</p>
             </div>
             <div>
               <p className="etiqueta">Servicios</p>
               <ul className="ticket-lista">
-                {eventoConfirmado.detalles.map((item) => (
+                {detallesConfirmados.map((item) => (
                   <li key={item.id}>
                     <span>
                       {item.nombre} <small>×{item.cantidad}</small>
                     </span>
-                    <strong>{formatearMoneda(item.precioUnitario * item.cantidad)}</strong>
+                    <strong>{formatearMoneda(Number(item.precioUnitario) * Number(item.cantidad))}</strong>
                   </li>
                 ))}
               </ul>
@@ -133,7 +194,7 @@ export default function Pago({ evento, onActualizar }) {
             <div>
               <p className="etiqueta">Primeros horarios</p>
               <ul className="ticket-horarios">
-                {cronograma.slice(0, 4).map((actividad) => (
+                {cronogramaConfirmado.slice(0, 4).map((actividad) => (
                   <li key={actividad.hora}>
                     <strong>{actividad.hora}</strong>
                     <span>{actividad.actividad}</span>
@@ -144,13 +205,20 @@ export default function Pago({ evento, onActualizar }) {
           </div>
 
           <footer className="ticket-pie">
-            <p>Comprobante generado el {confirmado.fecha}. Solo corresponde a una simulación.</p>
+            <p>
+              Compra registrada el {confirmado.fecha}.{" "}
+              {confirmado.estado === "aprobado"
+                ? "El administrador aprobó tu paquete y quedó confirmado."
+                : confirmado.estado === "rechazado"
+                  ? `Motivo: ${confirmado.motivo || "Sin motivo indicado."}`
+                  : "Tu paquete quedará confirmado cuando el administrador lo apruebe."}
+            </p>
             <div className="acciones-principales">
-              <Link className="boton" to="/">
-                Volver al inicio
+              <Link className="boton" to="/resumen">
+                Ver estado de mi compra
               </Link>
-              <Link className="boton boton-secundario" to="/resumen">
-                Ver resumen
+              <Link className="boton boton-secundario" to="/catalogo">
+                Seguir armando
               </Link>
             </div>
           </footer>
@@ -226,11 +294,11 @@ export default function Pago({ evento, onActualizar }) {
                 </span>
               </label>
             </div>
-            <button type="submit" className="boton boton-completo" disabled={procesando || Boolean(confirmado)}>
-              Generar comprobante
+            <button type="submit" className="boton boton-completo" disabled={procesando}>
+              {procesando ? "Enviando compra…" : "Confirmar compra"}
             </button>
             <p className="pago-nota">
-              Usa la tarjeta de prueba <strong>4242 4242 4242 4242</strong>. No guardamos estos datos.
+              Validación de prueba <strong>4242 4242 4242 4242</strong>. Solo se guarda la compra, nunca los datos de la tarjeta.
             </p>
           </form>
 
@@ -254,7 +322,7 @@ export default function Pago({ evento, onActualizar }) {
             </dl>
 
             <div className="total">
-              <span>Total a pagar</span>
+              <span>Total de la compra</span>
               <strong>{formatearMoneda(total)}</strong>
             </div>
 

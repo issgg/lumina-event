@@ -178,7 +178,7 @@ export default function App() {
           </>
         ) : (
           <>
-            <Route index element={<Inicio evento={evento} />} />
+            <Route index element={<Inicio evento={evento} sesion={sesion} />} />
             <Route
               path="catalogo"
               element={<Catalogo evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
@@ -197,7 +197,14 @@ export default function App() {
             />
             <Route
               path="pago"
-              element={<Pago evento={evento} onActualizar={actualizarEvento} />}
+              element={
+                <Pago
+                  evento={evento}
+                  onActualizar={actualizarEvento}
+                  sesion={sesion}
+                  setAviso={setAviso}
+                />
+              }
             />
             <Route path="administrar" element={<Navigate to="/" replace />} />
             <Route path="proveedor" element={<Navigate to="/" replace />} />
