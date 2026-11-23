@@ -8,6 +8,7 @@ import {
   motivoRechazoValido,
   validarDatosEvento,
   validarBusqueda,
+  validarRegistro,
 } from "../src/logica/validacion.js";
 import { filtrarServicios, normalizar } from "../src/logica/filtros.js";
 import { generarCronograma, aMinutos, formatearHora } from "../src/logica/cronograma.js";
@@ -180,4 +181,35 @@ test("rechazar un anuncio pide un motivo corto y no vacío", () => {
   assert.equal(motivoRechazoValido("   "), false);
   assert.equal(motivoRechazoValido(""), false);
   assert.equal(motivoRechazoValido("x".repeat(201)), false);
+});
+
+test("registro de organizador pide datos reales y contraseña coincidente", () => {
+  const base = {
+    nombre: "Ana Pérez",
+    correo: "ana@example.com",
+    telefono: "55 1234 5678",
+    clave: "clave123",
+    repetirClave: "clave123",
+    tipoEvento: "Boda",
+  };
+  assert.equal(validarRegistro("organizador", base), "");
+  assert.equal(validarRegistro("organizador", { ...base, tipoEvento: "" }), MENSAJES.registroTipoEvento);
+  assert.equal(validarRegistro("organizador", { ...base, telefono: "abc" }), MENSAJES.registroTelefono);
+  assert.equal(validarRegistro("organizador", { ...base, repetirClave: "otra123" }), MENSAJES.registroClaveDistinta);
+});
+
+test("registro de proveedor pide negocio y categoría", () => {
+  const base = {
+    nombre: "Luis Gómez",
+    correo: "luis@example.com",
+    telefono: "55 8765 4321",
+    clave: "clave123",
+    repetirClave: "clave123",
+    negocio: "Sonido Luna",
+    categoria: CATEGORIAS_PROVEEDOR[0].id,
+    descripcion: "Sonido e iluminación para eventos.",
+  };
+  assert.equal(validarRegistro("proveedor", base), "");
+  assert.equal(validarRegistro("proveedor", { ...base, negocio: "" }), MENSAJES.registroNegocio);
+  assert.equal(validarRegistro("proveedor", { ...base, categoria: "salones" }), MENSAJES.registroCategoria);
 });

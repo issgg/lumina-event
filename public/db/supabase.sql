@@ -2,14 +2,18 @@ create table if not exists usuarios (
   id integer primary key,
   nombre varchar(60) not null,
   correo varchar(120) not null unique,
-  tipo varchar(10) not null default 'usuario' check (tipo in ('usuario', 'admin'))
+  tipo varchar(10) not null default 'usuario' check (tipo in ('usuario', 'admin')),
+  telefono varchar(20),
+  tipo_evento varchar(40)
 );
 
 create table if not exists proveedores (
   id integer primary key,
   nombre varchar(80) not null,
   telefono varchar(20),
-  correo varchar(120)
+  correo varchar(120),
+  descripcion varchar(200),
+  categoria varchar(20)
 );
 
 create table if not exists categorias (

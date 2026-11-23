@@ -32,6 +32,8 @@ Aquí explico por qué tomé cada decisión. Está escrito en lenguaje sencillo 
 | 22/11 | Tabla `anuncios` con estados | Necesitábamos saber qué anuncio está pendiente, aprobado o rechazado | Supabase guarda el estado y el motivo; hay una migración SQL para proyectos ya creados |
 | 22/11 | Solo anuncios aprobados en el catálogo | No queremos mostrar ofertas sin revisar | El Inicio y el catálogo leen lo aprobado; el proveedor ve el estado y puede corregir rechazos |
 | 22/11 | Motivo obligatorio al rechazar | El proveedor debe saber qué corregir | El panel pide un motivo corto y el anuncio vuelve a `pendiente` al guardarse |
+| 22/11 | Registro sin confirmación de correo | Los correos son de prueba y no existen, así que esperar un correo no tenía sentido | La Edge Function crea al usuario con `email_confirm: true` y devuelve la sesión directo |
+| 22/11 | Registro con datos por rol | Solo correo y contraseña no describían bien al usuario | Organizador da nombre, teléfono y tipo de evento; proveedor da negocio, categoría y descripción |
 
 ## Qué respondería si me preguntan
  por una decisión
@@ -39,6 +41,7 @@ Aquí explico por qué tomé cada decisión. Está escrito en lenguaje sencillo 
 - **¿Por qué Supabase y no SQLite?** Porque el proyecto necesita guardar datos en la nube y funcionar desde el deploy.
 - **¿Qué rechacé de la IA?** La barra de progreso y la idea de juntar todo en pocas pantallas.
 - **¿Dónde se equivocó la IA?** Dejó `const total = total;` en el resumen. Lo detecté al revisar el archivo y lo corregí.
+- **¿Por qué no confirmar el correo?** Porque las cuentas son de demostración con correos inventados; esperar un correo real solo bloqueaba las pruebas.
 - **¿Por qué el proveedor no ve el armador?** Porque su trabajo es anunciar servicios, no elegir salón ni armar paquetes.
 - **¿Cómo aparecen los anuncios en el catálogo?** El proveedor los envía a la tabla `anuncios`; el administrador los aprueba y solo entonces se copian como servicios `extra-`.
 - **¿Por qué hay un administrador fijo?** Es una demo: así se puede probar la revisión sin depender de otro registro ni de permisos complejos.

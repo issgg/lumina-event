@@ -1,4 +1,34 @@
+import { CATEGORIAS_PROVEEDOR, TIPOS_EVENTO } from "../api/configuracion.js";
 import { MENSAJES } from "./mensajes.js";
+
+export function validarRegistro(rol, datos) {
+  const nombre = String(datos?.nombre ?? "").trim();
+  const correo = String(datos?.correo ?? "").trim().toLowerCase();
+  const telefono = String(datos?.telefono ?? "").trim();
+  const clave = String(datos?.clave ?? "");
+  const repetirClave = String(datos?.repetirClave ?? "");
+  const negocio = String(datos?.negocio ?? "").trim();
+  const categoria = String(datos?.categoria ?? "").trim();
+  const descripcion = String(datos?.descripcion ?? "").trim();
+  const tipoEvento = String(datos?.tipoEvento ?? "").trim();
+
+  if (rol !== "organizador" && rol !== "proveedor") return MENSAJES.registroRol;
+  if (!nombre || nombre.length > 60) return MENSAJES.registroNombre;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) return MENSAJES.registroCorreo;
+  if (!/^\d[\d\s()+-]{6,19}$/.test(telefono)) return MENSAJES.registroTelefono;
+  if (clave.length < 6) return MENSAJES.registroClave;
+  if (clave !== repetirClave) return MENSAJES.registroClaveDistinta;
+
+  if (rol === "proveedor") {
+    if (!negocio || negocio.length > 80) return MENSAJES.registroNegocio;
+    if (!CATEGORIAS_PROVEEDOR.some((item) => item.id === categoria)) return MENSAJES.registroCategoria;
+    if (descripcion.length > 200) return MENSAJES.registroDescripcion;
+    return "";
+  }
+
+  if (!TIPOS_EVENTO.includes(tipoEvento)) return MENSAJES.registroTipoEvento;
+  return "";
+}
 
 export function validarBusqueda(texto) {
   const limpio = String(texto ?? "").trim();

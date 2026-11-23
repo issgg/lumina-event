@@ -38,7 +38,7 @@ También ayuda a otra persona a ofrecer servicios y a un administrador a revisar
 
 | Archivo | Qué hace |
 |---|---|
-| `src/components/acceso.jsx` | Elige tipo de cuenta, inicia sesión o registra a la persona |
+| `src/components/acceso.jsx` | Elige tipo de cuenta, inicia sesión o registra con datos según organizador o proveedor |
 | `src/components/layout.jsx` | Muestra encabezado, menú según el rol, pie y botón para cambiar de tema |
 | `src/components/inicio.jsx` | Pantalla de bienvenida y accesos rápidos |
 | `src/components/armador.jsx` | Formulario de datos del evento y guardado del borrador |
@@ -97,7 +97,8 @@ En cada categoría:
 | `src/api/catalogo.js` | Trae catálogo y categorías desde Supabase |
 | `src/api/configuracion.js` | Roles, navegación por rol, categorías, tipos de evento y reglas del cronograma |
 | `src/api/red.js` | Corta la espera si una llamada tarda demasiado |
-| `supabase/functions/lumina-admin/index.ts` | Backend: valida admin, guarda anuncios, revisa solicitudes y sincroniza el catálogo |
+| `supabase/functions/lumina-admin/index.ts` | Backend: crea cuentas confirmadas, valida admin, guarda anuncios, revisa solicitudes y sincroniza el catálogo |
+| `public/db/migracion_registro.sql` | Agrega las columnas nuevas de teléfono, tipo de evento, negocio, categoría y descripción |
 
 Tablas: `usuarios`, `proveedores`, `categorias`, `salones`, `servicios`, `anuncios`, `eventos`, `detalle_evento`, `cronograma`.
 

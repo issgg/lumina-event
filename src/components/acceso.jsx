@@ -6,7 +6,9 @@ import {
   iniciarSesionCorreo,
   registrarseCorreo,
 } from "../api/autenticacion.js";
-import { ROLES_REGISTRO } from "../api/configuracion.js";
+import { CATEGORIAS_PROVEEDOR, ROLES_REGISTRO, TIPOS_EVENTO } from "../api/configuracion.js";
+import { MENSAJES } from "../logica/mensajes.js";
+import { validarRegistro } from "../logica/validacion.js";
 
 function errorGuardado() {
   try {
@@ -29,6 +31,15 @@ export default function Acceso({ onSesion }) {
   const [rol, setRol] = useState("organizador");
   const [correo, setCorreo] = useState("");
   const [clave, setClave] = useState("");
+  const [registro, setRegistro] = useState({
+    nombre: "",
+    telefono: "",
+    negocio: "",
+    categoria: "",
+    descripcion: "",
+    tipoEvento: "",
+    repetirClave: "",
+  });
   const [error, setError] = useState(errorGuardado);
   const [mensaje, setMensaje] = useState("");
   const [ocupado, setOcupado] = useState(false);
@@ -47,6 +58,10 @@ export default function Acceso({ onSesion }) {
     olvidarError();
   }
 
+  function cambiarRegistro(campo, valor) {
+    setRegistro((anterior) => ({ ...anterior, [campo]: valor }));
+  }
+
   async function enviar(evento) {
     evento.preventDefault();
     setError("");
@@ -54,8 +69,17 @@ export default function Acceso({ onSesion }) {
     olvidarError();
 
     if (clave.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres.");
+      setError(MENSAJES.registroClave);
       return;
+    }
+
+    const datosRegistro = { ...registro, correo, clave };
+    if (modo === "registrar") {
+      const problema = validarRegistro(rol, datosRegistro);
+      if (problema) {
+        setError(problema);
+        return;
+      }
     }
 
     setOcupado(true);
@@ -71,13 +95,9 @@ export default function Acceso({ onSesion }) {
           }
         }
       } else {
-        const resultado = await registrarseCorreo(correo, clave, rol);
-        if (resultado.sesion) {
-          onSesion(resultado.sesion);
-        } else {
-          setMensaje("Cuenta creada. Revisa tu correo para confirmarla y vuelve a entrar.");
-          setModo("entrar");
-        }
+        const resultado = await registrarseCorreo(datosRegistro, rol);
+        setMensaje(MENSAJES.registroCreado);
+        onSesion(resultado.sesion);
       }
     } catch (fallo) {
       setError(fallo.message || "No se pudo completar la acción.");
@@ -228,6 +248,102 @@ export default function Acceso({ onSesion }) {
                 required
               />
             </label>
+
+            {modo === "registrar" && (
+              <>
+                <label>
+                  Nombre completo
+                  <input
+                    type="text"
+                    autoComplete="name"
+                    value={registro.nombre}
+                    onChange={(evento) => cambiarRegistro("nombre", evento.target.value)}
+                    placeholder="Tu nombre y apellido"
+                    maxLength={60}
+                    required
+                  />
+                </label>
+                <label>
+                  Teléfono
+                  <input
+                    type="tel"
+                    autoComplete="tel"
+                    value={registro.telefono}
+                    onChange={(evento) => cambiarRegistro("telefono", evento.target.value)}
+                    placeholder="55 1234 5678"
+                    required
+                  />
+                </label>
+                {esProveedor ? (
+                  <>
+                    <label>
+                      Nombre del negocio
+                      <input
+                        type="text"
+                        value={registro.negocio}
+                        onChange={(evento) => cambiarRegistro("negocio", evento.target.value)}
+                        placeholder="Tu marca o negocio"
+                        maxLength={80}
+                        required
+                      />
+                    </label>
+                    <label>
+                      Categoría principal
+                      <select
+                        value={registro.categoria}
+                        onChange={(evento) => cambiarRegistro("categoria", evento.target.value)}
+                        required
+                      >
+                        <option value="">Elige una categoría</option>
+                        {CATEGORIAS_PROVEEDOR.map((categoria) => (
+                          <option key={categoria.id} value={categoria.id}>
+                            {categoria.nombre}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label>
+                      Describe lo que ofreces
+                      <textarea
+                        value={registro.descripcion}
+                        onChange={(evento) => cambiarRegistro("descripcion", evento.target.value)}
+                        placeholder="Una frase corta sobre tus servicios"
+                        maxLength={200}
+                        rows={3}
+                      />
+                    </label>
+                  </>
+                ) : (
+                  <label>
+                    Tipo de evento que planeas
+                    <select
+                      value={registro.tipoEvento}
+                      onChange={(evento) => cambiarRegistro("tipoEvento", evento.target.value)}
+                      required
+                    >
+                      <option value="">Elige un tipo de evento</option>
+                      {TIPOS_EVENTO.map((tipo) => (
+                        <option key={tipo} value={tipo}>
+                          {tipo}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
+                <label>
+                  Repite tu contraseña
+                  <input
+                    type="password"
+                    autoComplete="new-password"
+                    value={registro.repetirClave}
+                    onChange={(evento) => cambiarRegistro("repetirClave", evento.target.value)}
+                    placeholder="Otra vez tu contraseña"
+                    minLength={6}
+                    required
+                  />
+                </label>
+              </>
+            )}
 
             {error && <p className="error-acceso">{error}</p>}
             {mensaje && <p className="mensaje-acceso">{mensaje}</p>}

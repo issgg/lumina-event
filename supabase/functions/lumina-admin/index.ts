@@ -32,6 +32,15 @@ const CATEGORIAS = [
   "seguridad",
 ];
 const ESTADOS = ["pendiente", "aprobado", "rechazado"];
+const CATEGORIAS_PROVEEDOR = CATEGORIAS.filter((categoria) => categoria !== "salones");
+const TIPOS_EVENTO = [
+  "XV años",
+  "Boda",
+  "Cumpleaños",
+  "Graduación",
+  "Evento empresarial",
+  "Aniversario",
+];
 const IMAGENES: Record<string, string> = {
   musica: "musica",
   comida: "comida",
@@ -246,6 +255,173 @@ async function leerCuerpo(req: Request) {
   }
 }
 
+function datosRegistro(cuerpo: Record<string, unknown>) {
+  const rol = texto(cuerpo.rol);
+  const nombre = texto(cuerpo.nombre);
+  const correo = texto(cuerpo.correo).toLowerCase();
+  const telefono = texto(cuerpo.telefono);
+  const clave = String(cuerpo.clave ?? "");
+  const repetirClave = String(cuerpo.repetirClave ?? "");
+  const negocio = texto(cuerpo.negocio);
+  const categoria = texto(cuerpo.categoria);
+  const descripcion = texto(cuerpo.descripcion).slice(0, 200);
+  const tipoEvento = texto(cuerpo.tipoEvento);
+
+  if (rol !== "organizador" && rol !== "proveedor") throw new Error("Elige un tipo de cuenta.");
+  if (!nombre || nombre.length > 60) throw new Error("Escribe tu nombre, máximo 60 caracteres.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) throw new Error("Escribe un correo válido.");
+  if (!/^\d[\d\s()+-]{6,19}$/.test(telefono)) throw new Error("Escribe un teléfono válido.");
+  if (clave.length < 6) throw new Error("La contraseña debe tener al menos 6 caracteres.");
+  if (clave !== repetirClave) throw new Error("Las contraseñas no coinciden.");
+
+  if (rol === "proveedor") {
+    if (!negocio || negocio.length > 80) throw new Error("Escribe el nombre de tu negocio.");
+    if (!CATEGORIAS_PROVEEDOR.includes(categoria)) throw new Error("Elige una categoría válida.");
+  } else {
+    if (!TIPOS_EVENTO.includes(tipoEvento)) throw new Error("Elige el tipo de evento que planeas.");
+  }
+
+  return {
+    rol,
+    nombre,
+    correo,
+    telefono,
+    clave,
+    negocio,
+    categoria,
+    descripcion,
+    tipoEvento,
+  };
+}
+
+async function siguienteId(tabla: string) {
+  const filas = await rest(tabla);
+  return Math.max(1000, ...filas.map((fila) => Number(fila.id) || 0)) + 1;
+}
+
+async function crearUsuarioAuth(datos: ReturnType<typeof datosRegistro>) {
+  const clave = claveServicio();
+  const respuesta = await fetch(`${urlBase()}/auth/v1/admin/users`, {
+    method: "POST",
+    headers: {
+      apikey: clave,
+      Authorization: `Bearer ${clave}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: datos.correo,
+      password: datos.clave,
+      email_confirm: true,
+      user_metadata: {
+        rol: datos.rol,
+        nombre: datos.nombre,
+        telefono: datos.telefono,
+        negocio: datos.negocio,
+        categoria: datos.categoria,
+        descripcion: datos.descripcion,
+        tipo_evento: datos.tipoEvento,
+      },
+    }),
+  });
+
+  const contenido = await respuesta.text();
+  let datosRespuesta: Record<string, unknown> | null = null;
+  try {
+    datosRespuesta = contenido ? (JSON.parse(contenido) as Record<string, unknown>) : null;
+  } catch {
+    datosRespuesta = null;
+  }
+
+  if (!respuesta.ok) {
+    const mensaje = String(datosRespuesta?.msg ?? datosRespuesta?.message ?? "");
+    if (respuesta.status === 422 || mensaje.toLowerCase().includes("registered")) {
+      throw new Error("Ya existe una cuenta con ese correo.");
+    }
+    throw new Error(mensaje || "No se pudo crear la cuenta.");
+  }
+  return datosRespuesta ?? {};
+}
+
+async function borrarUsuarioAuth(id: string) {
+  const clave = claveServicio();
+  await fetch(`${urlBase()}/auth/v1/admin/users/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    headers: { apikey: clave, Authorization: `Bearer ${clave}` },
+  });
+}
+
+async function iniciarSesionPassword(correo: string, clave: string) {
+  const respuesta = await fetch(`${urlBase()}/auth/v1/token?grant_type=password`, {
+    method: "POST",
+    headers: { apikey: clavePublica(), "Content-Type": "application/json" },
+    body: JSON.stringify({ email: correo, password: clave }),
+  });
+  const contenido = await respuesta.text();
+  let datos: Record<string, unknown> = {};
+  try {
+    datos = contenido ? (JSON.parse(contenido) as Record<string, unknown>) : {};
+  } catch {
+    datos = {};
+  }
+  if (!respuesta.ok) throw new Error("La cuenta se creó, pero no se pudo iniciar sesión. Intenta entrar.");
+  return datos;
+}
+
+async function registrarCuenta(cuerpo: Record<string, unknown>) {
+  const datos = datosRegistro(cuerpo);
+  const existentes = await rest("usuarios", { filtros: { correo: `eq.${datos.correo}` } });
+  if (existentes.length) throw new Error("Ya existe una cuenta con ese correo.");
+
+  let creado: Record<string, unknown> | null = null;
+  try {
+    creado = await crearUsuarioAuth(datos);
+    await rest("usuarios", {
+      metodo: "POST",
+      cuerpo: [
+        {
+          id: await siguienteId("usuarios"),
+          nombre: datos.nombre,
+          correo: datos.correo,
+          tipo: "usuario",
+          telefono: datos.telefono,
+          tipo_evento: datos.rol === "organizador" ? datos.tipoEvento : null,
+        },
+      ],
+      prefer: "return=representation",
+    });
+
+    if (datos.rol === "proveedor") {
+      await rest("proveedores", {
+        metodo: "POST",
+        cuerpo: [
+          {
+            id: await siguienteId("proveedores"),
+            nombre: datos.negocio,
+            telefono: datos.telefono,
+            correo: datos.correo,
+            descripcion: datos.descripcion,
+            categoria: datos.categoria,
+          },
+        ],
+        prefer: "return=representation",
+      });
+    }
+
+    const sesion = await iniciarSesionPassword(datos.correo, datos.clave);
+    return {
+      access_token: sesion.access_token,
+      refresh_token: sesion.refresh_token,
+      expires_at: sesion.expires_at,
+      expires_in: sesion.expires_in,
+      user: sesion.user ?? creado,
+      rol: datos.rol,
+    };
+  } catch (error) {
+    if (creado?.id) await borrarUsuarioAuth(String(creado.id)).catch(() => {});
+    throw error;
+  }
+}
+
 function rutaDe(req: Request) {
   const partes = new URL(req.url).pathname.split("/");
   const indice = partes.indexOf("lumina-admin");
@@ -406,6 +582,15 @@ async function manejar(req: Request) {
       correo: correoEsperado,
       expires_at: Math.floor(Date.now() / 1000) + 60 * 60,
     });
+  }
+
+  if (ruta === "/registro" && metodo === "POST") {
+    try {
+      return json(await registrarCuenta(cuerpo));
+    } catch (error) {
+      const mensaje = error instanceof Error ? error.message : "No se pudo crear la cuenta.";
+      return json({ error: mensaje }, 400);
+    }
   }
 
   if (ruta.startsWith("/admin/") && !(await adminDe(req))) {

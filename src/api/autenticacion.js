@@ -1,4 +1,4 @@
-import { entrarAdminBackend, PREFIJO_TOKEN_ADMIN } from "./backendAdmin.js";
+import { entrarAdminBackend, PREFIJO_TOKEN_ADMIN, registrarBackend } from "./backendAdmin.js";
 import { rolValido } from "./configuracion.js";
 import { solicitarConTiempo } from "./red.js";
 
@@ -178,14 +178,11 @@ export async function iniciarSesionCorreo(correo, clave, rolElegido) {
   return sesion;
 }
 
-export async function registrarseCorreo(correo, clave, rolElegido) {
+export async function registrarseCorreo(datosRegistro, rolElegido) {
   const rol = rolValido(rolElegido);
-  const datos = await solicitarAuth("/signup", {
-    metodo: "POST",
-    cuerpo: { email: correo.trim(), password: clave, data: { rol } },
-  });
-  if (datos?.access_token) return { sesion: guardarSesion(datos, rol), pendiente: false };
-  return { sesion: null, pendiente: true };
+  const datos = await registrarBackend({ ...datosRegistro, rol });
+  if (!datos?.access_token) throw new Error("No se pudo crear la sesión. Intenta entrar.");
+  return { sesion: guardarSesion(datos, rol), pendiente: false };
 }
 
 export function iniciarConGoogle(rolElegido) {

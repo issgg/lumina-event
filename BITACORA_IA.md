@@ -23,6 +23,8 @@ Aquí anoto cuándo usé la IA, qué pedí y qué revisé yo después.
 | 22/11 | Estados de anuncio | Guardar aprobación o rechazo en Supabase | Propuso la tabla `anuncios` con `pendiente`, `aprobado` y `rechazado` | Revisé la migración SQL, las políticas y que solo lo aprobado se copie al catálogo |
 | 22/11 | Panel de revisión | Necesitar una pantalla clara para decidir | Propuso filtros, motivo de rechazo y botones de aprobar/rechazar | Revisé que el motivo sea obligatorio y que el proveedor pueda corregir y reenviar |
 | 22/11 | Pruebas y docs | Cerrar la entrega con tres roles | Amplió pruebas a 17 y actualizó guion, mapa y modelo | Corrí diff, pruebas, build y confirmé los assets del deploy |
+| 22/11 | Registro sin correo | Quitar la confirmación porque los correos son inventados | Propuso crear usuarios desde Supabase Auth con `email_confirm: true` desde la Edge Function | Verifiqué que no haya mensaje de confirmación y que la sesión se devuelva lista |
+| 22/11 | Registro más completo | Pedir más datos que correo y contraseña para ambos roles | Propuso campos por rol y validación compartida entre frontend y backend | Corrí pruebas y build; dejé una migración SQL para las columnas nuevas |
 
 ## Cosas que la IA propuso y yo rechacé
 
@@ -34,6 +36,7 @@ Aquí anoto cuándo usé la IA, qué pedí y qué revisé yo después.
 - **Administrador en el registro:** no lo acepté. El registro deja solo organizador y proveedor; el administrador valida sus credenciales en una Edge Function.
 - **Todo en el frontend:** no lo acepté. El usuario pidió backend, así que los secretos y las escrituras privadas pasaron a `lumina-admin`.
 - **Publicar anuncios sin revisión:** no lo acepté. Ahora pasan por `pendiente`, y solo los aprobados llegan al catálogo.
+- **Pedir confirmación de correo:** lo quité. Los correos son de prueba y no hay buzón real que revisar.
 
 ## Cómo revisé el trabajo de la IA
 

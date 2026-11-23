@@ -23,7 +23,7 @@ Mostrar en `README.md` los enlaces de entrega y la estructura de carpetas.
 
 Abrir `/#/acceso`.
 
-> "Primero se elige el tipo de cuenta. El organizador arma su evento y el proveedor anuncia servicios. La sesión se guarda, recuerda ese rol y se renueva sola. El acceso con Google queda pendiente porque falta el secreto en Supabase, pero el botón avisa en vez de romperse."
+> "Primero se elige el tipo de cuenta. El registro ya no espera un correo de confirmación: la Edge Function crea la cuenta confirmada y guarda nombre, teléfono y datos del rol. El organizador elige qué evento planea; el proveedor agrega negocio, categoría y descripción. La sesión se guarda, recuerda ese rol y se renueva sola. El acceso con Google queda pendiente porque falta el secreto en Supabase, pero el botón avisa en vez de romperse."
 
 ## 4. Proveedor (35 segundos)
 

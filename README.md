@@ -77,14 +77,17 @@ Para desplegarla:
 1. Instalar Supabase CLI e iniciar sesión con `supabase login`.
 2. Desde la raíz del repo, ejecutar `supabase link --project-ref dakdafqbgliyuqnqaduf`.
 3. Definir los secretos con `supabase secrets set ADMIN_CORREO=... ADMIN_CLAVE=...`, usando el correo y la contraseña privados del administrador.
-4. Ejecutar `supabase functions deploy lumina-admin`.
-5. Confirmar en **Edge Functions → Logs** que la función responde.
+4. Ejecutar en **SQL Editor** el archivo `public/db/migracion_registro.sql` para agregar los campos del registro.
+5. Ejecutar `supabase functions deploy lumina-admin`.
+6. Confirmar en **Edge Functions → Logs** que la función responde.
 
 `supabase/config.toml` deja `verify_jwt = false` porque la función valida por ella misma: token firmado para administrador y token de Supabase Auth para proveedor.
 
 ## Inicio de sesión
 
-La pantalla de acceso permite entrar o registrarse con correo y contraseña usando Supabase Auth. Antes de entrar se elige el tipo de cuenta: **Armar mi evento** o **Anunciar servicios**. La sesión se guarda en `localStorage`, conserva ese rol y se renueva sola cuando todavía hay un `refresh_token`. El administrador no aparece en el registro ni tiene un botón visible: entra escribiendo sus credenciales privadas en el formulario normal y la Edge Function las valida.
+La pantalla de acceso permite entrar o registrarse con correo y contraseña. Antes de entrar se elige el tipo de cuenta: **Armar mi evento** u **Anunciar servicios**. El registro ya no pide confirmar el correo: la Edge Function crea al usuario en Supabase Auth con `email_confirm: true`, guarda sus datos en `usuarios` y, si es proveedor, en `proveedores`, y devuelve la sesión lista para usar.
+
+El registro pide nombre, teléfono, correo, contraseña y repetir contraseña. El organizador elige además el tipo de evento que planea; el proveedor agrega nombre del negocio, categoría principal y una descripción corta. La sesión se guarda en `localStorage`, conserva ese rol y se renueva sola cuando todavía hay un `refresh_token`. El administrador no aparece en el registro ni tiene un botón visible: entra escribiendo sus credenciales privadas en el formulario normal y la Edge Function las valida.
 
 Los anuncios del proveedor se guardan en la tabla `anuncios` de Supabase con estado `pendiente`, `aprobado` o `rechazado`. El proveedor llama a la función con su token de Supabase; el administrador llama con su token firmado. El administrador ve los pendientes en `/#/admin`; si rechaza, escribe un motivo y el proveedor puede corregir y reenviar. Solo los aprobados se copian al catálogo como servicios `extra-`; por eso aparecen en el Inicio y en las categorías. Esa copia la hace la función, no el navegador. El proveedor no publica salones porque esos tienen dirección y capacidad aparte.
 

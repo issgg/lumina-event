@@ -2,7 +2,7 @@
 
 Última revisión: **22/11/2026**.
 
-Pruebas automáticas: **17/17 aprobadas** con:
+Pruebas automáticas: **19/19 aprobadas** con:
 
 ```bash
 npm test
@@ -42,10 +42,12 @@ Los casos de abajo están revisados en código y en la lógica. Se pueden volver
 | 22 | Extras manuales y anuncios | Agregar un servicio en `/#/administrar` con un anuncio aprobado | El servicio manual y el anuncio aprobado siguen en el catálogo | OK |
 | 23 | Falta la tabla `anuncios` | Abrir la app con Supabase sin correr la migración | La app abre igual; el panel de revisión muestra un aviso sobre la función y la tabla | OK |
 | 24 | Falta la Edge Function | Abrir `/#/admin` con la función `lumina-admin` sin desplegar | Aparece el aviso del panel y no se muestran credenciales ni botones admin en el login | OK |
+| 25 | Registro sin confirmación | Crear una cuenta con un correo de prueba en `/#/acceso` | Entra directo, sin pantalla de “revisa tu correo” ni correo enviado | OK |
+| 26 | Registro por rol | Crear organizador y proveedor con teléfono y campos propios | Organizador pide tipo de evento; proveedor pide negocio, categoría y descripción; ambos guardan los datos | OK |
 
 ## Pruebas automáticas incluidas
 
-En `tests/logica.test.js` hay 17 pruebas:
+En `tests/logica.test.js` hay 19 pruebas:
 
 1. No agrega el mismo servicio dos veces.
 2. `cambiarCantidad` no baja de 1.
@@ -64,6 +66,8 @@ En `tests/logica.test.js` hay 17 pruebas:
 15. Solo los estados conocidos son válidos para un anuncio.
 16. Solo un anuncio aprobado puede mostrarse en el catálogo.
 17. Rechazar un anuncio pide un motivo corto y no vacío.
+18. El registro de organizador pide datos reales y contraseña coincidente.
+19. El registro de proveedor pide negocio y categoría.
 
 ## Tarjeta de ejemplo para el pago
 

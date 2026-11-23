@@ -38,6 +38,10 @@ export function entrarAdminBackend(correo, clave) {
   return solicitar("/admin/login", { metodo: "POST", cuerpo: { correo, clave } });
 }
 
+export function registrarBackend(datos) {
+  return solicitar("/registro", { metodo: "POST", cuerpo: datos });
+}
+
 export function listarAnunciosBackend(tokenAdmin) {
   return solicitar("/admin/anuncios", { tokenAdmin });
 }
