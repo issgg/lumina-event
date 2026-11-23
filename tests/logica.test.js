@@ -17,7 +17,7 @@ import { generarCronograma, aMinutos, formatearHora } from "../src/logica/cronog
 import { seleccionarSalon, evaluarCobertura, estadoPresupuesto } from "../src/logica/paquete.js";
 import { validarPago, formatearNumeroTarjeta } from "../src/logica/pago.js";
 import { MENSAJES } from "../src/logica/mensajes.js";
-import { CATEGORIAS_PROVEEDOR, NAVEGACION_ADMIN, NAVEGACION_PROVEEDOR, ROLES_REGISTRO, RUTA_ACCION_POR_ROL, RUTA_POR_ROL, TEXTO_ESTADO_COMPRA, rolValido } from "../src/api/configuracion.js";
+import { CATEGORIAS_PROVEEDOR, NAVEGACION_ADMIN, NAVEGACION_PROVEEDOR, ROLES_REGISTRO, RUTA_ACCION_POR_ROL, RUTA_POR_ROL, TEXTO_ESTADO_COMPRA, galeriaDe, rolValido } from "../src/api/configuracion.js";
 
 const servicio = { id: "dj", nombre: "DJ", categoria: "musica", precio: 8000 };
 
@@ -225,4 +225,162 @@ test("registro de proveedor pide negocio y categoría", () => {
   assert.equal(validarRegistro("proveedor", base), "");
   assert.equal(validarRegistro("proveedor", { ...base, negocio: "" }), MENSAJES.registroNegocio);
   assert.equal(validarRegistro("proveedor", { ...base, categoria: "salones" }), MENSAJES.registroCategoria);
+});
+
+test("la galería usa la foto principal y completa las ocho de la categoría", () => {
+  const fotos = galeriaDe({ categoria: "musica", imagen: "assets/fotos/musica-3.jpg" });
+  assert.equal(fotos.length, 8);
+  assert.equal(fotos[0], "assets/fotos/musica-3.jpg");
+  assert.equal(new Set(fotos).size, 8);
+  assert.ok(fotos.every((foto) => foto.startsWith("assets/fotos/musica-")));
+});
+
+test("la galería cae a fotos de categoría cuando la imagen es un svg", () => {
+  const fotos = galeriaDe({ categoria: "comida", imagen: "assets/img/comida.svg" });
+  assert.equal(fotos[0], "assets/fotos/comida-1.jpg");
+  assert.equal(fotos.length, 8);
+});
+
+test("un precio inválido no contamina el total del paquete", () => {
+  const { detalles } = agregarServicio([], { ...servicio, precio: "abc" });
+  assert.equal(detalles[0].precioUnitario, 0);
+  assert.equal(calcularTotal(detalles), 0);
+});
+
+test("quitar un servicio elimina todas sus apariciones", () => {
+  const detalles = [
+    { ...servicio, id: "dj" },
+    { ...servicio, id: "dj" },
+    { ...servicio, id: "comida" },
+  ];
+  assert.deepEqual(quitarServicio(detalles, "dj"), [detalles[2]]);
+});
+
+test("un delta inválido no cambia la cantidad", () => {
+  const detalles = [{ ...servicio, cantidad: 3 }];
+  const resultado = cambiarCantidad(detalles, "dj", Number("nope"));
+  assert.equal(resultado[0].cantidad, 3);
+});
+
+test("calcularTotal ignora registros inválidos sin perder los válidos", () => {
+  const total = calcularTotal([
+    { precioUnitario: 100, cantidad: 2 },
+    { precioUnitario: "x", cantidad: 1 },
+    { precioUnitario: 50, cantidad: "y" },
+  ]);
+  assert.equal(total, 200);
+});
+
+test("agrupar por categoría redondea y tolera valores inválidos", () => {
+  const grupos = agruparPorCategoria([
+    { categoria: "musica", precioUnitario: 10.125, cantidad: 2 },
+    { categoria: "musica", precioUnitario: "x", cantidad: 1 },
+  ]);
+  assert.equal(grupos.length, 1);
+  assert.equal(grupos[0].subtotal, 20.25);
+  assert.equal(grupos[0].cantidad, 3);
+});
+
+test("normalizar elimina acentos y mayúsculas", () => {
+  assert.equal(normalizar("Música Ébano Ágil"), "musica ebano agil");
+});
+
+test("la búsqueda encuentra servicios por descripción y proveedor", () => {
+  const servicios = [
+    { categoria: "musica", nombre: "DJ Luna", descripcion: "Sonido en vivo", proveedor: "Luna" },
+    { categoria: "musica", nombre: "Banda Pop", descripcion: "Pop", proveedor: "Sol" },
+  ];
+  const encontrados = filtrarServicios(servicios, "musica", "sonido");
+  assert.equal(encontrados.length, 1);
+  assert.equal(encontrados[0].nombre, "DJ Luna");
+});
+
+test("una búsqueda demasiado larga no encuentra coincidencias accidentales", () => {
+  const servicios = [{ categoria: "musica", nombre: "z", descripcion: "", proveedor: "" }];
+  const busqueda = `${"x".repeat(60)}z`;
+  assert.equal(filtrarServicios(servicios, "musica", busqueda).length, 0);
+});
+
+test("aMinutos devuelve cero para una hora inválida", () => {
+  assert.equal(aMinutos("abc"), 0);
+  assert.equal(aMinutos("12:30"), 750);
+});
+
+test("formatearHora envuelve minutos negativos y mayores a un día", () => {
+  assert.equal(formatearHora(-30), "23:30");
+  assert.equal(formatearHora(1500), "01:00");
+});
+
+test("generarCronograma sin servicios conserva las reglas generales", () => {
+  const cronograma = generarCronograma();
+  assert.equal(cronograma.length, 2);
+  assert.ok(cronograma.some((item) => item.actividad === "Inicio del evento"));
+  assert.ok(cronograma.some((item) => item.actividad === "Cierre y desmontaje"));
+});
+
+test("seleccionar un salón inválido no modifica los detalles", () => {
+  const detalles = [{ ...servicio, id: "dj" }];
+  assert.equal(seleccionarSalon(detalles, {}), detalles);
+});
+
+test("la cobertura ignora categorías duplicadas", () => {
+  const cobertura = evaluarCobertura([
+    { categoria: "salones" },
+    { categoria: "salones" },
+    { categoria: "comida" },
+  ]);
+  assert.equal(cobertura.find((item) => item.categoria === "salones").completo, true);
+  assert.equal(cobertura.find((item) => item.categoria === "musica").completo, false);
+  assert.equal(cobertura.length, 6);
+});
+
+test("un total inválido se trata como cero al comparar presupuesto", () => {
+  assert.deepEqual(estadoPresupuesto(1000, "abc"), { estado: "dentro", diferencia: 1000 });
+});
+
+test("un presupuesto exacto queda dentro sin diferencia", () => {
+  assert.deepEqual(estadoPresupuesto(1000, 1000), { estado: "dentro", diferencia: 0 });
+});
+
+test("el registro de proveedor rechaza descripciones largas", () => {
+  const base = {
+    nombre: "Luis Gómez",
+    correo: "luis@example.com",
+    telefono: "55 8765 4321",
+    clave: "clave123",
+    repetirClave: "clave123",
+    negocio: "Sonido Luna",
+    categoria: CATEGORIAS_PROVEEDOR[0].id,
+    descripcion: "x".repeat(201),
+  };
+  assert.equal(validarRegistro("proveedor", base), MENSAJES.registroDescripcion);
+});
+
+test("los datos del evento marcan fecha pasada y hora inválida a la vez", () => {
+  const ayer = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const resultado = validarDatosEvento(
+    { nombre: "Boda", tipoEvento: "Boda", fecha: ayer, invitados: "50", presupuesto: "10000", horaInicio: "25:00" },
+    ["Boda"],
+  );
+  assert.equal(resultado.errores.fecha, MENSAJES.fechaPasada);
+  assert.equal(resultado.errores.horaInicio, MENSAJES.horaInvalida);
+});
+
+test("formatearNumeroTarjeta elimina letras y limita a 16 dígitos", () => {
+  assert.equal(
+    formatearNumeroTarjeta("ab12 34-56cd78901234567890"),
+    "1234 5678 9012 3456",
+  );
+});
+
+test("validarPago sin datos devuelve errores sin lanzar", () => {
+  const resultado = validarPago();
+  assert.equal(resultado.validos, false);
+  assert.equal(Object.keys(resultado.errores).length, 4);
+});
+
+test("la galería acepta rutas que empiezan con slash", () => {
+  const fotos = galeriaDe({ categoria: "decoracion", imagen: "/assets/fotos/decoracion-5.jpg" });
+  assert.equal(fotos[0], "assets/fotos/decoracion-5.jpg");
+  assert.equal(fotos.length, 8);
 });

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Navigate, Route, Routes, useNavigate } from "react-router";
+import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router";
+import { AnimatePresence, motion } from "framer-motion";
 
 import { inicializarBase, guardarEvento, leerEvento } from "./api/baseDatos.js";
 import {
@@ -11,6 +12,8 @@ import {
 import { RUTA_ACCION_POR_ROL, RUTA_POR_ROL } from "./api/configuracion.js";
 import { eventoVacio } from "./logica/evento.js";
 import { MENSAJES } from "./logica/mensajes.js";
+import { capaRuta } from "./movimiento.js";
+import { useDesplazamientoSuave } from "./hooks/useCinematico.js";
 import Acceso from "./components/acceso.jsx";
 import Layout from "./components/layout.jsx";
 import Inicio from "./components/inicio.jsx";
@@ -28,6 +31,8 @@ import "./App.css";
 
 export default function App() {
   const navegar = useNavigate();
+  const ubicacion = useLocation();
+  useDesplazamientoSuave();
   const [sesion, setSesion] = useState(null);
   const [verificandoSesion, setVerificandoSesion] = useState(true);
   const [listo, setListo] = useState(false);
@@ -147,73 +152,78 @@ export default function App() {
   const esAdmin = sesion?.rol === "admin";
   const esProveedor = sesion?.rol === "proveedor";
 
+  const claveRuta = ubicacion.pathname;
+
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <Layout
-            aviso={aviso}
-            sesion={sesion}
-            onCerrarSesion={salir}
-            onCambiarRol={cambiarRol}
-          />
-        }
-      >
-        {esAdmin ? (
-          <>
-            <Route index element={<Navigate to="/admin" replace />} />
-            <Route path="admin" element={<Aprobaciones token={sesion.access_token} setAviso={setAviso} />} />
-            <Route path="compras" element={<Compras token={sesion.access_token} setAviso={setAviso} />} />
-            <Route path="administrar" element={<Administrar token={sesion.access_token} setAviso={setAviso} />} />
-            <Route path="*" element={<Navigate to="/admin" replace />} />
-          </>
-        ) : esProveedor ? (
-          <>
-            <Route index element={<Navigate to="/proveedor" replace />} />
-            <Route path="proveedor" element={<Proveedor sesion={sesion} setAviso={setAviso} />} />
-            <Route
-              path="proveedor/anunciar"
-              element={<Proveedor sesion={sesion} setAviso={setAviso} formularioAbierto />}
-            />
-            <Route path="*" element={<Navigate to="/proveedor" replace />} />
-          </>
-        ) : (
-          <>
-            <Route index element={<Inicio evento={evento} sesion={sesion} />} />
-            <Route
-              path="catalogo"
-              element={<Catalogo evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
-            />
-            <Route
-              path="armador"
-              element={<Armador evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
-            />
-            <Route
-              path="salon"
-              element={<Salon evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
-            />
-            <Route
-              path="resumen"
-              element={<Resumen sesion={sesion} evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
-            />
-            <Route
-              path="pago"
-              element={
-                <Pago
-                  evento={evento}
-                  onActualizar={actualizarEvento}
-                  sesion={sesion}
-                  setAviso={setAviso}
-                />
-              }
-            />
-            <Route path="administrar" element={<Navigate to="/" replace />} />
-            <Route path="proveedor" element={<Navigate to="/" replace />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </>
-        )}
-      </Route>
-    </Routes>
+    <Layout aviso={aviso} sesion={sesion} onCerrarSesion={salir} onCambiarRol={cambiarRol}>
+      <div className="ruta-marco">
+        <AnimatePresence initial={false} mode="popLayout">
+          <motion.div
+            key={claveRuta}
+            className="ruta-capa"
+            variants={capaRuta}
+            initial="entrada"
+            animate="centro"
+            exit="salida"
+          >
+            <Routes location={ubicacion}>
+              {esAdmin ? (
+                <>
+                  <Route path="/" element={<Navigate to="/admin" replace />} />
+                  <Route path="/admin" element={<Aprobaciones token={sesion.access_token} setAviso={setAviso} />} />
+                  <Route path="/compras" element={<Compras token={sesion.access_token} setAviso={setAviso} />} />
+                  <Route path="/administrar" element={<Administrar token={sesion.access_token} setAviso={setAviso} />} />
+                  <Route path="*" element={<Navigate to="/admin" replace />} />
+                </>
+              ) : esProveedor ? (
+                <>
+                  <Route path="/" element={<Navigate to="/proveedor" replace />} />
+                  <Route path="/proveedor" element={<Proveedor sesion={sesion} setAviso={setAviso} />} />
+                  <Route
+                    path="/proveedor/anunciar"
+                    element={<Proveedor sesion={sesion} setAviso={setAviso} formularioAbierto />}
+                  />
+                  <Route path="*" element={<Navigate to="/proveedor" replace />} />
+                </>
+              ) : (
+                <>
+                  <Route path="/" element={<Inicio evento={evento} sesion={sesion} />} />
+                  <Route
+                    path="/catalogo"
+                    element={<Catalogo evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
+                  />
+                  <Route
+                    path="/armador"
+                    element={<Armador evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
+                  />
+                  <Route
+                    path="/salon"
+                    element={<Salon evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
+                  />
+                  <Route
+                    path="/resumen"
+                    element={<Resumen sesion={sesion} evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
+                  />
+                  <Route
+                    path="/pago"
+                    element={
+                      <Pago
+                        evento={evento}
+                        onActualizar={actualizarEvento}
+                        sesion={sesion}
+                        setAviso={setAviso}
+                      />
+                    }
+                  />
+                  <Route path="/administrar" element={<Navigate to="/" replace />} />
+                  <Route path="/proveedor" element={<Navigate to="/" replace />} />
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </>
+              )}
+            </Routes>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </Layout>
   );
 }

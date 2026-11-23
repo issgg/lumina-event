@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
+import { motion } from "framer-motion";
 
 import { cargarServicios } from "../api/catalogo.js";
 import { crearCompra, listarMisCompras, suscribirseCompras } from "../api/compras.js";
@@ -9,6 +10,9 @@ import { generarCronograma } from "../logica/cronograma.js";
 import { formatearMoneda } from "../logica/formato.js";
 import { MENSAJES } from "../logica/mensajes.js";
 import { formatearNumeroTarjeta, validarPago } from "../logica/pago.js";
+import { latido, numero, transicion } from "../movimiento.js";
+import Pagina from "./pagina.jsx";
+import { useRevelados } from "../hooks/useCinematico.js";
 
 const FORMULARIO_VACIO = { titular: "", numero: "", vencimiento: "", cvv: "" };
 
@@ -28,6 +32,8 @@ function mensajeEstado(estado) {
 }
 
 export default function Pago({ evento, onActualizar, sesion, setAviso }) {
+  const paginaRef = useRef(null);
+  useRevelados(paginaRef);
   const [formulario, setFormulario] = useState(FORMULARIO_VACIO);
   const [errores, setErrores] = useState({});
   const [confirmado, setConfirmado] = useState(null);
@@ -114,7 +120,7 @@ export default function Pago({ evento, onActualizar, sesion, setAviso }) {
 
   if (evento.detalles.length === 0) {
     return (
-      <section className="pagina">
+      <Pagina>
         <div className="vacio vacio-destacado">
           <p className="etiqueta">Finalizar compra</p>
           <h1>Tu paquete todavía está vacío.</h1>
@@ -123,13 +129,13 @@ export default function Pago({ evento, onActualizar, sesion, setAviso }) {
             Elegir salón
           </Link>
         </div>
-      </section>
+      </Pagina>
     );
   }
 
   return (
-    <section className="pagina pago-pagina">
-      <header className="titulo-pagina">
+    <Pagina className="pago-pagina" ref={paginaRef}>
+      <header className="titulo-pagina" data-reveal>
         <div>
           <p className="etiqueta">Finalizar compra</p>
           <h1>Confirma tu paquete.</h1>
@@ -138,7 +144,13 @@ export default function Pago({ evento, onActualizar, sesion, setAviso }) {
       </header>
 
       {confirmado ? (
-        <section className={`ticket ticket-compra estado-${confirmado.estado}`} role="status" aria-live="polite">
+        <motion.section
+          className={`ticket ticket-compra estado-${confirmado.estado}`}
+          role="status"
+          aria-live="polite"
+          initial={{ opacity: 0, y: 24, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1, transition: transicion }}
+        >
           <header className="ticket-cabecera">
             <div className="ticket-marca">
               <span className="marca-icono">L</span>
@@ -152,6 +164,10 @@ export default function Pago({ evento, onActualizar, sesion, setAviso }) {
               <strong>{confirmado.referencia || confirmado.id}</strong>
             </div>
           </header>
+
+          <motion.div className="ticket-sello" {...latido} key={confirmado.estado}>
+            {confirmado.estado === "aprobado" ? "CONFIRMADA" : confirmado.estado === "rechazado" ? "RECHAZADA" : "ENVIADA"}
+          </motion.div>
 
           <div className="ticket-confirmacion">
             <span className="ticket-check" aria-hidden="true">
@@ -169,7 +185,9 @@ export default function Pago({ evento, onActualizar, sesion, setAviso }) {
                 {eventoConfirmado.invitados || "—"} invitados
               </p>
             </div>
-            <strong className="ticket-total">{formatearMoneda(totalConfirmado)}</strong>
+            <motion.strong className="ticket-total" key={`ticket-total-${totalConfirmado}`} {...numero}>
+              {formatearMoneda(totalConfirmado)}
+            </motion.strong>
           </div>
 
           <div className="ticket-cuerpo">
@@ -222,10 +240,14 @@ export default function Pago({ evento, onActualizar, sesion, setAviso }) {
               </Link>
             </div>
           </footer>
-        </section>
+        </motion.section>
       ) : (
-        <div className="paneles pago-paneles">
-          <form className="panel pago-formulario" onSubmit={confirmar} noValidate>
+        <motion.div
+          className="paneles pago-paneles"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0, transition: transicion }}
+        >
+          <form className="panel pago-formulario" data-reveal onSubmit={confirmar} noValidate>
             <div className="pago-total">
               <span>Total de tu paquete</span>
               <strong>{formatearMoneda(total)}</strong>
@@ -294,9 +316,17 @@ export default function Pago({ evento, onActualizar, sesion, setAviso }) {
                 </span>
               </label>
             </div>
-            <button type="submit" className="boton boton-completo" disabled={procesando}>
-              {procesando ? "Enviando compra…" : "Confirmar compra"}
-            </button>
+            <motion.button type="submit" className="boton boton-completo" disabled={procesando} whileTap={{ scale: 0.98 }}>
+              {procesando && (
+                <motion.span
+                  className="boton-progreso"
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={{ duration: 1.2, ease: "linear", repeat: Infinity }}
+                />
+              )}
+              <span className="boton-texto-capa">{procesando ? "Enviando compra…" : "Confirmar compra"}</span>
+            </motion.button>
             <p className="pago-nota">
               Validación de prueba <strong>4242 4242 4242 4242</strong>. Solo se guarda la compra, nunca los datos de la tarjeta.
             </p>
@@ -330,8 +360,8 @@ export default function Pago({ evento, onActualizar, sesion, setAviso }) {
               Ver desglose completo
             </Link>
           </aside>
-        </div>
+        </motion.div>
       )}
-    </section>
+    </Pagina>
   );
 }

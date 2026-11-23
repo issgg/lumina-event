@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { AnimatePresence, motion } from "framer-motion";
 
 import {
   borrarAnuncio,
@@ -13,6 +14,8 @@ import {
 import { CATEGORIAS, CATEGORIAS_PROVEEDOR } from "../api/configuracion.js";
 import { formatearMoneda } from "../logica/formato.js";
 import { MENSAJES } from "../logica/mensajes.js";
+import { elemento, grupo, transicion } from "../movimiento.js";
+import Pagina from "./pagina.jsx";
 
 const FORMULARIO_VACIO = {
   negocio: "",
@@ -145,7 +148,7 @@ export default function Proveedor({ sesion, setAviso, formularioAbierto = false 
   }
 
   return (
-    <section className="pagina">
+    <Pagina>
       <header className="titulo-pagina">
         <div>
           <p className="etiqueta">Mi puesto</p>
@@ -170,8 +173,16 @@ export default function Proveedor({ sesion, setAviso, formularioAbierto = false 
         )}
       </header>
 
-      {formularioAbierto && (
-        <form className="panel formulario-anuncio" onSubmit={agregar} noValidate>
+      <AnimatePresence initial={false}>
+        {formularioAbierto && (
+        <motion.form
+          className="panel formulario-anuncio"
+          onSubmit={agregar}
+          noValidate
+          initial={{ opacity: 0, y: 18, scale: 0.99 }}
+          animate={{ opacity: 1, y: 0, scale: 1, transition: transicion }}
+          exit={{ opacity: 0, y: -10, transition: { duration: 0.16 } }}
+        >
           <h2>{editando ? "Corregir anuncio" : "Nuevo anuncio"}</h2>
           <div className="formulario">
             <label>
@@ -240,10 +251,11 @@ export default function Proveedor({ sesion, setAviso, formularioAbierto = false 
               Cancelar
             </button>
           </div>
-        </form>
-      )}
+        </motion.form>
+        )}
+      </AnimatePresence>
 
-      <div className="panel">
+      <motion.div className="panel" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0, transition: transicion }}>
         <div className="anuncios-cabecera">
           <h2>Mis anuncios</h2>
           <span>{anuncios.length} enviados</span>
@@ -251,11 +263,13 @@ export default function Proveedor({ sesion, setAviso, formularioAbierto = false 
         {anuncios.length === 0 ? (
           <p className="vacio-texto">Todavía no publicaste nada. Empieza con un servicio sencillo.</p>
         ) : (
-          <div className="lista-anuncios">
+          <motion.div className="lista-anuncios" variants={grupo} initial="hidden" animate="show">
             {anuncios.map((anuncio) => (
-              <article
+              <motion.article
                 className={`anuncio-tarjeta estado-${anuncio.estado}`}
                 key={anuncio.id}
+                variants={elemento}
+                layout
               >
                 <img
                   src={fotoDe(anuncio.categoria)}
@@ -299,11 +313,11 @@ export default function Proveedor({ sesion, setAviso, formularioAbierto = false 
                     </button>
                   </div>
                 </div>
-              </article>
+              </motion.article>
             ))}
-          </div>
+          </motion.div>
         )}
-      </div>
-    </section>
+      </motion.div>
+    </Pagina>
   );
 }

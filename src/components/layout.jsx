@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Link, NavLink, Outlet } from "react-router";
+import { Link, NavLink, useLocation } from "react-router";
+import { AnimatePresence, motion } from "framer-motion";
+import { aviso as avisoMovimiento, barrido, cortina } from "../movimiento.js";
 import {
   NAVEGACION,
   NAVEGACION_ADMIN,
@@ -7,7 +9,8 @@ import {
   RUTA_POR_ROL,
 } from "../api/configuracion.js";
 
-export default function Layout({ aviso, sesion, onCerrarSesion, onCambiarRol }) {
+export default function Layout({ aviso, sesion, onCerrarSesion, onCambiarRol, children }) {
+  const ubicacion = useLocation();
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [tema, setTema] = useState(() => document.documentElement.dataset.tema || "oscuro");
   const correo = sesion?.user?.email ?? sesion?.user?.user_metadata?.email ?? "Invitado";
@@ -100,11 +103,29 @@ export default function Layout({ aviso, sesion, onCerrarSesion, onCambiarRol }) 
         </div>
       </header>
 
-      {aviso && <p className="aviso">{aviso}</p>}
+      <AnimatePresence initial={false}>
+        {aviso && (
+          <motion.p key={aviso} className="aviso" {...avisoMovimiento}>
+            {aviso}
+          </motion.p>
+        )}
+      </AnimatePresence>
 
-      <main className="contenido">
-        <Outlet />
-      </main>
+      <motion.main className="contenido" layout>
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={`cortina-${ubicacion.pathname}${ubicacion.search}`}
+            className="transicion-cortina"
+            {...cortina}
+          />
+          <motion.div
+            key={`barrido-${ubicacion.pathname}${ubicacion.search}`}
+            className="transicion-barrido"
+            {...barrido}
+          />
+        </AnimatePresence>
+        {children}
+      </motion.main>
 
       <footer className="pie">
         <p>Lumina Event</p>

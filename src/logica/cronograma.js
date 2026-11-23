@@ -15,7 +15,7 @@ export function formatearHora(minutos) {
   return `${String(horas).padStart(2, "0")}:${String(restantes).padStart(2, "0")}`;
 }
 
-export function generarCronograma(detalles, horaInicio = "19:00", reglas = REGLAS_CRONOGRAMA) {
+export function generarCronograma(detalles = [], horaInicio = "19:00", reglas = REGLAS_CRONOGRAMA) {
   const categorias = new Set(detalles.map((item) => item.categoria));
   const base = aMinutos(horaInicio);
   return reglas

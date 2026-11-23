@@ -75,6 +75,20 @@ export const CATEGORIAS_PROVEEDOR = CATEGORIAS.filter(
   (categoria) => categoria.id !== "salones",
 );
 
+const CARPETAS_FOTO = new Set(CATEGORIAS.map((categoria) => categoria.id));
+
+export function galeriaDe(servicio) {
+  const categoria = String(servicio?.categoria ?? "");
+  const imagen = String(servicio?.imagen ?? "");
+  const coincidencia = imagen.match(/^\/?assets\/fotos\/([a-z-]+)-(\d+)\.jpg$/i);
+  const carpeta = coincidencia && CARPETAS_FOTO.has(coincidencia[1]) ? coincidencia[1] : categoria;
+  const prefijo = CARPETAS_FOTO.has(carpeta) ? carpeta : "detalles";
+  const numero = coincidencia ? Number(coincidencia[2]) : 1;
+  const principal = numero >= 1 && numero <= 8 ? numero : 1;
+  const orden = [principal, ...Array.from({ length: 8 }, (_, indice) => indice + 1).filter((valor) => valor !== principal)];
+  return orden.map((valor) => `assets/fotos/${prefijo}-${valor}.jpg`);
+}
+
 export const TIPOS_EVENTO = [
   "XV años",
   "Boda",

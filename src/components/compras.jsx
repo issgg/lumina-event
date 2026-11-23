@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 import { listarComprasAdmin, revisarCompraAdmin, suscribirseCompras } from "../api/compras.js";
 import { TEXTO_ESTADO_COMPRA } from "../api/configuracion.js";
 import { formatearMoneda } from "../logica/formato.js";
 import { MENSAJES } from "../logica/mensajes.js";
 import { motivoRechazoValido } from "../logica/validacion.js";
+import { elemento, grupo, resaltado } from "../movimiento.js";
+import Pagina from "./pagina.jsx";
 
 const FILTROS = [
   { id: "pendiente", texto: "Pendientes" },
@@ -97,7 +100,7 @@ export default function Compras({ token, setAviso }) {
   }
 
   return (
-    <section className="pagina">
+    <Pagina>
       <header className="titulo-pagina">
         <div>
           <p className="etiqueta">Panel de compras</p>
@@ -119,15 +122,23 @@ export default function Compras({ token, setAviso }) {
 
       <div className="barra-filtros revision-filtros">
         {FILTROS.map((opcion) => (
-          <button
+          <motion.button
             key={opcion.id}
             type="button"
             className={`boton boton-secundario${filtro === opcion.id ? " activo" : ""}`}
             aria-pressed={filtro === opcion.id}
             onClick={() => setFiltro(opcion.id)}
+            whileTap={{ scale: 0.97 }}
           >
-            {opcion.texto}
-          </button>
+            {filtro === opcion.id && (
+              <motion.span
+                className="filtro-fondo"
+                layoutId="filtro-admin-compras"
+                transition={resaltado.layout}
+              />
+            )}
+            <span className="filtro-texto">{opcion.texto}</span>
+          </motion.button>
         ))}
       </div>
 
@@ -140,14 +151,19 @@ export default function Compras({ token, setAviso }) {
         {visibles.length === 0 ? (
           <p className="vacio-texto">No hay compras en esta lista por ahora.</p>
         ) : (
-          <div className="lista-compras">
+          <motion.div className="lista-compras" variants={grupo} initial="hidden" animate="show">
             {visibles.map((compra) => {
               const instancia = instanciaDe(compra);
               const evento = instancia.evento ?? {};
               const detalles = Array.isArray(instancia.detalles) ? instancia.detalles : [];
               const salon = instancia.salon ?? null;
               return (
-                <article className={`compra-tarjeta estado-${compra.estado}`} key={compra.id}>
+                <motion.article
+                  className={`compra-tarjeta estado-${compra.estado}`}
+                  key={compra.id}
+                  variants={elemento}
+                  layout
+                >
                   <div className="compra-cabecera">
                     <div>
                       <span className="etiqueta">{fechaTexto(compra.creadoEn)}</span>
@@ -236,12 +252,12 @@ export default function Compras({ token, setAviso }) {
                       </button>
                     )}
                   </div>
-                </article>
+                </motion.article>
               );
             })}
-          </div>
+          </motion.div>
         )}
       </div>
-    </section>
+    </Pagina>
   );
 }

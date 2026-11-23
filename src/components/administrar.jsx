@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 import {
   borrarExtraManual,
@@ -8,6 +9,8 @@ import {
 import { CATEGORIAS } from "../api/configuracion.js";
 import { formatearMoneda } from "../logica/formato.js";
 import { MENSAJES } from "../logica/mensajes.js";
+import { elemento, grupo } from "../movimiento.js";
+import Pagina from "./pagina.jsx";
 
 const FORMULARIO_VACIO = {
   nombre: "",
@@ -86,7 +89,7 @@ export default function Administrar({ token, setAviso }) {
   }
 
   return (
-    <section className="pagina">
+    <Pagina>
       <header className="titulo-pagina">
         <div>
           <p className="etiqueta">Panel básico</p>
@@ -95,8 +98,8 @@ export default function Administrar({ token, setAviso }) {
         </div>
       </header>
 
-      <div className="paneles">
-        <form className="panel" onSubmit={agregar}>
+      <motion.div className="paneles" variants={grupo} initial="hidden" animate="show">
+        <motion.form className="panel" onSubmit={agregar} variants={elemento}>
           <h2>Agregar servicio</h2>
           <div className="formulario">
             <label>
@@ -129,16 +132,16 @@ export default function Administrar({ token, setAviso }) {
           <button className="boton" type="submit">
             Guardar servicio
           </button>
-        </form>
+        </motion.form>
 
-        <aside className="panel">
+        <motion.aside className="panel" variants={elemento}>
           <h2>Servicios agregados</h2>
           {extras.length === 0 ? (
             <p className="vacio-texto">No hay servicios agregados por el administrador.</p>
           ) : (
             <ul className="lista-evento">
               {extras.map((servicio) => (
-                <li key={servicio.id}>
+                <motion.li key={servicio.id} layout initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
                   <div>
                     <strong>{servicio.nombre}</strong>
                     <small>{servicio.categoria} · {servicio.proveedor}</small>
@@ -147,12 +150,12 @@ export default function Administrar({ token, setAviso }) {
                   <button type="button" className="boton-texto" onClick={() => eliminar(servicio.id)}>
                     Eliminar
                   </button>
-                </li>
+                </motion.li>
               ))}
             </ul>
           )}
-        </aside>
-      </div>
-    </section>
+        </motion.aside>
+      </motion.div>
+    </Pagina>
   );
 }

@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
+import { motion } from "framer-motion";
 
 import { cargarServicios } from "../api/catalogo.js";
 import { consultarCronograma, limpiarEvento } from "../api/baseDatos.js";
@@ -11,8 +12,13 @@ import { eventoVacio } from "../logica/evento.js";
 import { formatearMoneda } from "../logica/formato.js";
 import { MENSAJES } from "../logica/mensajes.js";
 import { estadoPresupuesto, evaluarCobertura } from "../logica/paquete.js";
+import { elemento, grupo, numero } from "../movimiento.js";
+import Pagina from "./pagina.jsx";
+import { useRevelados } from "../hooks/useCinematico.js";
 
 export default function Resumen({ sesion, evento, onActualizar, setAviso }) {
+  const paginaRef = useRef(null);
+  useRevelados(paginaRef);
   const [cronograma, setCronograma] = useState([]);
   const [ultimaCompra, setUltimaCompra] = useState(null);
   const total = calcularTotal(evento.detalles);
@@ -22,6 +28,7 @@ export default function Resumen({ sesion, evento, onActualizar, setAviso }) {
   const salon = cargarServicios().find((servicio) => servicio.id === evento.salonId);
   const cubiertas = cobertura.filter((item) => item.completo).length;
   const faltantes = cobertura.filter((item) => !item.completo).map((item) => nombreCategoria(item.categoria));
+  const porcentajeCobertura = cobertura.length ? Math.round((cubiertas / cobertura.length) * 100) : 0;
 
   useEffect(() => {
     let activo = true;
@@ -69,8 +76,8 @@ export default function Resumen({ sesion, evento, onActualizar, setAviso }) {
   }
 
   return (
-    <section className="pagina">
-      <header className="titulo-pagina">
+    <Pagina ref={paginaRef}>
+      <header className="titulo-pagina" data-reveal>
         <div>
           <p className="etiqueta">Mi paquete</p>
           <h1>Revisa tu evento antes de confirmar.</h1>
@@ -96,7 +103,7 @@ export default function Resumen({ sesion, evento, onActualizar, setAviso }) {
       </header>
 
       {ultimaCompra && (
-        <div className={`compra-estado estado-${ultimaCompra.estado}`}>
+        <motion.div className={`compra-estado estado-${ultimaCompra.estado}`} variants={elemento} initial="hidden" animate="show">
           <span>Última compra · {ultimaCompra.referencia || ultimaCompra.id}</span>
           <strong>{TEXTO_ESTADO_COMPRA[ultimaCompra.estado] ?? "Pendiente de aprobación"}</strong>
           <small>
@@ -106,25 +113,29 @@ export default function Resumen({ sesion, evento, onActualizar, setAviso }) {
                 ? `Motivo: ${ultimaCompra.motivo || "Sin motivo indicado."}`
                 : "El administrador debe aprobarla para confirmar el paquete."}
           </small>
-        </div>
+        </motion.div>
       )}
 
-      <div className="resumen-metricas">
-        <div className="metrica">
+      <motion.div className="resumen-metricas" variants={grupo} initial="hidden" animate="show">
+        <motion.div className="metrica" variants={elemento}>
           <span>Servicios</span>
-          <strong>{evento.detalles.length}</strong>
-        </div>
-        <div className="metrica">
+          <motion.strong key={`servicios-${evento.detalles.length}`} {...numero}>
+            {evento.detalles.length}
+          </motion.strong>
+        </motion.div>
+        <motion.div className="metrica" variants={elemento}>
           <span>Ubicación</span>
           <strong>{salon?.nombre || "Salón por definir"}</strong>
-        </div>
-        <div className="metrica metrica-total">
+        </motion.div>
+        <motion.div className="metrica metrica-total" variants={elemento}>
           <span>Total estimado</span>
-          <strong>{formatearMoneda(total)}</strong>
-        </div>
-      </div>
+          <motion.strong key={`total-${total}`} {...numero}>
+            {formatearMoneda(total)}
+          </motion.strong>
+        </motion.div>
+      </motion.div>
 
-      <div className="resumen-notas">
+      <div className="resumen-notas" data-reveal>
         <p className={`nota-linea ${presupuesto.estado}`}>
           <strong>Presupuesto:</strong>{" "}
           {presupuesto.estado === "sin-definir"
@@ -137,9 +148,16 @@ export default function Resumen({ sesion, evento, onActualizar, setAviso }) {
           <strong>Cobertura:</strong> {cubiertas} de {cobertura.length} esenciales
           {faltantes.length ? ` · Faltan ${faltantes.join(", ")}` : " · Todo cubierto"}
         </p>
+        <div className="cobertura-barra" role="progressbar" aria-valuenow={porcentajeCobertura} aria-valuemin="0" aria-valuemax="100">
+          <motion.span
+            initial={{ width: 0 }}
+            animate={{ width: `${porcentajeCobertura}%` }}
+            transition={{ type: "spring", stiffness: 120, damping: 20 }}
+          />
+        </div>
       </div>
 
-      <div className="paneles resumen-paneles">
+      <div className="paneles resumen-paneles" data-reveal>
         <div className="panel">
           <h2>Lo que contrataste</h2>
           <Tabla
@@ -183,10 +201,10 @@ export default function Resumen({ sesion, evento, onActualizar, setAviso }) {
           <strong>{formatearMoneda(total)}</strong>
         </div>
         <Link className="boton" to="/pago">
-          Simular compra <span aria-hidden="true">→</span>
+          Confirmar compra <span aria-hidden="true">→</span>
         </Link>
       </div>
-    </section>
+    </Pagina>
   );
 }
 
@@ -198,7 +216,7 @@ function Tabla({ columnas, filas, mensajeVacio }) {
   if (filas.length === 0) return <p className="vacio-texto">{mensajeVacio}</p>;
 
   return (
-    <div className="tabla-contenedor">
+    <div className="tabla-contenedor" data-reveal>
       <table>
         <thead>
           <tr>
@@ -209,15 +227,15 @@ function Tabla({ columnas, filas, mensajeVacio }) {
             ))}
           </tr>
         </thead>
-        <tbody>
+        <motion.tbody variants={grupo} initial="hidden" animate="show">
           {filas.map((fila, indice) => (
-            <tr key={indice}>
+            <motion.tr key={indice} variants={elemento}>
               {fila.map((celda, posicion) => (
                 <td key={posicion}>{celda}</td>
               ))}
-            </tr>
+            </motion.tr>
           ))}
-        </tbody>
+        </motion.tbody>
       </table>
     </div>
   );

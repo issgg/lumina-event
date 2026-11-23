@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
+import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "framer-motion";
 
 import {
   fotoDe,
@@ -11,16 +12,28 @@ import { listarMisCompras, suscribirseCompras } from "../api/compras.js";
 import { CATEGORIAS, TEXTO_ESTADO_COMPRA } from "../api/configuracion.js";
 import { calcularTotal } from "../logica/carrito.js";
 import { formatearMoneda } from "../logica/formato.js";
+import { elemento, grupo, transicion } from "../movimiento.js";
+import Pagina from "./pagina.jsx";
+import { useRevelados } from "../hooks/useCinematico.js";
+
+const Paso = motion.create(Link);
 
 function nombreCategoria(id) {
   return CATEGORIAS.find((categoria) => categoria.id === id)?.nombre ?? id;
 }
 
 export default function Inicio({ evento = { detalles: [] }, sesion }) {
+  const paginaRef = useRef(null);
+  useRevelados(paginaRef);
   const servicios = evento.detalles.length;
   const total = calcularTotal(evento.detalles);
   const [recomendados, setRecomendados] = useState([]);
   const [ultimaCompra, setUltimaCompra] = useState(null);
+  const reducirMovimiento = useReducedMotion();
+  const inclinacionX = useMotionValue(0);
+  const inclinacionY = useMotionValue(0);
+  const rotarX = useSpring(useTransform(inclinacionY, [-0.5, 0.5], [7, -7]), { stiffness: 180, damping: 20 });
+  const rotarY = useSpring(useTransform(inclinacionX, [-0.5, 0.5], [-8, 8]), { stiffness: 180, damping: 20 });
 
   useEffect(() => {
     let activo = true;
@@ -62,28 +75,58 @@ export default function Inicio({ evento = { detalles: [] }, sesion }) {
   }, [sesion?.access_token]);
 
   return (
-    <section className="pagina inicio-pagina">
+    <Pagina className="inicio-pagina" ref={paginaRef}>
       <div className="portada">
-        <div className="portada-texto">
-          <p className="etiqueta">Planea tu evento</p>
-          <h1>
+        <div className="portada-video" aria-hidden="true">
+          <video autoPlay muted loop playsInline preload="auto" poster="/hero-poster.jpg">
+            <source src="/hero-bg.mp4" type="video/mp4" />
+          </video>
+          <span className="portada-velo portada-velo-lateral" />
+          <span className="portada-velo portada-velo-inferior" />
+          <span className="portada-velo portada-velo-grano" />
+        </div>
+
+        <motion.div className="portada-texto" data-hero variants={grupo} initial="hidden" animate="show">
+          <motion.p className="etiqueta" variants={elemento}>
+            Lumina Event · Estudio de celebraciones
+          </motion.p>
+          <motion.h1 variants={elemento}>
             Tu celebración, <em>en un solo lugar.</em>
-          </h1>
-          <p className="subtitulo">
+          </motion.h1>
+          <motion.p className="subtitulo" variants={elemento}>
             Elige el salón, agrega los servicios y mira cómo queda tu paquete antes de pagar.
-          </p>
-          <div className="acciones-principales">
+          </motion.p>
+          <motion.div className="acciones-principales acciones-hero" variants={elemento}>
             <Link className="boton" to="/armador">
               Empezar mi evento <span aria-hidden="true">→</span>
             </Link>
             <Link className="boton boton-secundario" to="/catalogo">
               Explorar catálogo
             </Link>
-          </div>
-          <p className="portada-ayuda">Guarda lo que lleves y continua cuando quieras.</p>
-        </div>
+          </motion.div>
+          <motion.p className="portada-ayuda" variants={elemento}>
+            Guarda lo que lleves y continua cuando quieras.
+          </motion.p>
+        </motion.div>
 
-        <aside className="portada-tarjeta" aria-label="Resumen del evento">
+        <motion.aside
+          className="portada-tarjeta"
+          aria-label="Resumen del evento"
+          initial={{ opacity: 0, y: 26, scale: 0.97 }}
+          animate={{ opacity: 1, y: 0, scale: 1, transition: { ...transicion, delay: 0.12 } }}
+          whileHover={{ y: -8 }}
+          onMouseMove={(evento) => {
+            if (reducirMovimiento) return;
+            const rect = evento.currentTarget.getBoundingClientRect();
+            inclinacionX.set((evento.clientX - rect.left) / rect.width - 0.5);
+            inclinacionY.set((evento.clientY - rect.top) / rect.height - 0.5);
+          }}
+          onMouseLeave={() => {
+            inclinacionX.set(0);
+            inclinacionY.set(0);
+          }}
+          style={reducirMovimiento ? undefined : { rotateX: rotarX, rotateY: rotarY, transformPerspective: 1000 }}
+        >
           <p className="etiqueta">Tu evento</p>
           <h2>{evento.nombre || "Aún sin nombre"}</h2>
           <p className="portada-detalle">
@@ -112,32 +155,32 @@ export default function Inicio({ evento = { detalles: [] }, sesion }) {
           <Link className="boton-texto" to={servicios ? "/resumen" : "/armador"}>
             {servicios ? "Ver mi paquete" : "Comenzar con los datos"}
           </Link>
-        </aside>
+        </motion.aside>
       </div>
 
-        <div className="inicio-resumen">
-          <div>
-            <p className="etiqueta">Así funciona</p>
-            <h2>Lo esencial, sin rodeos.</h2>
-          </div>
-          <nav className="inicio-pasos" aria-label="Comenzar">
-            <Link className="paso" to="/armador">
-              <span>01</span>
-              <strong>Cuenta tu evento</strong>
-              <small>Fecha, invitados y presupuesto</small>
-            </Link>
-            <Link className="paso" to="/salon">
-              <span>02</span>
-              <strong>Elige el salón</strong>
-              <small>Espacios con capacidad y horarios</small>
-            </Link>
-            <Link className="paso" to="/catalogo">
-              <span>03</span>
-              <strong>Arma tu paquete</strong>
-              <small>Servicios, total y cronograma</small>
-            </Link>
-          </nav>
+      <div className="inicio-resumen" data-reveal>
+        <div>
+          <p className="etiqueta">Así funciona</p>
+          <h2>Lo esencial, sin rodeos.</h2>
         </div>
+        <motion.nav className="inicio-pasos" aria-label="Comenzar" data-reveal variants={grupo} initial="hidden" animate="show">
+          <Paso className="paso" to="/armador" variants={elemento} whileHover={{ y: -6 }}>
+            <span>01</span>
+            <strong>Cuenta tu evento</strong>
+            <small>Fecha, invitados y presupuesto</small>
+          </Paso>
+          <Paso className="paso" to="/salon" variants={elemento} whileHover={{ y: -6 }}>
+            <span>02</span>
+            <strong>Elige el salón</strong>
+            <small>Espacios con capacidad y horarios</small>
+          </Paso>
+          <Paso className="paso" to="/catalogo" variants={elemento} whileHover={{ y: -6 }}>
+            <span>03</span>
+            <strong>Arma tu paquete</strong>
+            <small>Servicios, total y cronograma</small>
+          </Paso>
+        </motion.nav>
+      </div>
 
       {recomendados.length > 0 && (
         <section className="recomendados">
@@ -150,9 +193,9 @@ export default function Inicio({ evento = { detalles: [] }, sesion }) {
               Ver catálogo
             </Link>
           </div>
-          <div className="lista-anuncios">
+          <motion.div className="lista-anuncios" variants={grupo} initial="hidden" animate="show">
             {recomendados.map((anuncio) => (
-              <article className="anuncio-tarjeta" key={anuncio.id}>
+              <motion.article className="anuncio-tarjeta" key={anuncio.id} variants={elemento} whileHover={{ y: -5 }}>
                 <img
                   src={fotoDe(anuncio.categoria)}
                   alt=""
@@ -169,11 +212,11 @@ export default function Inicio({ evento = { detalles: [] }, sesion }) {
                     <strong>{formatearMoneda(anuncio.precio)}</strong>
                   </div>
                 </div>
-              </article>
+              </motion.article>
             ))}
-          </div>
+          </motion.div>
         </section>
       )}
-    </section>
+    </Pagina>
   );
 }

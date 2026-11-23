@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   authConfigurado,
   iniciarConGoogle,
@@ -9,6 +10,7 @@ import {
 import { CATEGORIAS_PROVEEDOR, ROLES_REGISTRO } from "../api/configuracion.js";
 import { MENSAJES } from "../logica/mensajes.js";
 import { validarRegistro } from "../logica/validacion.js";
+import { resaltado, transicion } from "../movimiento.js";
 
 function errorGuardado() {
   try {
@@ -119,9 +121,17 @@ export default function Acceso({ onSesion }) {
   const esProveedor = rol === "proveedor";
 
   return (
-    <main className="acceso">
+    <motion.main
+      className="acceso"
+      initial={{ opacity: 0, y: 18 }}
+      animate={{ opacity: 1, y: 0, transition: transicion }}
+    >
       <div className="acceso-contenedor">
-        <aside className="acceso-lado">
+        <motion.aside
+          className="acceso-lado"
+          initial={{ opacity: 0, x: -24 }}
+          animate={{ opacity: 1, x: 0, transition: transicion }}
+        >
           <div className="acceso-marca">
             <span className="marca-icono">L</span>
             <span>Lumina Event</span>
@@ -164,9 +174,13 @@ export default function Acceso({ onSesion }) {
               </>
             )}
           </div>
-        </aside>
+        </motion.aside>
 
-        <section className="acceso-tarjeta">
+        <motion.section
+          className="acceso-tarjeta"
+          initial={{ opacity: 0, y: 24, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1, transition: { ...transicion, delay: 0.08 } }}
+        >
           <p className="etiqueta">Bienvenido</p>
           <h1>{modo === "entrar" ? "Entra a tu cuenta" : "Crea tu cuenta"}</h1>
           <p className="subtitulo">
@@ -176,34 +190,40 @@ export default function Acceso({ onSesion }) {
           </p>
 
           <div className="pestanas" aria-label="Tipo de acceso">
-            <button
-              type="button"
-              className={modo === "entrar" ? "activo" : ""}
-              onClick={() => cambiarModo("entrar")}
-            >
-              Entrar
+            <button type="button" className={modo === "entrar" ? "activo" : ""} onClick={() => cambiarModo("entrar")}>
+              {modo === "entrar" && (
+                <motion.span className="pestana-fondo" layoutId="pestana-acceso" transition={resaltado.layout} />
+              )}
+              <span className="pestana-texto">Entrar</span>
             </button>
             <button
               type="button"
               className={modo === "registrar" ? "activo" : ""}
               onClick={() => cambiarModo("registrar")}
             >
-              Registrarme
+              {modo === "registrar" && (
+                <motion.span className="pestana-fondo" layoutId="pestana-acceso" transition={resaltado.layout} />
+              )}
+              <span className="pestana-texto">Registrarme</span>
             </button>
           </div>
 
           <div className="roles-acceso" aria-label="Tipo de cuenta">
             {ROLES_REGISTRO.map((opcion) => (
-              <button
+              <motion.button
                 key={opcion.id}
                 type="button"
                 className={rol === opcion.id ? "activo" : ""}
                 aria-pressed={rol === opcion.id}
                 onClick={() => cambiarRol(opcion.id)}
+                whileTap={{ scale: 0.98 }}
               >
-                <strong>{opcion.texto}</strong>
-                <span>{opcion.descripcion}</span>
-              </button>
+                {rol === opcion.id && (
+                  <motion.span className="rol-fondo" layoutId="rol-acceso" transition={resaltado.layout} />
+                )}
+                <strong className="rol-texto">{opcion.texto}</strong>
+                <span className="rol-texto">{opcion.descripcion}</span>
+              </motion.button>
             ))}
           </div>
 
@@ -224,6 +244,14 @@ export default function Acceso({ onSesion }) {
           </div>
 
           <form className="formulario-acceso" onSubmit={enviar}>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={modo}
+                className="campos-acceso"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0, transition: transicion }}
+                exit={{ opacity: 0, y: -8, transition: { duration: 0.16 } }}
+              >
             {modo === "registrar" && (
               <>
                 <label>
@@ -331,6 +359,9 @@ export default function Acceso({ onSesion }) {
               </>
             )}
 
+              </motion.div>
+            </AnimatePresence>
+
             {error && <p className="error-acceso">{error}</p>}
             {mensaje && <p className="mensaje-acceso">{mensaje}</p>}
 
@@ -338,8 +369,8 @@ export default function Acceso({ onSesion }) {
               {ocupado ? "Un momento…" : modo === "entrar" ? "Entrar" : "Crear cuenta"}
             </button>
           </form>
-        </section>
+        </motion.section>
       </div>
-    </main>
+    </motion.main>
   );
 }

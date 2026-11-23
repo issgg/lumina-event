@@ -28,7 +28,7 @@ function vencimientoValido(texto, hoy) {
   return anio === hoy.getFullYear() && mes >= hoy.getMonth() + 1;
 }
 
-export function validarPago(datos, hoy = new Date()) {
+export function validarPago(datos = {}, hoy = new Date()) {
   const errores = {};
   const titular = String(datos.titular ?? "").trim();
   const numero = String(datos.numero ?? "").replace(/[\s-]/g, "");

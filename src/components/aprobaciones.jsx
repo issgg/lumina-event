@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 import {
   fotoDe,
@@ -11,6 +12,8 @@ import { CATEGORIAS } from "../api/configuracion.js";
 import { formatearMoneda } from "../logica/formato.js";
 import { MENSAJES } from "../logica/mensajes.js";
 import { motivoRechazoValido } from "../logica/validacion.js";
+import { elemento, grupo, resaltado } from "../movimiento.js";
+import Pagina from "./pagina.jsx";
 
 const FILTROS = [
   { id: "pendiente", texto: "Pendientes" },
@@ -109,7 +112,7 @@ export default function Aprobaciones({ token, setAviso }) {
   }
 
   return (
-    <section className="pagina">
+    <Pagina>
       <header className="titulo-pagina">
         <div>
           <p className="etiqueta">Panel de revisión</p>
@@ -129,15 +132,23 @@ export default function Aprobaciones({ token, setAviso }) {
 
       <div className="barra-filtros revision-filtros">
         {FILTROS.map((opcion) => (
-          <button
+          <motion.button
             key={opcion.id}
             type="button"
             className={`boton boton-secundario${filtro === opcion.id ? " activo" : ""}`}
             aria-pressed={filtro === opcion.id}
             onClick={() => setFiltro(opcion.id)}
+            whileTap={{ scale: 0.97 }}
           >
-            {opcion.texto}
-          </button>
+            {filtro === opcion.id && (
+              <motion.span
+                className="filtro-fondo"
+                layoutId="filtro-admin-anuncios"
+                transition={resaltado.layout}
+              />
+            )}
+            <span className="filtro-texto">{opcion.texto}</span>
+          </motion.button>
         ))}
       </div>
 
@@ -150,11 +161,13 @@ export default function Aprobaciones({ token, setAviso }) {
         {visibles.length === 0 ? (
           <p className="vacio-texto">No hay anuncios en esta lista por ahora.</p>
         ) : (
-          <div className="lista-anuncios">
+          <motion.div className="lista-anuncios" variants={grupo} initial="hidden" animate="show">
             {visibles.map((anuncio) => (
-              <article
+              <motion.article
                 className={`anuncio-tarjeta revision-tarjeta estado-${anuncio.estado}`}
                 key={anuncio.id}
+                variants={elemento}
+                layout
               >
                 <img
                   src={fotoDe(anuncio.categoria)}
@@ -227,11 +240,11 @@ export default function Aprobaciones({ token, setAviso }) {
                     )}
                   </div>
                 </div>
-              </article>
+              </motion.article>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
-    </section>
+    </Pagina>
   );
 }

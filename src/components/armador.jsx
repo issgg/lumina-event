@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router";
+import { motion } from "framer-motion";
 
 import { TIPOS_EVENTO } from "../api/configuracion.js";
 import { formatearMoneda } from "../logica/formato.js";
 import { MENSAJES } from "../logica/mensajes.js";
 import { validarDatosEvento } from "../logica/validacion.js";
+import { elemento, grupo, numero } from "../movimiento.js";
+import Pagina from "./pagina.jsx";
+import { useRevelados } from "../hooks/useCinematico.js";
 
 const CAMPOS = [
   { clave: "nombre", etiqueta: "Nombre del evento", tipo: "text", maxLength: 60 },
@@ -15,7 +19,11 @@ const CAMPOS = [
   { clave: "horaInicio", etiqueta: "Hora de inicio", tipo: "time" },
 ];
 
+const PASOS = ["Datos", "Salón", "Servicios", "Confirmar"];
+
 export default function Armador({ evento, onActualizar, setAviso }) {
+  const paginaRef = useRef(null);
+  useRevelados(paginaRef);
   const navigate = useNavigate();
   const [formulario, setFormulario] = useState(() => ({
     nombre: evento.nombre,
@@ -96,19 +104,19 @@ export default function Armador({ evento, onActualizar, setAviso }) {
     }
 
     return (
-      <label key={clave} htmlFor={clave}>
+      <motion.label key={clave} htmlFor={clave} variants={elemento} whileFocus={{ y: -2 }}>
         {etiqueta}
         {control}
         <span className="error-campo" id={`error-${clave}`}>
           {errores[clave] ?? ""}
         </span>
-      </label>
+      </motion.label>
     );
   }
 
   return (
-    <section className="pagina">
-      <header className="titulo-pagina">
+    <Pagina ref={paginaRef}>
+      <header className="titulo-pagina" data-reveal>
         <div>
           <p className="etiqueta">Datos del evento</p>
           <h1>Empecemos por lo básico.</h1>
@@ -116,40 +124,53 @@ export default function Armador({ evento, onActualizar, setAviso }) {
         </div>
       </header>
 
-      <div className="paneles paneles-formulario">
-        <form className="panel" onSubmit={guardar} noValidate>
+      <motion.ol className="flujo-progreso" data-reveal variants={grupo} initial="hidden" animate="show" aria-label="Progreso del evento">
+        {PASOS.map((paso, indice) => (
+          <motion.li key={paso} variants={elemento} className={indice === 0 ? "actual" : ""}>
+            <motion.span className="flujo-linea" initial={{ scaleX: 0 }} animate={{ scaleX: indice === 0 ? 1 : 0.2 }} transition={{ duration: 0.6, delay: indice * 0.08 }} />
+            <span className="flujo-numero">0{indice + 1}</span>
+            <span>{paso}</span>
+          </motion.li>
+        ))}
+      </motion.ol>
+
+      <motion.div className="paneles paneles-formulario" data-reveal variants={grupo} initial="hidden" animate="show">
+        <motion.form className="panel" onSubmit={guardar} noValidate variants={elemento}>
           <h2>Tu evento</h2>
           <div className="formulario">{CAMPOS.map(campo)}</div>
           <div className="acciones-formulario">
             <button className="boton" type="submit" disabled={guardando}>
-              {guardando ? "Guardando…" : "Guardar y continuar"}
+              {guardando ? "Guardando…" : "Continuar al salón"} <span aria-hidden="true">→</span>
             </button>
             <span className="acciones-nota">Después elegirás el salón.</span>
           </div>
-        </form>
+        </motion.form>
 
-        <aside className="panel panel-nota">
+        <motion.aside className="panel panel-nota" variants={elemento}>
           <p className="etiqueta">Lo que llevas</p>
           <h2>{formulario.nombre || "Evento sin nombre"}</h2>
-          <dl className="nota-datos">
-            <div>
-              <dt>Tipo</dt>
-              <dd>{formulario.tipoEvento || "Por definir"}</dd>
-            </div>
-            <div>
-              <dt>Invitados</dt>
-              <dd>{formulario.invitados || "—"}</dd>
-            </div>
-            <div>
-              <dt>Presupuesto</dt>
-              <dd>
-                {formulario.presupuesto ? formatearMoneda(Number(formulario.presupuesto)) : "Sin definir"}
-              </dd>
-            </div>
-          </dl>
+            <dl className="nota-datos">
+              <div>
+                <dt>Tipo</dt>
+                <dd>{formulario.tipoEvento || "Por definir"}</dd>
+              </div>
+              <div>
+                <dt>Invitados</dt>
+                <motion.dd key={formulario.invitados || "vacio"} {...numero}>
+                  {formulario.invitados || "—"}
+                </motion.dd>
+              </div>
+              <div>
+                <dt>Presupuesto</dt>
+                <motion.dd key={formulario.presupuesto || "vacio"} {...numero}>
+                  {formulario.presupuesto ? formatearMoneda(Number(formulario.presupuesto)) : "Sin definir"}
+                </motion.dd>
+              </div>
+            </dl>
+
           <p className="vacio-texto">Nada se pierde: puedes volver a editar estos datos cuando quieras.</p>
-        </aside>
-      </div>
-    </section>
+        </motion.aside>
+      </motion.div>
+    </Pagina>
   );
 }

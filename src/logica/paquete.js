@@ -34,7 +34,8 @@ export function evaluarCobertura(detalles) {
 export function estadoPresupuesto(presupuesto, total) {
   const limite = Number(presupuesto) || 0;
   if (limite <= 0) return { estado: "sin-definir", diferencia: 0 };
-  const diferencia = Math.round((limite - Number(total)) * 100) / 100;
+  const totalSeguro = Number(total);
+  const diferencia = Math.round((limite - (Number.isFinite(totalSeguro) ? totalSeguro : 0)) * 100) / 100;
   return diferencia >= 0
     ? { estado: "dentro", diferencia }
     : { estado: "excedido", diferencia: Math.abs(diferencia) };

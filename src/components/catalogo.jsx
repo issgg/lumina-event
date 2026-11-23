@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
+import { AnimatePresence, motion } from "framer-motion";
 
 import {
   leerAnunciosAprobados,
@@ -11,13 +12,19 @@ import { CATEGORIAS } from "../api/configuracion.js";
 import { agregarServicio } from "../logica/carrito.js";
 import { filtrarServicios } from "../logica/filtros.js";
 import { MENSAJES } from "../logica/mensajes.js";
+import { elemento, grupo } from "../movimiento.js";
 import { validarBusqueda } from "../logica/validacion.js";
+import Pagina from "./pagina.jsx";
+import { useRevelados } from "../hooks/useCinematico.js";
 import TarjetaServicio from "./tarjetaServicio.jsx";
 
 const CATEGORIAS_FLUJO = CATEGORIAS.filter((item) => item.id !== "salones");
 const PRIMERA_CATEGORIA = CATEGORIAS_FLUJO[0].id;
+const ETAPAS = ["Datos", "Salón", "Servicios", "Revisar"];
 
 export default function Catalogo({ evento, onActualizar, setAviso }) {
+  const paginaRef = useRef(null);
+  useRevelados(paginaRef);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [servicios, setServicios] = useState([]);
@@ -90,8 +97,8 @@ export default function Catalogo({ evento, onActualizar, setAviso }) {
   }
 
   return (
-    <section className="pagina">
-      <header className="titulo-pagina">
+    <Pagina ref={paginaRef}>
+      <header className="titulo-pagina" data-reveal>
         <div>
           <p className="etiqueta">Servicios · {categoria.nombre}</p>
           <h1>{categoria.nombre}.</h1>
@@ -105,7 +112,27 @@ export default function Catalogo({ evento, onActualizar, setAviso }) {
         </div>
       </header>
 
-      <div className="catalogo-pista">
+      <motion.ol
+        className="flujo-etapas"
+        variants={grupo}
+        initial="hidden"
+        animate="show"
+        aria-label="Etapas de tu evento"
+      >
+        {ETAPAS.map((etapa, indiceEtapa) => (
+          <motion.li
+            key={etapa}
+            variants={elemento}
+            className={indiceEtapa === 2 ? "actual" : indiceEtapa < 2 ? "hecho" : ""}
+            aria-current={indiceEtapa === 2 ? "step" : undefined}
+          >
+            <span className="flujo-etapa-numero">{indiceEtapa < 2 ? "✓" : `0${indiceEtapa + 1}`}</span>
+            <span>{etapa}</span>
+          </motion.li>
+        ))}
+      </motion.ol>
+
+      <div className="catalogo-pista" data-reveal>
         <p>
           Ahora: <strong>{categoria.nombre}</strong>
           {siguiente ? ` · Después: ${siguiente.nombre}` : " · Última categoría"}
@@ -113,7 +140,7 @@ export default function Catalogo({ evento, onActualizar, setAviso }) {
         <p className="contador">{seleccionadosCategoria} en esta categoría</p>
       </div>
 
-      <div className="barra-filtros">
+      <div className="barra-filtros" data-reveal>
         <label className="buscador">
           Buscar en {categoria.nombre}
           <input
@@ -131,39 +158,56 @@ export default function Catalogo({ evento, onActualizar, setAviso }) {
 
       {errorBusqueda && <p className="aviso aviso-error">{errorBusqueda}</p>}
 
-      {visibles.length === 0 ? (
-        <div className="vacio">
-          <p>{MENSAJES.sinResultados}</p>
-          <button type="button" className="boton" onClick={() => setBusqueda("")}>
-            Limpiar búsqueda
-          </button>
-        </div>
-      ) : (
-        <div className="rejilla">
-          {visibles.map((servicio) => (
-            <TarjetaServicio
-              key={servicio.id}
-              servicio={servicio}
-              agregado={evento.detalles.some((item) => item.id === servicio.id)}
-              onAgregar={agregar}
-            />
-          ))}
-        </div>
-      )}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={categoria.id}
+          variants={grupo}
+          initial="hidden"
+          animate="show"
+          exit={{ opacity: 0, y: -12, transition: { duration: 0.18 } }}
+        >
+          {visibles.length === 0 ? (
+            <div className="vacio">
+              <p>{MENSAJES.sinResultados}</p>
+              <button type="button" className="boton" onClick={() => setBusqueda("")}>
+                Limpiar búsqueda
+              </button>
+            </div>
+          ) : (
+            <motion.div className="rejilla" layout variants={grupo} initial="hidden" animate="show">
+              {visibles.map((servicio) => (
+                <TarjetaServicio
+                  key={servicio.id}
+                  servicio={servicio}
+                  agregado={evento.detalles.some((item) => item.id === servicio.id)}
+                  onAgregar={agregar}
+                />
+              ))}
+            </motion.div>
+          )}
+        </motion.div>
+      </AnimatePresence>
 
-      <div className="flujo-acciones">
-        <button type="button" className="boton boton-secundario" onClick={retroceder}>
-          ← {anterior ? `Regresar a ${anterior.nombre}` : "Regresar al salón"}
-        </button>
+      <motion.div className="flujo-acciones flujo-acciones-fijas" layout>
+        <div className="flujo-acciones-info">
+          <span className="etiqueta">Paso {indice + 1} de {CATEGORIAS_FLUJO.length}</span>
+          <strong>{categoria.nombre}</strong>
+          <span className="contador">
+            {seleccionadosCategoria} aquí · {evento.detalles.length} en tu paquete
+          </span>
+        </div>
         <div className="acciones-principales">
+          <button type="button" className="boton boton-secundario" onClick={retroceder}>
+            ← {anterior ? "Atrás" : "Salón"}
+          </button>
           <button type="button" className="boton-texto" onClick={avanzar}>
-            {esUltima ? "Omitir y ver resumen" : "Omitir esta categoría"}
+            {esUltima ? "Omitir y ver resumen" : "Omitir"}
           </button>
           <button type="button" className="boton" onClick={avanzar}>
-            {esUltima ? "Terminar y ver resumen" : `Continuar a ${siguiente.nombre}`} →
+            Continuar {esUltima ? "al resumen" : `a ${siguiente.nombre}`} <span aria-hidden="true">→</span>
           </button>
         </div>
-      </div>
-    </section>
+      </motion.div>
+    </Pagina>
   );
 }

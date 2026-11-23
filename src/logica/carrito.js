@@ -1,5 +1,10 @@
 import { MENSAJES } from "./mensajes.js";
 
+function numeroSeguro(valor) {
+  const numero = Number(valor);
+  return Number.isFinite(numero) ? numero : 0;
+}
+
 export function agregarServicio(detalles, servicio) {
   if (detalles.some((item) => item.id === servicio.id)) {
     return { detalles, agregado: false, mensaje: MENSAJES.yaAgregado };
@@ -9,7 +14,7 @@ export function agregarServicio(detalles, servicio) {
     nombre: servicio.nombre,
     categoria: servicio.categoria,
     proveedor: servicio.proveedor ?? "",
-    precioUnitario: Number(servicio.precio) || 0,
+    precioUnitario: numeroSeguro(servicio.precio),
     cantidad: 1,
   };
   return { detalles: [...detalles, nuevo], agregado: true, mensaje: MENSAJES.agregado };
@@ -22,25 +27,26 @@ export function quitarServicio(detalles, id) {
 export function cambiarCantidad(detalles, id, delta) {
   return detalles.map((item) => {
     if (item.id !== id) return item;
-    const cantidad = Math.min(99, Math.max(1, Number(item.cantidad) + delta));
+    const deltaSeguro = numeroSeguro(delta);
+    const cantidad = Math.min(99, Math.max(1, numeroSeguro(item.cantidad) + deltaSeguro));
     return { ...item, cantidad };
   });
 }
 
 export function calcularTotal(detalles) {
   const total = detalles.reduce(
-    (suma, item) => suma + Number(item.precioUnitario) * Number(item.cantidad),
+    (suma, item) => suma + numeroSeguro(item.precioUnitario) * numeroSeguro(item.cantidad),
     0,
   );
-  return Math.round((Number.isFinite(total) ? total : 0) * 100) / 100;
+  return Math.round(total * 100) / 100;
 }
 
 export function agruparPorCategoria(detalles) {
   const grupos = new Map();
   for (const item of detalles) {
     const actual = grupos.get(item.categoria) ?? { categoria: item.categoria, subtotal: 0, cantidad: 0 };
-    actual.subtotal += Number(item.precioUnitario) * Number(item.cantidad);
-    actual.cantidad += Number(item.cantidad);
+    actual.subtotal += numeroSeguro(item.precioUnitario) * numeroSeguro(item.cantidad);
+    actual.cantidad += numeroSeguro(item.cantidad);
     grupos.set(item.categoria, actual);
   }
   return [...grupos.values()].map((grupo) => ({

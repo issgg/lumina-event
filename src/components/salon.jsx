@@ -1,20 +1,28 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
+import { AnimatePresence, motion } from "framer-motion";
 
 import { cargarServicios } from "../api/catalogo.js";
-import { CATEGORIAS } from "../api/configuracion.js";
+import { CATEGORIAS, galeriaDe } from "../api/configuracion.js";
 import { formatearMoneda } from "../logica/formato.js";
 import { seleccionarSalon } from "../logica/paquete.js";
+import { grupo, latido, numero } from "../movimiento.js";
+import ModalDetalle from "./modalDetalle.jsx";
+import Pagina from "./pagina.jsx";
+import { useRevelados } from "../hooks/useCinematico.js";
 
 const PRIMERA_CATEGORIA = CATEGORIAS.filter((item) => item.id !== "salones")[0].id;
 
 export default function Salon({ evento, onActualizar, setAviso }) {
+  const paginaRef = useRef(null);
+  useRevelados(paginaRef);
   const navigate = useNavigate();
   const [orden, setOrden] = useState("recomendado");
   const [guardando, setGuardando] = useState("");
   const [avisoLocal, setAvisoLocal] = useState("");
-  const [detalleAbierto, setDetalleAbierto] = useState(null);
-  const botonCerrar = useRef(null);
+  const [detalleSalon, setDetalleSalon] = useState(null);
+  const [detalleAbierto, setDetalleAbierto] = useState(false);
+  const guardandoRef = useRef(false);
 
   const salones = cargarServicios()
     .filter((servicio) => servicio.categoria === "salones")
@@ -25,29 +33,16 @@ export default function Salon({ evento, onActualizar, setAviso }) {
     });
 
   const seleccionado = salones.find((salon) => salon.id === evento.salonId);
-  const salonDetalle = salones.find((salon) => salon.id === detalleAbierto);
+  const salonDetalle = detalleSalon;
   const invitados = Number(evento.invitados) || 0;
 
-  useEffect(() => {
-    if (!detalleAbierto) return;
-
-    function cerrarConTecla(evento) {
-      if (evento.key === "Escape") setDetalleAbierto(null);
-    }
-
-    const overflowOriginal = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    document.addEventListener("keydown", cerrarConTecla);
-    botonCerrar.current?.focus();
-
-    return () => {
-      document.body.style.overflow = overflowOriginal;
-      document.removeEventListener("keydown", cerrarConTecla);
-    };
-  }, [detalleAbierto]);
+  function abrirDetalle(salon) {
+    setDetalleSalon(salon);
+    setDetalleAbierto(true);
+  }
 
   async function elegir(salon) {
-    if (guardando || seleccionado?.id === salon.id) return;
+    if (guardandoRef.current || seleccionado?.id === salon.id) return;
 
     if (Number(salon.capacidad) < invitados) {
       setAvisoLocal(`Este salón recibe hasta ${salon.capacidad} personas y tu evento tiene ${invitados}.`);
@@ -56,24 +51,29 @@ export default function Salon({ evento, onActualizar, setAviso }) {
 
     setAvisoLocal("");
     setGuardando(salon.id);
+    guardandoRef.current = true;
     const actualizado = {
       ...evento,
       salonId: salon.id,
       detalles: seleccionarSalon(evento.detalles, salon),
     };
-    const guardado = await onActualizar(actualizado, `Salón ${salon.nombre} elegido.`);
-    setGuardando("");
-    if (guardado) {
-      setDetalleAbierto(null);
-      navigate(`/catalogo?categoria=${PRIMERA_CATEGORIA}`);
-    } else {
-      setAviso("No se pudo guardar el salón. Intenta otra vez.");
+    try {
+      const guardado = await onActualizar(actualizado, `Salón ${salon.nombre} elegido.`);
+      if (guardado) {
+        setDetalleAbierto(false);
+        navigate(`/catalogo?categoria=${PRIMERA_CATEGORIA}`);
+      } else {
+        setAviso("No se pudo guardar el salón. Intenta otra vez.");
+      }
+    } finally {
+      guardandoRef.current = false;
+      setGuardando("");
     }
   }
 
   return (
-    <section className="pagina">
-      <header className="titulo-pagina">
+    <Pagina ref={paginaRef}>
+      <header className="titulo-pagina" data-reveal>
         <div>
           <p className="etiqueta">El lugar</p>
           <h1>Elige el salón de tu evento.</h1>
@@ -109,36 +109,51 @@ export default function Salon({ evento, onActualizar, setAviso }) {
 
       {avisoLocal && <p className="aviso aviso-error">{avisoLocal}</p>}
 
-      <div className="paneles salon-paneles">
-        <div className="rejilla salon-rejilla">
+      <div className="paneles salon-paneles" data-reveal>
+        <motion.div className="rejilla salon-rejilla" variants={grupo} initial="hidden" animate="show">
           {salones.map((salon) => {
             const suffices = Number(salon.capacidad) >= invitados;
             const activo = seleccionado?.id === salon.id;
             return (
-              <article key={salon.id} className={`tarjeta salon-tarjeta ${activo ? "seleccionado" : ""}`}>
+              <motion.article
+                key={salon.id}
+                className={`tarjeta salon-tarjeta ${activo ? "seleccionado" : ""}`}
+                layout
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0, scale: activo ? [1, 1.025, 1] : 1 }}
+                whileHover={{ y: -6 }}
+                transition={{ duration: 0.5 }}
+              >
                 <div
                   className="tarjeta-clicable"
                   role="button"
                   tabIndex={0}
-                  onClick={() => setDetalleAbierto(salon.id)}
+                  onClick={() => abrirDetalle(salon)}
                   onKeyDown={(evento) => {
                     if (evento.key === "Enter" || evento.key === " ") {
                       evento.preventDefault();
-                      setDetalleAbierto(salon.id);
+                      abrirDetalle(salon);
                     }
                   }}
-                  aria-label={`Ver detalles del salón ${salon.nombre}`}
+                  aria-labelledby={`salon-${salon.id}`}
                 >
-                  <figure className="tarjeta-imagen salon-imagen">
+                  <figure className="tarjeta-imagen salon-imagen" style={{ backgroundImage: `url("${salon.imagen}")` }}>
                     <img src={salon.imagen} alt={`Salón ${salon.nombre}`} loading="lazy" />
                     <span className={`salon-badge ${suffices ? "" : "alerta"}`}>
                       {suffices ? `Hasta ${salon.capacidad} personas` : `Capacidad ${salon.capacidad}`}
                     </span>
                     <span className="tarjeta-ver">Ver detalle</span>
+                    <AnimatePresence>
+                      {activo && (
+                        <motion.span className="salon-elegido" {...latido} exit={{ opacity: 0, scale: 0.8 }}>
+                          ✓ Elegido
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
                   </figure>
                   <div className="tarjeta-cuerpo salon-cuerpo">
                     <div className="tarjeta-cabecera">
-                      <h2>{salon.nombre}</h2>
+                      <h2 id={`salon-${salon.id}`}>{salon.nombre}</h2>
                       <span className="categoria">Salón</span>
                     </div>
                     <p>{salon.direccion}</p>
@@ -170,14 +185,16 @@ export default function Salon({ evento, onActualizar, setAviso }) {
                           : "Capacidad insuficiente"}
                   </button>
                 </div>
-              </article>
+              </motion.article>
             );
           })}
-        </div>
+        </motion.div>
 
         <aside className="panel salon-resumen">
           <p className="etiqueta">Ubicación del evento</p>
-          <h2>{seleccionado ? seleccionado.nombre : "Aún sin salón"}</h2>
+          <motion.h2 key={seleccionado?.id ?? "vacio"} {...numero}>
+            {seleccionado ? seleccionado.nombre : "Aún sin salón"}
+          </motion.h2>
           <p className="subtitulo">
             {seleccionado
               ? seleccionado.direccion
@@ -215,29 +232,15 @@ export default function Salon({ evento, onActualizar, setAviso }) {
         </aside>
       </div>
 
-      {salonDetalle && (
-        <div className="modal-fondo" onClick={() => setDetalleAbierto(null)}>
-          <div
-            className="modal-tarjeta"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby={`detalle-salon-${salonDetalle.id}`}
-            onClick={(evento) => evento.stopPropagation()}
-          >
-            <button
-              type="button"
-              className="modal-cerrar"
-              aria-label="Cerrar detalle"
-              ref={botonCerrar}
-              onClick={() => setDetalleAbierto(null)}
-            >
-              ×
-            </button>
-
-            <div className="modal-imagen">
-              <img src={salonDetalle.imagen} alt={`Salón ${salonDetalle.nombre}`} />
-            </div>
-
+      <ModalDetalle
+        abierto={detalleAbierto}
+        onCerrar={() => setDetalleAbierto(false)}
+        tituloId={`detalle-salon-${salonDetalle?.id}`}
+        titulo={salonDetalle?.nombre ?? "salón"}
+        galeria={salonDetalle ? galeriaDe(salonDetalle) : []}
+      >
+        {salonDetalle && (
+          <>
             <div className="modal-contenido">
               <p className="etiqueta">Salón</p>
               <h2 id={`detalle-salon-${salonDetalle.id}`}>{salonDetalle.nombre}</h2>
@@ -297,7 +300,7 @@ export default function Salon({ evento, onActualizar, setAviso }) {
                       ? "Salón elegido"
                       : "Elegir este salón"}
                 </button>
-                <button type="button" className="boton boton-secundario" onClick={() => setDetalleAbierto(null)}>
+                <button type="button" className="boton boton-secundario" onClick={() => setDetalleAbierto(false)}>
                   Seguir comparando
                 </button>
                 <button
@@ -309,9 +312,9 @@ export default function Salon({ evento, onActualizar, setAviso }) {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
-      )}
-    </section>
+          </>
+        )}
+      </ModalDetalle>
+    </Pagina>
   );
 }
