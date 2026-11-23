@@ -16,9 +16,9 @@ Sistema web para planificar y armar eventos sociales y empresariales. El módulo
 
 Una sola plataforma reúne salón, comida, mobiliario, música, decoración, fotografía y detalles, para que el usuario no tenga que buscar proveedor por proveedor.
 
-El flujo es sencillo: datos del evento, salón, categorías de servicios, resumen y pago simulado. En cada categoría se puede **regresar**, **omitir** o **continuar**.
+El flujo es sencillo: datos del evento, salón, categorías de servicios, resumen y confirmación de compra. En cada categoría se puede **regresar**, **omitir** o **continuar**.
 
-También hay tres tipos de cuenta. El **organizador** arma su paquete con el flujo anterior. El **proveedor** anuncia lo que ofrece, por ejemplo DJ, comida o decoración. El **administrador** revisa esos anuncios y aprueba o rechaza cada uno. Organizador y proveedor se eligen al entrar y se pueden cambiar desde el encabezado sin cerrar sesión; el administrador valida sus credenciales en el backend y tiene menú propio. El botón **Anunciar servicio** abre directo el formulario del proveedor.
+También hay tres tipos de cuenta. El **organizador** arma su paquete y confirma la compra: la compra se guarda como `pendiente` y solo queda confirmada cuando el administrador la aprueba. El **proveedor** anuncia lo que ofrece, por ejemplo DJ, comida o decoración. El **administrador** revisa anuncios y compras, y aprueba o rechaza cada uno. Organizador y proveedor se eligen al entrar y se pueden cambiar desde el encabezado sin cerrar sesión; el administrador valida sus credenciales en el backend y tiene menú propio. El botón **Anunciar servicio** abre directo el formulario del proveedor.
 
 ## Paleta
 
@@ -62,9 +62,10 @@ npm test
 
 1. Crear proyecto gratuito en Supabase.
 2. Pegar `public/db/supabase.sql` en **SQL Editor → New query → Run**.
-3. Si el proyecto ya estaba creado, pegar también `public/db/migracion_anuncios.sql` para agregar la tabla de anuncios. Sin esta migración el resto de la app sigue abriendo, pero revisar y enviar anuncios no funcionará.
+3. Si el proyecto ya estaba creado, pegar también `public/db/migracion_anuncios.sql`, `public/db/migracion_registro.sql` y `public/db/migracion_compras.sql` en el SQL Editor. Sin esas migraciones no funcionarán los anuncios, el registro completo ni las compras.
 4. Copiar `.env.example` a `.env.local` y rellenar `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` del proyecto.
-5. Reiniciar Vite. La primera carga siembra las 8 tablas base desde `public/data/catalogo.json`; la novena tabla es `anuncios`.
+5. Desplegar la Edge Function con `supabase functions deploy lumina-admin` y configurar `ADMIN_CORREO`, `ADMIN_CLAVE` y `SUPABASE_SERVICE_ROLE_KEY` como secrets.
+6. Reiniciar Vite. La primera carga siembra las 8 tablas base desde `public/data/catalogo.json`; las tablas opcionales son `anuncios` y `compras`.
 
 El `anon key` es público y debe ir en el frontend; el `service_role` **nunca** se pone aquí. Las políticas RLS del SQL permiten el acceso de demostración; para producción habría que reducirlas.
 
@@ -77,7 +78,7 @@ Para desplegarla:
 1. Instalar Supabase CLI e iniciar sesión con `supabase login`.
 2. Desde la raíz del repo, ejecutar `supabase link --project-ref dakdafqbgliyuqnqaduf`.
 3. Definir los secretos con `supabase secrets set ADMIN_CORREO=... ADMIN_CLAVE=...`, usando el correo y la contraseña privados del administrador.
-4. Ejecutar en **SQL Editor** el archivo `public/db/migracion_registro.sql` para agregar los campos del registro.
+4. Ejecutar en **SQL Editor** los archivos `public/db/migracion_registro.sql` y `public/db/migracion_compras.sql` para agregar los campos del registro y la tabla de compras.
 5. Ejecutar `supabase functions deploy lumina-admin`.
 6. Confirmar en **Edge Functions → Logs** que la función responde.
 
@@ -92,6 +93,8 @@ El registro pide nombre, teléfono, correo, contraseña y repetir contraseña. E
 El administrador no aparece en el registro ni tiene un botón visible: entra escribiendo sus credenciales privadas en el formulario normal y la Edge Function las valida.
 
 Los anuncios del proveedor se guardan en la tabla `anuncios` de Supabase con estado `pendiente`, `aprobado` o `rechazado`. El proveedor llama a la función con su token de Supabase; el administrador llama con su token firmado. El administrador ve los pendientes en `/#/admin`; si rechaza, escribe un motivo y el proveedor puede corregir y reenviar. Solo los aprobados se copian al catálogo como servicios `extra-`; por eso aparecen en el Inicio y en las categorías. Esa copia la hace la función, no el navegador. El proveedor no publica salones porque esos tienen dirección y capacidad aparte.
+
+Las compras se guardan en la tabla `compras` con el mismo modelo de estados. Al confirmar el paquete, el navegador envía un snapshot del evento y el backend recalcula el total desde el desglose; la tarjeta no viaja al servidor. La compra nace `pendiente`, aparece en `/#/compras` para el administrador y solo cuando este la aprueba el cliente ve **Confirmada** en el Inicio y en **Mi paquete**. Si la rechaza, el motivo se muestra al cliente. Una compra aprobada ya no se puede revertir desde el panel.
 
 Para habilitar Google:
 
@@ -128,8 +131,10 @@ LuminaEvent/
 │  ├─ api/
 │  │  ├─ anuncios.js
 │  │  ├─ autenticacion.js
+│  │  ├─ backendAdmin.js
 │  │  ├─ baseDatos.js
 │  │  ├─ catalogo.js
+│  │  ├─ compras.js
 │  │  ├─ configuracion.js
 │  │  ├─ red.js
 │  │  └─ supabase.js
@@ -145,6 +150,7 @@ LuminaEvent/
 │  │  ├─ pago.jsx
 │  │  ├─ administrar.jsx
 │  │  ├─ aprobaciones.jsx
+│  │  ├─ compras.jsx
 │  │  └─ proveedor.jsx
 │  └─ logica/
 │     ├─ carrito.js
@@ -160,6 +166,8 @@ LuminaEvent/
 │  ├─ .nojekyll
 │  ├─ data/catalogo.json
 │  ├─ db/migracion_anuncios.sql
+│  ├─ db/migracion_compras.sql
+│  ├─ db/migracion_registro.sql
 │  ├─ db/supabase.sql
 │  └─ assets/fotos/*.jpg
 └─ tests/

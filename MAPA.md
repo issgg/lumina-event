@@ -14,7 +14,7 @@
 
 Lumina Event es una app estática hecha con React y Vite. El navegador habla con Supabase por REST. No hay servidor propio: GitHub Pages publica `dist/`.
 
-La idea es ayudar a una persona a organizar un evento en pocos pasos: elegir salón, pasar por categorías de servicios, ver el resumen y recibir un comprobante de pago simulado.
+La idea es ayudar a una persona a organizar un evento en pocos pasos: elegir salón, pasar por categorías de servicios, ver el resumen y confirmar la compra. La compra queda pendiente hasta que el administrador la apruebe.
 
 También ayuda a otra persona a ofrecer servicios y a un administrador a revisarlos. Según el tipo de cuenta, la app muestra un menú distinto: el organizador arma el paquete, el proveedor publica anuncios y el administrador aprueba o rechaza esos anuncios antes de que lleguen al catálogo.
 
@@ -29,7 +29,7 @@ También ayuda a otra persona a ofrecer servicios y a un administrador a revisar
 | Componentes | `src/components/*.jsx` | Pantallas y piezas visuales |
 | Lógica | `src/logica/*.js` | Cálculos que se pueden probar sin pantalla |
 | Datos | `public/data/catalogo.json` | Datos iniciales para sembrar Supabase |
-| SQL | `public/db/supabase.sql`, `public/db/migracion_anuncios.sql` | Crea tablas, llaves y políticas; la migración agrega `anuncios` |
+| SQL | `public/db/supabase.sql`, `public/db/migracion_*.sql` | Crea tablas, llaves y políticas; las migraciones agregan anuncios, datos de registro y compras |
 | Imágenes | `public/assets/fotos/*.jpg` | Fotos locales de salones y servicios |
 | Pruebas | `tests/*.test.js` | Pruebas de la lógica |
 | Deploy | `.github/workflows/pages.yml` | Publica el build en GitHub Pages |
@@ -46,9 +46,10 @@ También ayuda a otra persona a ofrecer servicios y a un administrador a revisar
 | `src/components/catalogo.jsx` | Muestra una categoría a la vez con regresar, omitir y continuar |
 | `src/components/tarjetaServicio.jsx` | Modal con foto, descripción y precio de cada servicio |
 | `src/components/resumen.jsx` | Resume salón, servicios y costo aproximado |
-| `src/components/pago.jsx` | Valida tarjeta de ejemplo y muestra comprobante |
+| `src/components/pago.jsx` | Valida tarjeta de ejemplo, envía la compra al backend y muestra su estado |
 | `src/components/administrar.jsx` | Agrega y elimina servicios manuales del catálogo |
 | `src/components/aprobaciones.jsx` | Muestra anuncios pendientes y permite aprobarlos o rechazarlos |
+| `src/components/compras.jsx` | Muestra compras pendientes y permite confirmarlas o rechazarlas |
 | `src/components/proveedor.jsx` | Envía, muestra, corrige y quita anuncios del proveedor |
 
 ## FLUJO DE UNA PANTALLA A OTRA
@@ -141,7 +142,7 @@ Detalle y pasos para probarlos: `PRUEBAS.md`.
 - Supabase en vez de SQLite: el proyecto necesita datos en la nube.
 - REST con `fetch` en vez de una librería nueva: menos dependencias.
 - Rutas con `HashRouter`: funciona en GitHub Pages sin configurar el servidor.
-- Pago simulado: no se cobra nada ni se guardan datos de tarjeta.
+- Compra con aprobación: se guarda en `compras` como `pendiente`; solo pasa a `aprobado` cuando el admin la revisa. No se cobra dinero ni se guardan datos de tarjeta.
 - Sin barra de progreso: el flujo quedó más simple.
 - Categorías por pasos: se puede regresar u omitir sin perder el avance.
 - Tres tipos de cuenta: el menú cambia según el rol para no mezclar armar paquetes, anunciar servicios y revisar anuncios.

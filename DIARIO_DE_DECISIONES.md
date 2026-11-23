@@ -16,7 +16,7 @@ Aquí explico por qué tomé cada decisión. Está escrito en lenguaje sencillo 
 | 21/11 | Conservar las rutas actuales | Así puedo decir en la presentación dónde vive cada parte | La navegación sigue siendo predecible |
 | 21/11 | Abrir cada tarjeta en grande | Antes de elegir, la persona debe ver bien de qué se trata | El modal muestra foto, descripción, precio y datos |
 | 21/11 | Pasar por categorías una a una | Salón y luego todas las categorías juntas era demasiado | Ahora hay regresar, omitir y continuar en cada categoría |
-| 21/11 | Hacer que el pago sea simulado | No queremos cobrar ni guardar datos bancarios | El comprobante es de ejemplo y no hace cargos |
+| 21/11 | No cobrar con una pasarela externa | No queremos guardar datos bancarios | La tarjeta solo valida el formulario; nunca se envía al backend |
 | 21/11 | Paleta marfil, verde profundo, terracota apagado y latón | Se ve más elegante y mantiene buen contraste | Botones en verde, acentos en terracota y selección en latón |
 | 21/11 | Modo oscuro por defecto con botón para volver al claro | El usuario pidió que el oscuro se vea mejor que todo en claro | Fondo verde oscuro, texto marfil, botones latón y preferencia guardada |
 | 22/11 | Agregar tiempo de espera a las llamadas | Si el servidor no responde, la app no debe quedarse cargando | Muestra un mensaje claro y permite reintentar |
@@ -35,6 +35,9 @@ Aquí explico por qué tomé cada decisión. Está escrito en lenguaje sencillo 
 | 22/11 | Registro sin confirmación de correo | Los correos son de prueba y no existen, así que esperar un correo no tenía sentido | La Edge Function crea al usuario con `email_confirm: true` y devuelve la sesión directo |
 | 22/11 | Registro con datos por rol | Solo correo y contraseña no describían bien al usuario | Organizador da nombre y teléfono; proveedor da negocio, categoría y descripción |
 | 22/11 | Borrador por cuenta | Una cuenta nueva veía el evento armado antes porque todo se guardaba con id 1 | El evento, sus detalles y el cronograma ahora usan el id del usuario de la sesión |
+| 22/11 | Compra con aprobación | El usuario pidió que la compra no fuera solo una prueba local y llegara al admin | Se creó la tabla `compras`; el pago envía la solicitud y solo el panel admin la confirma |
+| 22/11 | Sin datos bancarios en el backend | Un cobro real implicaría guardar información sensible | La tarjeta solo valida en el cliente; al backend viaja una referencia y los últimos 4 dígitos |
+| 22/11 | Contraste y animaciones | El usuario vio textos ilegibles y un diseño aburrido | Se corrigieron colores, se añadieron transiciones y un menú inicial con tres pasos |
 
 ## Qué respondería si me preguntan
  por una decisión

@@ -2,7 +2,7 @@
 
 Última revisión: **22/11/2026**.
 
-Pruebas automáticas: **19/19 aprobadas** con:
+Pruebas automáticas: **20/20 aprobadas** con:
 
 ```bash
 npm test
@@ -47,10 +47,14 @@ Los casos de abajo están revisados en código y en la lógica. Se pueden volver
 | 27 | Cuentas separadas | Armar un evento con una cuenta, cerrar sesión y entrar con otra | La cuenta nueva empieza vacía; al volver a la primera aparece solo su evento | OK |
 | 28 | Orden del registro | Abrir **Registrarme** y mirar los campos | Aparecen nombre, teléfono, correo, contraseña y confirmación, en ese orden | OK |
 | 29 | Función anterior activa | Crear organizador antes de desplegar la función actualizada | Se crea igual, sin selector de tipo de evento; el tipo se elige después en el armador | OK |
+| 30 | Compra pendiente | Confirmar un paquete con la tarjeta de prueba | Aparece en `/#/compras` y el cliente ve pendiente | OK |
+| 31 | Cliente sin paquete confirmado | Abrir `/#/resumen` apenas se envió la compra | No aparece como confirmada antes de la aprobación | OK |
+| 32 | Aprobar compra | Aprobar la solicitud en el panel admin | El cliente ve confirmada la compra al recargar | OK |
+| 33 | Rechazo con motivo | Rechazar sin escribir motivo | Muestra el error y no cambia el estado | OK |
 
 ## Pruebas automáticas incluidas
 
-En `tests/logica.test.js` hay 19 pruebas:
+En `tests/logica.test.js` hay 20 pruebas automáticas:
 
 1. No agrega el mismo servicio dos veces.
 2. `cambiarCantidad` no baja de 1.
@@ -71,11 +75,18 @@ En `tests/logica.test.js` hay 19 pruebas:
 17. Rechazar un anuncio pide un motivo corto y no vacío.
 18. El registro de organizador pide datos reales y contraseña coincidente.
 19. El registro de proveedor pide negocio y categoría.
+20. Una compra solo queda confirmada cuando el admin la aprueba.
 
-## Tarjeta de ejemplo para el pago
+También se revisan en pantalla estos casos:
+
+21. Una compra recién enviada aparece pendiente en el panel admin.
+22. Aprobar una compra la confirma para el cliente.
+23. Rechazar una compra exige un motivo corto y no vacío.
+
+## Tarjeta de ejemplo para la compra
 
 - Número: `4242 4242 4242 4242`
 - Vencimiento: cualquier fecha futura
 - CVC: 3 dígitos
 
-El pago es simulado. No se cobra dinero ni se guardan datos bancarios.
+La compra se registra en Supabase y queda pendiente de aprobación. No se cobra dinero ni se guardan datos bancarios.

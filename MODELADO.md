@@ -1,6 +1,6 @@
 # Modelo de datos
 
-Nueve tablas. Este archivo explica el modelo; `public/db/supabase.sql` contiene la definición SQL y `public/db/migracion_anuncios.sql` agrega la tabla de anuncios a proyectos ya creados. `anuncios` es opcional en el arranque: si falta, el resto de la app sigue funcionando.
+Diez tablas. Este archivo explica el modelo; `public/db/supabase.sql` contiene la definición SQL. Para proyectos ya creados están `public/db/migracion_anuncios.sql`, `public/db/migracion_registro.sql` y `public/db/migracion_compras.sql`. `anuncios` y `compras` son opcionales en el arranque: si faltan, el resto de la app sigue funcionando.
 
 ## Tablas
 
@@ -12,6 +12,7 @@ Nueve tablas. Este archivo explica el modelo; `public/db/supabase.sql` contiene 
 | `salones` | Catálogo de salones | `id` | `proveedor_id → proveedores.id` |
 | `servicios` | Catálogo de servicios | `id` | `categoria_id → categorias.id`, `proveedor_id → proveedores.id` |
 | `anuncios` | Servicios enviados por proveedores y revisados por el administrador | `id` | — |
+| `compras` | Compras confirmadas por el cliente y revisadas por el administrador | `id` | — |
 | `eventos` | Evento que el usuario está armando | `id` | `usuario_id → usuarios.id`, `salon_id → salones.id` |
 | `detalle_evento` | Servicios agregados al evento | `id` | `evento_id → eventos.id`, `servicio_id → servicios.id` |
 | `cronograma` | Actividades propuestas | `id` | `evento_id → eventos.id` |
@@ -26,6 +27,7 @@ Nueve tablas. Este archivo explica el modelo; `public/db/supabase.sql` contiene 
 - Un proveedor puede enviar **muchos** anuncios; cada anuncio tiene **un** estado.
 - Solo un anuncio aprobado se copia al catálogo como servicio `extra-`.
 - Un evento tiene **muchas** filas de cronograma.
+- Una compra guarda un snapshot del evento confirmado por el cliente y tiene **un** estado revisado por el administrador.
 
 ## Campos principales
 
@@ -35,6 +37,7 @@ Nueve tablas. Este archivo explica el modelo; `public/db/supabase.sql` contiene 
 - `salones`: nombre, direccion, capacidad, precio, horarios, imagen.
 - `servicios`: nombre, descripcion, precio, imagen.
 - `anuncios`: clave, correo, negocio, categoria, nombre, descripcion, precio, imagen, estado (`pendiente`, `aprobado` o `rechazado`), motivo, creado_en, revisado_en.
+- `compras`: clave, correo, total, moneda, estado (`pendiente`, `aprobado` o `rechazado`), motivo, metodo, ultimos4, instancia JSON, creado_en, revisado_en.
 - `detalle_evento`: cantidad, precio_unitario, subtotal.
 - `cronograma`: hora, actividad, descripcion.
 

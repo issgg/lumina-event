@@ -80,13 +80,13 @@ Ir a `/#/catalogo?categoria=comida`.
 
 > "El catálogo va por pasos: comida, mobiliario, música, decoración, fotografía, detalles y seguridad. En cada paso se puede regresar u omitir. El avance se guarda, así que al recargar se retoma."
 
-## 8. Resumen y pago simulado (25 segundos)
+## 8. Resumen y compra pendiente de aprobación (25 segundos)
 
 Ir a `/#/resumen` y después a `/#/pago`.
 
-> "El resumen junta salón, servicios y costo aproximado. Desde ahí se puede volver a ajustar servicios. El pago es simulado: valida una tarjeta de ejemplo y muestra comprobante, pero no cobra ni guarda datos bancarios."
+> "El resumen junta salón, servicios y costo aproximado. Desde ahí se puede volver a ajustar servicios. Al confirmar, la compra se guarda en Supabase y queda pendiente: el comprobante aparece, pero el paquete solo se considera confirmado cuando el administrador lo aprueba en su panel. No cobramos dinero ni guardamos datos bancarios."
 
-Tarjeta de ejemplo: `4242 4242 4242 4242`, cualquier fecha futura y CVC de 3 dígitos.
+Tarjeta de ejemplo: `4242 4242 4242 4242`, cualquier fecha futura y CVC de 3 dígitos. Después entra con el administrador, abre **Revisar compras** y aprueba la solicitud para ver el cambio.
 
 ## 9. Cierre (20 segundos)
 
@@ -99,10 +99,11 @@ Abrir `DIARIO_DE_DECISIONES.md` y `PRUEBAS.md`.
 - **¿Dónde viven los datos?** En Supabase; se ven en Table Editor y en la consola con `luminaDB`. Las acciones privadas pasan por la Edge Function `lumina-admin`.
 - **¿Cómo funciona el proveedor?** Publica servicios con precio y categoría; quedan pendientes. Cuando el administrador los aprueba, la Edge Function los copia al catálogo como servicios `extra-` y el organizador los puede ver.
 - **¿Cómo entra el administrador?** Escribe sus credenciales en el formulario normal; la validación ocurre en la Edge Function y no hay datos visibles en pantalla.
+- **¿Qué pasa con las compras?** Se guardan pendientes en Supabase; el administrador las aprueba en **Revisar compras** y recién ahí el paquete aparece como confirmado para el cliente.
 - **¿Se pierde el evento al cambiar de rol?** No. El cambio solo cambia el menú y la ruta; la sesión y el borrador siguen ahí.
 - **¿Qué es lo más complicado?** El cálculo del cronograma, porque respeta horarios y tiempos de cada servicio.
 - **¿Qué cambiaste después de probar?** Quité la barra de progreso porque hacía la app más complicada.
-- **¿Qué propuso la IA y rechazaste?** Juntar todo en pocas pantallas y el cobro real.
+- **¿Qué propuso la IA y rechazaste?** Juntar todo en pocas pantallas y el cobro con pasarela externa.
 - **¿Qué pasa si Supabase no responde?** La app deja de esperar, muestra un aviso y permite reintentar.
 
 ## Antes de que te toque
@@ -113,5 +114,6 @@ Abrir `DIARIO_DE_DECISIONES.md` y `PRUEBAS.md`.
 - Probar una vez el flujo completo con la tarjeta de ejemplo.
 - Mostrar que el modo oscuro viene por defecto y que el botón del encabezado permite volver al claro.
 - Probar el cambio entre **Anunciar servicio** y **Armar mi evento** sin cerrar sesión.
-- Confirmar que en Supabase se corrió `public/db/migracion_anuncios.sql` si el proyecto ya existía.
+- Confirmar que en Supabase se corrieron `public/db/migracion_anuncios.sql`, `public/db/migracion_registro.sql` y `public/db/migracion_compras.sql` si el proyecto ya existía.
 - Confirmar que la Edge Function `lumina-admin` está desplegada y que los secretos `ADMIN_CORREO` y `ADMIN_CLAVE` están definidos en Supabase.
+- Probar que una compra enviada aparece pendiente en **Revisar compras** y que se vuelve confirmada al aprobarla.

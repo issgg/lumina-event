@@ -9,7 +9,7 @@ Aquí anoto cuándo usé la IA, qué pedí y qué revisé yo después.
 | 20/11 | Base de datos | Pasar de SQLite a Supabase | Propuso REST con `fetch` y un archivo SQL | Revisé que no apareciera `service_role` en el frontend |
 | 20/11 | Deploy | Publicar en GitHub Pages | Propuso un workflow de Actions | Confirmé que la URL respondiera |
 | 21/11 | Diseño | Mejorar diseño y responsividad | Propuso paleta crema, verde y terracota, y menú móvil | Revisé clases, build y que no se rompiera en pantallas pequeñas |
-| 21/11 | Flujo guiado | Agregar ruta por pasos y pago simulado | Propuso barra de progreso, números de paso y comprobante | Probé el flujo y sentí que la barra estorbaba |
+| 21/11 | Flujo guiado | Agregar ruta por pasos y pago de prueba | Propuso barra de progreso, números de paso y comprobante | Probé el flujo y sentí que la barra estorbaba |
 | 21/11 | Simplificación | Quitar progreso y hacer todo más fácil | Propuso pantallas simples y una sola acción principal | Encontré un error en `resumen.jsx` y lo corregí |
 | 21/11 | Tarjetas | Abrir la tarjeta en grande | Propuso un modal con foto, descripción y datos | Revisé cierre con Escape, foco y botones |
 | 21/11 | Categorías | Ir por categorías con regresar y omitir | Propuso un parámetro `?categoria=` en la URL | Revisé que el salón mande a la primera categoría y que la última mande al resumen |
@@ -26,12 +26,15 @@ Aquí anoto cuándo usé la IA, qué pedí y qué revisé yo después.
 | 22/11 | Registro sin correo | Quitar la confirmación porque los correos son inventados | Propuso crear usuarios desde Supabase Auth con `email_confirm: true` desde la Edge Function | Verifiqué que no haya mensaje de confirmación y que la sesión se devuelva lista |
 | 22/11 | Registro más completo | Pedir más datos que correo y contraseña para ambos roles | Propuso campos por rol y validación compartida entre frontend y backend | Corrí pruebas y build; dejé una migración SQL para las columnas nuevas |
 | 22/11 | Datos compartidos entre cuentas | El usuario vio el borrador anterior al crear otra cuenta | Señaló que todo estaba fijo en id 1 | Cambié el guardado para usar el id de cada usuario y limpiar la pantalla al cambiar de sesión |
+| 22/11 | Compra real con aprobación | El usuario pidió que la compra llegara al admin y no quedara confirmada antes de la revisión | Propuse la tabla `compras`, endpoints autenticados y un panel con aprobar/rechazar | Verifiqué que el total se recalcula en el backend y que el cliente ve el estado actualizado |
+| 22/11 | Contraste | El usuario vio textos que no se leían en algunas pantallas | Señaló botones desactivados, etiquetas doradas y paneles verdes | Cambié colores a variables legibles, corregí estados disabled y volví a correr pruebas y build |
+| 22/11 | Diseño y animaciones | El usuario pidió un diseño menos aburrido y un menú de comienzo mejor | Propuso entradas suaves, hover en tarjetas y tres accesos rápidos en el inicio | Añadí animaciones, transiciones y `prefers-reduced-motion`; revisé responsive y build |
 
 ## Cosas que la IA propuso y yo rechacé
 
 - **Barra de progreso con pasos 01/05:** la quité porque hacía la app más complicada.
 - **Juntar todo en pocas pantallas:** no lo acepté; mantuve las rutas actuales para saber dónde estaba cada parte.
-- **Cobro real:** no lo acepté. El pago es solo una simulación y no guarda datos bancarios.
+- **Cobro con pasarela externa:** no lo acepté. La compra se registra en Supabase y pasa por aprobación, pero no se cobra dinero ni se guardan datos bancarios.
 - **SQLite en el navegador:** la dejé atrás porque el proyecto debía usar Supabase.
 - **Google OAuth sin secret:** lo dejé pendiente. Sin `Client Secret` la app muestra un mensaje claro y no se rompe.
 - **Administrador en el registro:** no lo acepté. El registro deja solo organizador y proveedor; el administrador valida sus credenciales en una Edge Function.
