@@ -53,13 +53,13 @@ export default function App() {
 
   useEffect(() => {
     if (!sesion) return;
+    setListo(false);
+    setAviso("");
     inicializarBase()
       .then(async () => {
-        const guardado = await leerEvento();
-        if (guardado) {
-          setEvento(guardado);
-          setAviso(MENSAJES.recuperado);
-        }
+        const guardado = await leerEvento(sesion);
+        setEvento(guardado ?? eventoVacio());
+        setAviso(guardado ? MENSAJES.recuperado : "");
         setListo(true);
       })
       .catch((error) => {
@@ -75,7 +75,7 @@ export default function App() {
       return true;
     }
     try {
-      const guardado = await guardarEvento(nuevo);
+      const guardado = await guardarEvento(nuevo, sesion);
       if (!guardado) {
         setAviso(MENSAJES.falloGuardado);
         return false;
@@ -193,7 +193,7 @@ export default function App() {
             />
             <Route
               path="resumen"
-              element={<Resumen evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
+              element={<Resumen sesion={sesion} evento={evento} onActualizar={actualizarEvento} setAviso={setAviso} />}
             />
             <Route
               path="pago"

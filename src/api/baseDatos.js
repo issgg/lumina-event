@@ -185,9 +185,32 @@ async function crearBase() {
   return datos;
 }
 
-function consultarCronograma() {
-  return datos.cronograma
-    .filter((actividad) => Number(actividad.evento_id) === 1)
+async function idUsuarioPara(sesion) {
+  const correo = String(sesion?.user?.email ?? "").trim().toLowerCase();
+  if (!correo) return 1;
+
+  const encontrados = await leerTabla("usuarios", { correo: `eq.${correo}` });
+  if (encontrados.length) return Number(encontrados[0].id) || 1;
+
+  const todos = await leerTabla("usuarios");
+  const id = Math.max(1000, ...todos.map((fila) => Number(fila.id) || 0)) + 1;
+  const meta = sesion?.user?.user_metadata ?? {};
+  const fila = {
+    id,
+    nombre: String(meta.nombre || correo.split("@")[0]).slice(0, 60),
+    correo,
+    tipo: "usuario",
+    telefono: meta.telefono ? String(meta.telefono).slice(0, 20) : null,
+  };
+  await insertarFilas("usuarios", [fila]);
+  datos.usuarios = [...datos.usuarios, fila];
+  return id;
+}
+
+async function consultarCronograma(sesion) {
+  const id = await idUsuarioPara(sesion);
+  const filas = await leerTabla("cronograma", { evento_id: `eq.${id}` });
+  return filas
     .sort((primero, segundo) => Number(primero.id) - Number(segundo.id))
     .map(({ hora, actividad, descripcion }) => ({
       hora: valorTexto(hora),
@@ -204,11 +227,13 @@ function leerServiciosExtra() {
   return serviciosDesdeTablas().filter((servicio) => servicio.id.startsWith("extra-"));
 }
 
-function leerEvento() {
-  const fila = filaPorId("eventos", 1);
+async function leerEvento(sesion) {
+  const id = await idUsuarioPara(sesion);
+  const [fila] = await leerTabla("eventos", { id: `eq.${id}` });
   if (!fila) return null;
-  const detalles = datos.detalle_evento
-    .filter((detalle) => Number(detalle.evento_id) === 1)
+
+  const filasDetalle = await leerTabla("detalle_evento", { evento_id: `eq.${id}` });
+  const detalles = filasDetalle
     .map((detalle) => {
       const servicio = filaPorId("servicios", detalle.servicio_id);
       if (!servicio) return null;
@@ -235,20 +260,15 @@ function leerEvento() {
   };
 }
 
-async function guardarEvento(evento) {
+async function guardarEvento(evento, sesion) {
+  const id = await idUsuarioPara(sesion);
   const nombre = valorTexto(evento.nombre) || "Usuario Lumina";
-  if (!filaPorId("usuarios", 1)) {
-    await insertarFilas("usuarios", [
-      { id: 1, nombre, correo: "usuario@lumina.local", tipo: "usuario" },
-    ]);
-  } else {
-    await actualizarFilas("usuarios", { id: "eq.1" }, { nombre });
-  }
+  await actualizarFilas("usuarios", { id: `eq.${id}` }, { nombre });
 
   const salon = filaPorClave("salones", valorTexto(evento.salonId));
   const filaEvento = {
-    id: 1,
-    usuario_id: 1,
+    id,
+    usuario_id: id,
     salon_id: salon ? Number(salon.id) : null,
     tipo_evento: valorTexto(evento.tipoEvento),
     fecha: valorTexto(evento.fecha),
@@ -259,7 +279,7 @@ async function guardarEvento(evento) {
   };
   await upsertFilas("eventos", [filaEvento]);
 
-  await eliminarFilas("detalle_evento", { evento_id: "eq.1" });
+  await eliminarFilas("detalle_evento", { evento_id: `eq.${id}` });
   const detalles = (evento.detalles ?? [])
     .map((item) => {
       const servicio = filaPorClave("servicios", valorTexto(item.id));
@@ -267,7 +287,7 @@ async function guardarEvento(evento) {
       const precio = Number(item.precioUnitario) || 0;
       const cantidad = Math.max(1, Number(item.cantidad) || 1);
       return {
-        evento_id: 1,
+        evento_id: id,
         servicio_id: Number(servicio.id),
         cantidad,
         precio_unitario: precio,
@@ -275,35 +295,42 @@ async function guardarEvento(evento) {
       };
     })
     .filter(Boolean)
-    .map((detalle, indice) => ({ ...detalle, id: indice + 1 }));
+    .map((detalle, indice) => ({ ...detalle, id: id * 100 + indice + 1 }));
   if (detalles.length) await insertarFilas("detalle_evento", detalles);
 
-  await eliminarFilas("cronograma", { evento_id: "eq.1" });
+  await eliminarFilas("cronograma", { evento_id: `eq.${id}` });
   const actividades = generarCronograma(evento.detalles ?? [], evento.horaInicio).map((actividad, indice) => ({
-    id: indice + 1,
-    evento_id: 1,
+    id: id * 100 + indice + 1,
+    evento_id: id,
     hora: actividad.hora,
     actividad: actividad.actividad,
     descripcion: actividad.descripcion ?? "",
   }));
   if (actividades.length) await insertarFilas("cronograma", actividades);
 
-  datos.usuarios = filaPorId("usuarios", 1)
-    ? datos.usuarios.map((usuario) => (Number(usuario.id) === 1 ? { ...usuario, nombre } : usuario))
-    : [...datos.usuarios, { id: 1, nombre, correo: "usuario@lumina.local", tipo: "usuario" }];
-  datos.eventos = [filaEvento, ...datos.eventos.filter((fila) => Number(fila.id) !== 1)];
-  datos.detalle_evento = detalles;
-  datos.cronograma = actividades;
+  datos.usuarios = datos.usuarios.map((usuario) =>
+    Number(usuario.id) === id ? { ...usuario, nombre } : usuario,
+  );
+  datos.eventos = [filaEvento, ...datos.eventos.filter((fila) => Number(fila.id) !== id)];
+  datos.detalle_evento = [
+    ...detalles,
+    ...datos.detalle_evento.filter((fila) => Number(fila.evento_id) !== id),
+  ];
+  datos.cronograma = [
+    ...actividades,
+    ...datos.cronograma.filter((fila) => Number(fila.evento_id) !== id),
+  ];
   return true;
 }
 
-async function limpiarEvento() {
-  await eliminarFilas("detalle_evento", { evento_id: "eq.1" });
-  await eliminarFilas("cronograma", { evento_id: "eq.1" });
-  await eliminarFilas("eventos", { id: "eq.1" });
-  datos.detalle_evento = [];
-  datos.cronograma = [];
-  datos.eventos = datos.eventos.filter((fila) => Number(fila.id) !== 1);
+async function limpiarEvento(sesion) {
+  const id = await idUsuarioPara(sesion);
+  await eliminarFilas("detalle_evento", { evento_id: `eq.${id}` });
+  await eliminarFilas("cronograma", { evento_id: `eq.${id}` });
+  await eliminarFilas("eventos", { id: `eq.${id}` });
+  datos.detalle_evento = datos.detalle_evento.filter((fila) => Number(fila.evento_id) !== id);
+  datos.cronograma = datos.cronograma.filter((fila) => Number(fila.evento_id) !== id);
+  datos.eventos = datos.eventos.filter((fila) => Number(fila.id) !== id);
   return true;
 }
 

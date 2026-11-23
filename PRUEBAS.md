@@ -43,7 +43,8 @@ Los casos de abajo están revisados en código y en la lógica. Se pueden volver
 | 23 | Falta la tabla `anuncios` | Abrir la app con Supabase sin correr la migración | La app abre igual; el panel de revisión muestra un aviso sobre la función y la tabla | OK |
 | 24 | Falta la Edge Function | Abrir `/#/admin` con la función `lumina-admin` sin desplegar | Aparece el aviso del panel y no se muestran credenciales ni botones admin en el login | OK |
 | 25 | Registro sin confirmación | Crear una cuenta con un correo de prueba en `/#/acceso` | Entra directo, sin pantalla de “revisa tu correo” ni correo enviado | OK |
-| 26 | Registro por rol | Crear organizador y proveedor con teléfono y campos propios | Organizador pide tipo de evento; proveedor pide negocio, categoría y descripción; ambos guardan los datos | OK |
+| 26 | Registro por rol | Crear organizador y proveedor con teléfono y campos propios | Organizador pide datos de persona; proveedor pide negocio, categoría y descripción; ambos guardan los datos | OK |
+| 27 | Cuentas separadas | Armar un evento con una cuenta, cerrar sesión y entrar con otra | La cuenta nueva empieza vacía; al volver a la primera aparece solo su evento | OK |
 
 ## Pruebas automáticas incluidas
 

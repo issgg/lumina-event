@@ -33,7 +33,8 @@ Aquí explico por qué tomé cada decisión. Está escrito en lenguaje sencillo 
 | 22/11 | Solo anuncios aprobados en el catálogo | No queremos mostrar ofertas sin revisar | El Inicio y el catálogo leen lo aprobado; el proveedor ve el estado y puede corregir rechazos |
 | 22/11 | Motivo obligatorio al rechazar | El proveedor debe saber qué corregir | El panel pide un motivo corto y el anuncio vuelve a `pendiente` al guardarse |
 | 22/11 | Registro sin confirmación de correo | Los correos son de prueba y no existen, así que esperar un correo no tenía sentido | La Edge Function crea al usuario con `email_confirm: true` y devuelve la sesión directo |
-| 22/11 | Registro con datos por rol | Solo correo y contraseña no describían bien al usuario | Organizador da nombre, teléfono y tipo de evento; proveedor da negocio, categoría y descripción |
+| 22/11 | Registro con datos por rol | Solo correo y contraseña no describían bien al usuario | Organizador da nombre y teléfono; proveedor da negocio, categoría y descripción |
+| 22/11 | Borrador por cuenta | Una cuenta nueva veía el evento armado antes porque todo se guardaba con id 1 | El evento, sus detalles y el cronograma ahora usan el id del usuario de la sesión |
 
 ## Qué respondería si me preguntan
  por una decisión

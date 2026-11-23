@@ -90,7 +90,7 @@ En cada categoría:
 | Archivo | Qué hace |
 |---|---|
 | `src/api/supabase.js` | Lee, inserta, actualiza y borra filas con REST |
-| `src/api/baseDatos.js` | Siembra tablas, arma el cache `luminaDB` y calcula el cronograma |
+| `src/api/baseDatos.js` | Siembra tablas, guarda evento, servicios y cronograma por cuenta, y arma el cache `luminaDB` |
 | `src/api/autenticacion.js` | Sesión con correo, Google, renovación de token y rol guardado |
 | `src/api/anuncios.js` | Envía anuncios, revisiones y extras a la Edge Function; expone los aprobados al catálogo |
 | `src/api/backendAdmin.js` | Cliente de la Edge Function `lumina-admin` |

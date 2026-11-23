@@ -11,7 +11,7 @@ import { formatearMoneda } from "../logica/formato.js";
 import { MENSAJES } from "../logica/mensajes.js";
 import { estadoPresupuesto, evaluarCobertura } from "../logica/paquete.js";
 
-export default function Resumen({ evento, onActualizar, setAviso }) {
+export default function Resumen({ sesion, evento, onActualizar, setAviso }) {
   const [cronograma, setCronograma] = useState([]);
   const total = calcularTotal(evento.detalles);
   const presupuesto = estadoPresupuesto(evento.presupuesto, total);
@@ -22,13 +22,24 @@ export default function Resumen({ evento, onActualizar, setAviso }) {
   const faltantes = cobertura.filter((item) => !item.completo).map((item) => nombreCategoria(item.categoria));
 
   useEffect(() => {
-    const guardado = consultarCronograma();
-    setCronograma(guardado.length ? guardado : generarCronograma(evento.detalles, evento.horaInicio));
-  }, [evento]);
+    let activo = true;
+    consultarCronograma(sesion)
+      .then((guardado) => {
+        if (activo) {
+          setCronograma(guardado.length ? guardado : generarCronograma(evento.detalles, evento.horaInicio));
+        }
+      })
+      .catch(() => {
+        if (activo) setCronograma(generarCronograma(evento.detalles, evento.horaInicio));
+      });
+    return () => {
+      activo = false;
+    };
+  }, [sesion, evento]);
 
   async function reiniciar() {
     try {
-      await limpiarEvento();
+      await limpiarEvento(sesion);
       onActualizar(eventoVacio(), "Evento reiniciado.", false);
     } catch {
       setAviso(MENSAJES.falloGuardado);

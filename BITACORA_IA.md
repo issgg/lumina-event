@@ -25,6 +25,7 @@ Aquí anoto cuándo usé la IA, qué pedí y qué revisé yo después.
 | 22/11 | Pruebas y docs | Cerrar la entrega con tres roles | Amplió pruebas a 17 y actualizó guion, mapa y modelo | Corrí diff, pruebas, build y confirmé los assets del deploy |
 | 22/11 | Registro sin correo | Quitar la confirmación porque los correos son inventados | Propuso crear usuarios desde Supabase Auth con `email_confirm: true` desde la Edge Function | Verifiqué que no haya mensaje de confirmación y que la sesión se devuelva lista |
 | 22/11 | Registro más completo | Pedir más datos que correo y contraseña para ambos roles | Propuso campos por rol y validación compartida entre frontend y backend | Corrí pruebas y build; dejé una migración SQL para las columnas nuevas |
+| 22/11 | Datos compartidos entre cuentas | El usuario vio el borrador anterior al crear otra cuenta | Señaló que todo estaba fijo en id 1 | Cambié el guardado para usar el id de cada usuario y limpiar la pantalla al cambiar de sesión |
 
 ## Cosas que la IA propuso y yo rechacé
 
