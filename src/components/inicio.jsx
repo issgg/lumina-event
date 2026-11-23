@@ -115,17 +115,29 @@ export default function Inicio({ evento = { detalles: [] }, sesion }) {
         </aside>
       </div>
 
-      <div className="inicio-resumen">
-        <div>
-          <p className="etiqueta">Así funciona</p>
-          <h2>Lo esencial, sin rodeos.</h2>
+        <div className="inicio-resumen">
+          <div>
+            <p className="etiqueta">Así funciona</p>
+            <h2>Lo esencial, sin rodeos.</h2>
+          </div>
+          <nav className="inicio-pasos" aria-label="Comenzar">
+            <Link className="paso" to="/armador">
+              <span>01</span>
+              <strong>Cuenta tu evento</strong>
+              <small>Fecha, invitados y presupuesto</small>
+            </Link>
+            <Link className="paso" to="/salon">
+              <span>02</span>
+              <strong>Elige el salón</strong>
+              <small>Espacios con capacidad y horarios</small>
+            </Link>
+            <Link className="paso" to="/catalogo">
+              <span>03</span>
+              <strong>Arma tu paquete</strong>
+              <small>Servicios, total y cronograma</small>
+            </Link>
+          </nav>
         </div>
-        <div className="inicio-pasos">
-          <p>Cuenta tu evento</p>
-          <p>Elige el salón</p>
-          <p>Arma y revisa tu paquete</p>
-        </div>
-      </div>
 
       {recomendados.length > 0 && (
         <section className="recomendados">
